@@ -1,4 +1,6 @@
 var TestCases = {
+    description: 'Reproduction',
+    
     setup: function() {
         this.mutation = new Hybrid.Reproduction.Mutation();
         this.crossover = new Hybrid.Reproduction.Crossover();

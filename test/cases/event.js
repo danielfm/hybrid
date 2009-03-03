@@ -1,4 +1,6 @@
 var TestCases = {
+    description: 'Event',
+    
     setup: function() {
         this.handler = new Hybrid.Event.Handler();
     },

@@ -1,4 +1,6 @@
 var TestCases = {
+    description: 'Fitness',
+    
     setup: function() {
         var FitnessEvaluator = function() {
             this.evaluate = function(individual, population) {

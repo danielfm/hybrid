@@ -54,11 +54,18 @@
         <echo message="${DIST_PACK} built." />
     </target>
     
+    <target name="test" depends="hybrid" description="Runs the test cases using Rhino">
+        <echo message="Running test cases..."/>
+        <exec executable="jrunscript" dir="test">
+            <arg value="rhino.js"/>
+        </exec>
+    </target>
+    
     <target name="clean">
         <delete dir="${BUILD_DIR}" />
     </target>
     
-    <target name="all" depends="clean,hybrid,pack">
+    <target name="all" depends="clean,hybrid,test,pack">
         <echo message="Build complete." />
     </target>
 </project>

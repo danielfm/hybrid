@@ -1,4 +1,6 @@
 var TestCases = {
+    description: 'Selection',
+    
     setup: function() {
         var individuals = [];
         for (var i = 0; i < 10; i++) {

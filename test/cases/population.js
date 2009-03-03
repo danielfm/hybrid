@@ -1,4 +1,6 @@
 var TestCases = {
+    description: 'Population',
+    
     setup: function() {
         var IndividualFactory = function() {
             this.create = function(randomizer, population) {

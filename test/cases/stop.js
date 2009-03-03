@@ -1,4 +1,6 @@
 var TestCases = {
+    description: 'Stop Conditions',
+    
     setup: function() {
         this.stop = new Hybrid.Stop.ElapsedGeneration(10);
     },

@@ -1,4 +1,6 @@
 var TestCases = {
+    description: 'Util',
+    
     setup: function() {
         this.randomizer = new Hybrid.Util.Randomizer();
     },

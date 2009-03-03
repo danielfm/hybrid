@@ -392,7 +392,11 @@ Hybrid.Population = function(options) {
      * @type number
      * @private
      */
-    var generation = options.generation || 0;
+    var generation = options.generation;
+    
+    if (!generation) {
+        generation = 0;
+    }
     
     /**
      * Event handler used by this population to notify third party objects
