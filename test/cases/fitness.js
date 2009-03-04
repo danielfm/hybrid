@@ -1,5 +1,5 @@
 var TestCases = {
-    description: 'Fitness',
+    name: 'Fitness',
     
     setup: function() {
         var FitnessEvaluator = function() {
@@ -56,5 +56,5 @@ var TestCases = {
     }}
 };
 
-new Test.Unit.Runner(TestCases, {'testLog':'fitnessLog'});
+new Test.Unit.Runner(TestCases, {'testLog':'fitnessLog', 'callback':testCallback});
 

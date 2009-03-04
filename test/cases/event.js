@@ -1,5 +1,5 @@
 var TestCases = {
-    description: 'Event',
+    name: 'Event',
     
     setup: function() {
         this.handler = new Hybrid.Event.Handler();
@@ -134,5 +134,5 @@ var TestCases = {
     }}
 };
 
-new Test.Unit.Runner(TestCases, {'testLog':'eventLog'});
+new Test.Unit.Runner(TestCases, {'testLog':'eventLog', 'callback':testCallback});
 

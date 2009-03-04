@@ -37,10 +37,12 @@
             <fileset dir="${SRC_DIR}" includes="individual.js" />
             <fileset dir="${SRC_DIR}" includes="event.js" />
         </concat>
-        
-    	<replaceregexp match="@VERSION" replace="${VERSION}" flags="g" byline="true" file="${DIST}" />
-		<replaceregexp match="@DATE" replace="${DATE}" file="${DIST}" />
-		<replaceregexp match="@REV" replace="${REV}" file="${DIST}" />
+
+        <echo message="Appending Revision and Date"/>
+    	  <replaceregexp match="@VERSION" replace="${VERSION}" flags="g" byline="true" file="${DIST}" />
+		    <replaceregexp match="@DATE" replace="${DATE}" file="${DIST}" />
+        <replaceregexp match="@REV" replace="${REV}" file="${DIST}" />
+
         <echo message="${DIST} built." />
     </target>
     
@@ -54,11 +56,19 @@
         <echo message="${DIST_PACK} built." />
     </target>
     
-    <target name="test" depends="hybrid" description="Runs the test cases using Rhino">
+    <target name="test" depends="hybrid" description="Run the Test Suite using Rhino">
         <echo message="Running test cases..."/>
-        <exec executable="jrunscript" dir="test">
-            <arg value="rhino.js"/>
-        </exec>
+        <java jar="${LIB_DIR}/js.jar" dir="test" fork="true" resultproperty="exitCode">
+            <arg value="rhinoTestSuite.js"/>
+        </java>
+
+        <fail message="Test Suite failed">
+            <condition>
+                <not>
+                    <equals arg1="${exitCode}" arg2="0"/>
+                </not>
+            </condition>
+        </fail>
     </target>
     
     <target name="clean">

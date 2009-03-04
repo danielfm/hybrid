@@ -1,5 +1,5 @@
 var TestCases = {
-    description: 'Population',
+    name: 'Population',
     
     setup: function() {
         var IndividualFactory = function() {
@@ -285,5 +285,5 @@ var TestCases = {
     }}
 };
 
-new Test.Unit.Runner(TestCases, {'testLog':'populationLog'});
+new Test.Unit.Runner(TestCases, {'testLog':'populationLog', 'callback':testCallback});
 

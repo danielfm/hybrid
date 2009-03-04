@@ -1,5 +1,5 @@
 var TestCases = {
-    description: 'Selection',
+    name: 'Selection',
     
     setup: function() {
         var individuals = [];
@@ -76,5 +76,5 @@ var TestCases = {
     }}
 };
 
-new Test.Unit.Runner(TestCases, {'testLog':'selectionLog'});
+new Test.Unit.Runner(TestCases, {'testLog':'selectionLog', 'callback':testCallback});
 

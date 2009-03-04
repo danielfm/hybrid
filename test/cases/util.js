@@ -1,5 +1,5 @@
 var TestCases = {
-    description: 'Util',
+    name: 'Util',
     
     setup: function() {
         this.randomizer = new Hybrid.Util.Randomizer();
@@ -95,5 +95,5 @@ var TestCases = {
     }}
 };
 
-new Test.Unit.Runner(TestCases, {'testLog':'utilLog'});
+new Test.Unit.Runner(TestCases, {'testLog':'utilLog', 'callback':testCallback});
 

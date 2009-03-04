@@ -1,5 +1,5 @@
 var TestCases = {
-    description: 'Stop Conditions',
+    name: 'Stop Conditions',
     
     setup: function() {
         this.stop = new Hybrid.Stop.ElapsedGeneration(10);
@@ -38,5 +38,5 @@ var TestCases = {
     }}
 };
 
-new Test.Unit.Runner(TestCases, {'testLog':'stopLog'});
+new Test.Unit.Runner(TestCases, {'testLog':'stopLog', 'callback':testCallback});
 

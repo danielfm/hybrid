@@ -1,5 +1,5 @@
 var TestCases = {
-    description: 'Reproduction',
+    name: 'Reproduction',
     
     setup: function() {
         this.mutation = new Hybrid.Reproduction.Mutation();
@@ -18,5 +18,5 @@ var TestCases = {
     }}
 };
 
-new Test.Unit.Runner(TestCases, {'testLog':'reproductionLog'});
+new Test.Unit.Runner(TestCases, {'testLog':'reproductionLog', 'callback':testCallback});
 
