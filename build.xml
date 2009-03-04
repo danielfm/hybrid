@@ -2,27 +2,27 @@
     <property file="build.properties"/>
     <property name="DIST" value="${BUILD_DIR}/hybrid.js" />
     <property name="DIST_PACK" value="${BUILD_DIR}/hybrid_minified.js" />
-    
+
     <taskdef resource="net/sf/antcontrib/antcontrib.properties">
 		<classpath>
 			<pathelement location="${LIB_DIR}/ant-contrib.jar"/>
 		</classpath>
-	</taskdef>
-	
+    </taskdef>
+
     <exec executable="git-rev-list" outputproperty="GIT_REVISION">
         <arg value="--all"/>
         <arg value="--max-count=1"/>
         <arg value="--pretty"/>
     </exec>
-    
+
     <propertyregex property="REV" input="${GIT_REVISION}" select="\1">
         <regexp pattern="commit\W+([0-9a-f]+)"/>
     </propertyregex>
-    
+
     <propertyregex property="DATE" input="${GIT_REVISION}" select="\1">
         <regexp pattern="Date:\W+(.*)"/>
     </propertyregex>
-    
+
     <target name="hybrid" description="Main jquery build, concatenates source files and replaces @VERSION">
         <echo message="Building ${DIST}" />
         <mkdir dir="${BUILD_DIR}" />
@@ -39,8 +39,8 @@
         </concat>
 
         <echo message="Appending Revision and Date"/>
-    	  <replaceregexp match="@VERSION" replace="${VERSION}" flags="g" byline="true" file="${DIST}" />
-		    <replaceregexp match="@DATE" replace="${DATE}" file="${DIST}" />
+        <replaceregexp match="@VERSION" replace="${VERSION}" flags="g" byline="true" file="${DIST}" />
+        <replaceregexp match="@DATE" replace="${DATE}" file="${DIST}" />
         <replaceregexp match="@REV" replace="${REV}" file="${DIST}" />
 
         <echo message="${DIST} built." />
@@ -55,7 +55,7 @@
         </java>
         <echo message="${DIST_PACK} built." />
     </target>
-    
+
     <target name="test" depends="hybrid" description="Run the Test Suite using Rhino">
         <echo message="Running test cases..."/>
         <java jar="${LIB_DIR}/js.jar" dir="test" fork="true" resultproperty="exitCode">
@@ -70,11 +70,11 @@
             </condition>
         </fail>
     </target>
-    
+
     <target name="clean">
         <delete dir="${BUILD_DIR}" />
     </target>
-    
+
     <target name="all" depends="clean,hybrid,test,pack">
         <echo message="Build complete." />
     </target>
