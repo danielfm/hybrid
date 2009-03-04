@@ -144,11 +144,11 @@ JsUnitTest.Unit.Logger.prototype.startTestCase = function(name) {
   println('------------------------------------------------------------');
   println('');
   
-  if (name) println('Running ' + name + ' Test Case:');
+  if (name) println(name + ' Test Case:');
 };
 
 JsUnitTest.Unit.Logger.prototype.start = function(testName) {
-  print('  ' + testName + '... ');
+  print('  Running ' + testName + '... ');
 };
 
 JsUnitTest.Unit.Logger.prototype.finish = function(status, summary) {
