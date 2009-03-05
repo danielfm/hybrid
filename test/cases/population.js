@@ -285,5 +285,5 @@ var TestCases = {
     }}
 };
 
-new Test.Unit.Runner(TestCases, {'testLog':'populationLog', 'callback':testCallback});
+new Test.Unit.Runner(TestCases, {'testLog':'populationLog', 'logger':testLogger});
 

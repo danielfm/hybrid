@@ -138,26 +138,78 @@ JsUnitTest.Template.prototype.evaluate = function(object) {
 
 JsUnitTest.Template.Pattern = /(^|.|\r|\n)(#\{(.*?)\})/;
 
-JsUnitTest.Unit.Logger = function() {};
+JsUnitTest.Unit.Logger = function() {
+  this.loggedTests = [];
+};
 
-JsUnitTest.Unit.Logger.prototype.startTestCase = function(name) {
-  println('------------------------------------------------------------');
+JsUnitTest.Unit.Logger.prototype.startCase = function(name) {
   println('');
+  println('------------------------------------------------------------');
   
-  if (name) println(name + ' Test Case:');
+  if (name) {
+    println(name + ' Test Case:');
+    println('');
+  }
 };
 
-JsUnitTest.Unit.Logger.prototype.start = function(testName) {
-  print('  Running ' + testName + '... ');
+JsUnitTest.Unit.Logger.prototype.overallSummary = function() {
+  println('');
+  println('Overall Test Execution Summary');
+  println('------------------------------');
+  println('Assertions : ' + this.getTotalAssertions());
+  println('Failures   : ' + this.getTotalFailures());
+  println('Errors     : ' + this.getTotalErrors());
 };
 
-JsUnitTest.Unit.Logger.prototype.finish = function(status, summary) {
-  println(status);
+JsUnitTest.Unit.Logger.prototype.getTotalAssertions = function() {
+  var assertions = 0;
+  for (var i = 0; i < this.loggedTests.length; i++) {
+      assertions += this.loggedTests[i].assertions;
+  }
+  return assertions;
+};
+
+JsUnitTest.Unit.Logger.prototype.getTotalErrors = function() {
+  var errors = 0;
+  for (var i = 0; i < this.loggedTests.length; i++) {
+      errors += this.loggedTests[i].errors;
+  }
+  return errors;
+};
+
+JsUnitTest.Unit.Logger.prototype.getTotalFailures = function() {
+  var failures = 0;
+  for (var i = 0; i < this.loggedTests.length; i++) {
+      failures += this.loggedTests[i].failures;
+  }
+  return failures;
+};
+
+JsUnitTest.Unit.Logger.prototype.hasErrors = function() {
+  var errorsAndFailures = 0;
+  for (var i = 0; i < this.loggedTests.length; i++) {
+    var test = this.loggedTests[i];
+    errorsAndFailures += test.failures + test.errors;
+  }
+  return errorsAndFailures > 0;
+};
+
+JsUnitTest.Unit.Logger.prototype.start = function(test) {
+  print('Running ' + test.name + '... ');
+};
+
+JsUnitTest.Unit.Logger.prototype.finish = function(test) {
+  this.loggedTests.push(test);
+  println(test.status());
+
+  for (var i = 0; i < test.messages.length; i++) {
+    println(test.messages[i]);
+  };
 };
 
 JsUnitTest.Unit.Logger.prototype.summary = function(summary) {
-  println('Summary: ' + summary);
   println('');
+  println('Summary: ' + summary);
 };
 
 JsUnitTest.Unit.MessageTemplate = function(string) {
@@ -372,27 +424,18 @@ JsUnitTest.Unit.Assertions = {
     }
   }
 };
+
 JsUnitTest.Unit.Runner = function(testcases, options) {
   var argumentOptions = arguments[1] || {};
   var options = this.options = {};
-  options.callback = ('callback' in argumentOptions) ? argumentOptions.callback : null;
+  options.logger = ('logger' in argumentOptions) ? argumentOptions.logger : new JsUnitTest.Unit.Logger();
 
-  var argumentOptions = arguments[1] || {};
-  var options = this.options = {};
-  options.callback = argumentOptions.callback;
-
-  this.tests = this.getTests(testcases);
   this.currentTest = 0;
-  this.logger = new JsUnitTest.Unit.Logger();
+  this.tests = this.getTests(testcases);
+  this.logger = options.logger;
 
-  this.logger.startTestCase(testcases.name);
-
-  var results = [];
-  this.runTests(results);
-
-  if (options.callback && typeof options.callback == 'function') {
-    options.callback(results);
-  }
+  this.logger.startCase(testcases.name);
+  this.runTests();
 };
 
 JsUnitTest.Unit.Runner.prototype.getTests = function(testcases) {
@@ -432,20 +475,18 @@ JsUnitTest.Unit.Runner.prototype.getResult = function() {
   return results;
 };
 
-JsUnitTest.Unit.Runner.prototype.runTests = function(finished) {
+JsUnitTest.Unit.Runner.prototype.runTests = function() {
   var test = this.tests[this.currentTest], actions;
 
   if (!test) return this.finish();
-  this.logger.start(test.name);
+  this.logger.start(test);
   test.run();
 
-  this.logger.finish(test.status(), test.summary());
+  this.logger.finish(test);
   this.currentTest++;
 
-  finished.push(test);
-
   // tail recursive, hopefully the browser will skip the stackframe
-  this.runTests(finished);
+  this.runTests();
 };
 
 JsUnitTest.Unit.Runner.prototype.finish = function() {
@@ -500,13 +541,11 @@ JsUnitTest.Unit.Testcase.prototype.pass = function() {
 
 JsUnitTest.Unit.Testcase.prototype.fail = function(message) {
   this.failures++;
-  var line = "";
   try {
     throw new Error("stack");
   } catch(e){
-    line = (/\.html:(\d+)/.exec(e.stack || '') || ['',''])[1];
   }
-  this.messages.push("Failure: " + message + (line ? " Line #" + line : ""));
+  this.messages.push("Failure: " + message);
 };
 
 JsUnitTest.Unit.Testcase.prototype.info = function(message) {
@@ -516,7 +555,7 @@ JsUnitTest.Unit.Testcase.prototype.info = function(message) {
 JsUnitTest.Unit.Testcase.prototype.error = function(error, test) {
   this.errors++;
   this.actions['retry with throw'] = function() { test.run(true) };
-  this.messages.push(error.name + ": "+ error.message + "(" + JsUnitTest.inspect(error) + ")");
+  this.messages.push('Error [' + error.name + ']: ' + error.message);
 };
 
 JsUnitTest.Unit.Testcase.prototype.status = function() {

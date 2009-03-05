@@ -76,5 +76,5 @@ var TestCases = {
     }}
 };
 
-new Test.Unit.Runner(TestCases, {'testLog':'selectionLog', 'callback':testCallback});
+new Test.Unit.Runner(TestCases, {'testLog':'selectionLog', 'logger':testLogger});
 

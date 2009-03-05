@@ -18,5 +18,5 @@ var TestCases = {
     }}
 };
 
-new Test.Unit.Runner(TestCases, {'testLog':'reproductionLog', 'callback':testCallback});
+new Test.Unit.Runner(TestCases, {'testLog':'reproductionLog', 'logger':testLogger});
 

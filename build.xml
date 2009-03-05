@@ -4,9 +4,9 @@
     <property name="DIST_PACK" value="${BUILD_DIR}/hybrid_minified.js" />
 
     <taskdef resource="net/sf/antcontrib/antcontrib.properties">
-		<classpath>
-			<pathelement location="${LIB_DIR}/ant-contrib.jar"/>
-		</classpath>
+        <classpath>
+            <pathelement location="${LIB_DIR}/ant-contrib.jar"/>
+        </classpath>
     </taskdef>
 
     <exec executable="git-rev-list" outputproperty="GIT_REVISION">
@@ -48,8 +48,7 @@
     
     <target name="pack" depends="hybrid" description="Remove all comments and whitespace and compress">
         <echo message="Building ${DIST_PACK}" />
-        <java jar="${LIB_DIR}/yuicompressor.jar" fork="true">
-            <arg value="-o" />
+        <java jar="${LIB_DIR}/yuicompressor.jar" fork="true"> <arg value="-o" />
             <arg value="${DIST_PACK}" />
             <arg value="${DIST}" />
         </java>
@@ -59,7 +58,7 @@
     <target name="test" depends="hybrid" description="Run the Test Suite using Rhino">
         <echo message="Running test cases..."/>
         <java jar="${LIB_DIR}/js.jar" dir="test" fork="true" resultproperty="exitCode">
-            <arg value="rhinoTestSuite.js"/>
+            <arg value="testSuite.js"/>
         </java>
 
         <fail message="Test Suite failed">
