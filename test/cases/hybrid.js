@@ -8,7 +8,6 @@ var TestCases = {
     },
     
     testEngineConstructorWithNoArgs: function() { with(this) {
-        
     }},
     
     testEngineConstructor: function() { with(this) {
