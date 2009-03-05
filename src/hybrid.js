@@ -24,20 +24,7 @@ Hybrid = {
      * @type string
      * @static
      */
-    version: '@VERSION',
-
-    /**
-     *
-     */
-    subclass: function(constructor, superConstructor) {
-        function SurrogateConstructor(){ }
-        SurrogateConstructor.prototype = superConstructor.prototype;
-
-        var prototypeObject = new SurrogateConstructor();
-        prototypeObject.constructor = constructor;
-
-        constructor.prototype = prototypeObject;
-    }
+    version: '@VERSION'
 };
 
 /**
