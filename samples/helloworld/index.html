@@ -1,0 +1,134 @@
+<html>
+<head>
+    <title>Hybrid Hello World</title>
+    <script src="js/hybrid.js" type="text/javascript"></script>
+    <script src="js/jquery.js" type="text/javascript"></script>
+    <script src="js/helloworld.js" type="text/javascript"></script>
+    <link type="text/css" rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <h1> Hybrid Hello World</h1>
+    
+    <p>
+        Sample generic algorithm that evolves a population of
+        random-generated words in order to recreate the same word specified
+        in the form below.
+    </p>
+
+   <table class="params">
+        <tbody>
+            <tr>
+                <th>
+                    <label for="expected">Expected word:</label>
+                </th>
+                <td>
+                    <input type="text" id="expected" value="helloworld"/>
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    <label for="populationSize">Population size:</label>
+                </th>
+                <td>
+                    <select id="populationSize">
+                        <option>10</option>
+                        <option>25</option>
+                        <option>50</option>
+                        <option>75</option>
+                        <option selected="">100</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    <label for="elitismSize">Elitism size:</label>
+                </th>
+                <td>
+                    <select id="elitismSize">
+                        <option>0</option>
+                        <option selected="">1</option>
+                        <option>2</option>
+                        <option>3</option>
+                        <option>4</option>
+                        <option>5</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    <label for="crossoverProbability">% Crossover:</label>
+                </th>
+                <td>
+                    <select id="crossoverProbability">
+                        <option>10</option>
+                        <option>20</option>
+                        <option>30</option>
+                        <option>40</option>
+                        <option>50</option>
+                        <option>60</option>
+                        <option selected="">70</option>
+                        <option>80</option>
+                        <option>90</option>
+                        <option>100</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    <label for="mutationProbability">% Mutation:</label>
+                </th>
+                <td>
+                    <select id="mutationProbability">
+                        <option>0</option>
+                        <option>10</option>
+                        <option>20</option>
+                        <option>30</option>
+                        <option>40</option>
+                        <option selected="">50</option>
+                        <option>60</option>
+                        <option>70</option>
+                        <option>80</option>
+                        <option>90</option>
+                        <option>100</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    <label for="selectionStrategy">Selection:</label>
+                </th>
+                <td>
+                    <select id="selectionStrategy">
+                        <option value="1">Ranking</option>
+                        <option value="2">Tournament</option>
+                    </select>
+                </td>
+            </tr>
+            <tr id="selectionParam">
+                <th>
+                    <label for="tournamentSize">% Tournament Size:</label>
+                </th>
+                <td>
+                    <select id="tournamentSize">
+                        <option>0</option>
+                        <option>10</option>
+                        <option>20</option>
+                        <option selected="">30</option>
+                        <option>40</option>
+                        <option>50</option>
+                        <option>60</option>
+                        <option>70</option>
+                        <option>80</option>
+                        <option>90</option>
+                        <option>100</option>
+                    </select>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="buttons">
+        <input type="button" value="Start the evolution!" onclick="javascript: evolve();"/>
+    </div>
+</body>
+</html>

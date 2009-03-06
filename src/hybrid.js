@@ -1,6 +1,6 @@
 /*
  * Hybrid, The Genetic Algorithm Framework v@VERSION
- * https://github.com/danielfm/hybrid/tree
+ * http://github.com/danielfm/hybrid/tree
  *
  * Copyright (c) 2009 Daniel Fernandes Martins
  * Licensed under the BSD license.
