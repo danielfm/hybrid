@@ -17,7 +17,7 @@ var TestCases = {
         var type = 'event type';
         
         handler.addListener(type, listener);
-        assertEqual(1, this.handler.getListenersCount());
+        assertEqual(1, handler.getListenersCount());
         
         var entry = handler.getListeners()[0];
         
@@ -44,7 +44,7 @@ var TestCases = {
         handler.addListener('event', listener);
         assertEqual(1, handler.getListenersCount());
         
-        this.handler.removeListener(listener);
+        handler.removeListener(listener);
         assertEqual(0, handler.getListenersCount());
     }},
     
@@ -111,7 +111,7 @@ var TestCases = {
     }},
     
     testNotifyInexistentListeners: function() { with(this) {
-        this.handler.notifyListeners('event', {});
+        handler.notifyListeners('event', {});
     }},
     
     testNotifyListeners: function() { with(this) {

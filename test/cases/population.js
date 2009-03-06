@@ -108,8 +108,8 @@ var TestCases = {
         assertEqual(1, before);
         assertEqual(1, after);
         
-        for (var i = 0; i < this.population.getSize(); i++) {
-            assert(this.population.getIndividual(i).fitness);
+        for (var i = 0; i < population.getSize(); i++) {
+            assert(population.getIndividual(i).fitness);
         }
     }},
     
@@ -171,7 +171,7 @@ var TestCases = {
         population.initialize(randomizer);
         population.addAll([second, first]);
         
-        assertEnumEqual([first, second], this.population.best(2));
+        assertEnumEqual([first, second], population.best(2));
     }},
     
     testReplaceGenerationAndIncrement: function() { with(this) {
