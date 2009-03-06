@@ -1,27 +1,37 @@
 /**
- * Rhino-based test suite.
+ * Hybrid test runner.
+ *
+ * Usage:
+ * jrunscript testSuite.js
+ *     - Runs all test cases.
+ *
+ * jrunscript testSuite.js case1.js case2.js caseN.js
+ *     - Runs the specified test cases.
  */
+var testCases = [].concat(arguments);
 
 load('assets/jsunittest_rhino.js');
-
-// Load Hybrid
 load('../build/hybrid.js');
 
-// Prepare a test logger to collect results
+// If no test case is specified, all test cases are selected
+if (!arguments.length) {
+    var cases = new java.io.File('cases').listFiles();
+    for (var i = 0; i < cases.length; i++) {
+        var name = cases[i].name;
+        if (name.search(/.*.js$/i) >= 0) {
+            testCases.push(name);
+        }
+    }
+}
+
+// Test logger used to collect the results
 var testLogger = new JsUnitTest.Unit.Logger();
 
-// Load test cases
-load(
-    'cases/hybrid.js',
-    'cases/event.js',
-    'cases/stop.js',
-    'cases/population.js',
-    'cases/individual.js',
-    'cases/fitness.js',
-    'cases/selection.js',
-    'cases/reproduction.js',
-    'cases/util.js'
-);
+// Runs the specified test cases
+for (var i = 0; i < testCases.length; i++) {
+    load('cases/' + testCases[i]);
+}
 
+// Prints the result and exits
 testLogger.overallSummary();
 System.exit(testLogger.hasErrors() ? 1 : 0);

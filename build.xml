@@ -55,7 +55,7 @@
         <echo message="${DIST_PACK} built." />
     </target>
 
-    <target name="test" depends="hybrid" description="Run the Test Suite using Rhino">
+    <target name="test" depends="hybrid" description="Run the whole test suite">
         <echo message="Running test cases..."/>
         <java jar="${LIB_DIR}/js.jar" dir="test" fork="true" resultproperty="exitCode">
             <arg value="testSuite.js"/>
@@ -74,7 +74,7 @@
         <delete dir="${BUILD_DIR}" />
     </target>
 
-    <target name="all" depends="clean,hybrid,test,pack">
+    <target name="all" depends="clean,hybrid,pack,test">
         <echo message="Build complete." />
     </target>
 </project>
