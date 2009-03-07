@@ -494,22 +494,38 @@ Hybrid.Population = function(options) {
  * in the next  generation. Elitism can very rapidly increase performance of
  * the Genetic Algorithm, because it prevents losing the best found solution
  * to date.
- * @class Population.Elitism
- * @constructor
- * @param size {number} Number of best individuals to keep from generation to
- * generation.
+ * @method addElitism
+ * @param options {object} Configuration object that must provide the following
+ * attributes:
+ * <ul>
+ *   <li>to: Instance of <code>Hybrid.Population</code> that should support
+ *   elitism.</li>
+ *   <li>size: Number of best individuals to keep from generation to
+ *   generation.</li>
+ * </ul>
  * @param population {Hybrid.Population} Population.
  * @static
  */
-Hybrid.Population.Elitism = function(size, population) {
-    population.on('replaceGeneration', function(event) {
-        var breed = event.breed;
-        
-        breed = breed.slice(size);
-        breed = breed.concat(event.population.best(size));
-        
-        event.breed = breed;
-    });
+Hybrid.Population.addElitism = function(options) {
+    options = options || {};
+
+    var population = options.to;
+    var size = options.size;
+
+    if (population == null || size == null) {
+        throw new Hybrid.Population.IllegalElitismOptionsError();
+    }
+
+    new (function() {
+        population.on('replaceGeneration', function(event) {
+            var breed = event.breed;
+            
+            breed = breed.slice(size);
+            breed = breed.concat(event.population.best(size));
+            
+            event.breed = breed;
+        });
+    })();
 };
 
 /**
@@ -547,4 +563,12 @@ Hybrid.Population.AlreadyInitializedError = function() {};
  * @constructor
  */
 Hybrid.Population.IncompatibleBreedError = function() {};
+
+/**
+ * This exception is thrown when trying to add elitism support to a population
+ * without specify either the population or the elitism size.
+ * @class Population.IllegalElitismOptionsError
+ * @constructor
+ */
+Hybrid.Population.IllegalElitismOptionsError = function() {};
 

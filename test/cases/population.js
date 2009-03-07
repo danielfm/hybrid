@@ -254,7 +254,10 @@ var TestCases = {
             breed: breed
         };
         
-        new Hybrid.Population.Elitism(0, population);
+        Hybrid.Population.addElitism({
+            to: population,
+            size: 0
+        });
         population.notify('replaceGeneration', event);
         
         assertEqual(5, event.breed.length);
@@ -274,7 +277,10 @@ var TestCases = {
             breed: breed
         };
         
-        new Hybrid.Population.Elitism(2, population);
+        Hybrid.Population.addElitism({
+            to: population,
+            size: 2
+        });
         population.notify('replaceGeneration', event);
         
         assertEqual(5, event.breed.length);
@@ -282,6 +288,29 @@ var TestCases = {
         assertEqual(4, event.breed[2].number);
         assertEqual(9, event.breed[3].number);
         assertEqual(8, event.breed[4].number);
+    }},
+
+    testElitismWithMissingOptions: function() { with(this) {
+        assertRaise(Hybrid.Population.IllegalElitismOptionsError, function() {
+            Hybrid.Population.addElitism();
+        });
+
+        assertRaise(Hybrid.Population.IllegalElitismOptionsError, function() {
+            Hybrid.Population.addElitism({
+                to: population
+            });
+        });
+
+        assertRaise(Hybrid.Population.IllegalElitismOptionsError, function() {
+            Hybrid.Population.addElitism({
+                size: 2
+            });
+        });
+
+        Hybrid.Population.addElitism({
+            to: population,
+            size: 2
+        });
     }}
 };
 

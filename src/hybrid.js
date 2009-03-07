@@ -77,52 +77,54 @@ Hybrid.Engine = function(options) {
     }
     
     /**
-     * Initializes and evolves a population until the given stop condition
-     * have been satisfied.
+     * Initializes the population and processes the evolution.
      * @method evolve
-     * @param stopCondition {Hybrid.Stop.Condition} Object used to determine
-     * when the evolution should be interrupted.
-     * @return {object} The best individual from the last generation produced
      * by the algorithm.
      */
-    this.evolve = function(stopCondition) {
-        if (!population.isInitialized()) {
-            population.initialize(randomizer);
-        }
-        
+    this.evolve = function() {
+        population.initialize(randomizer);
+        processEvolution();
+    }
+
+    /**
+     * Processes the evolution.
+     * @method processEvolution
+     * @private
+     */
+    function processEvolution() {
         var size = population.getInitialSize();
         
-        while (!stopCondition.interrupt(getStatistics())) {
-            this.notify('newGeneration', getStatistics());
-            var breed = [];
+        self.notify('newGeneration', getStatistics());
+        var breed = [];
+        
+        while (breed.length < size) {
+            // selects two different individuals for breeding
+            var father = selection.select(randomizer, population);
+            var mother = null;
+            do {
+                mother = selection.select(randomizer, population);
+            } while (mother === father);
             
-            while (breed.length < size) {
-                // selects two different individuals for breeding
-                var father = selection.select(randomizer, population);
-                var mother = null;
-                do {
-                    mother = selection.select(randomizer, population);
-                } while (mother === father);
+            var child = crossover.crossover(randomizer, mother, father, population);
+            if (child) {
+                var mutated = mutation.mutate(randomizer, child, population);
+                breed.push(((mutated) ? mutated : child));
+            }
+            else {
+                // preserves the parents if the crossover produces no child
+                breed.push(father);
                 
-                var child = crossover.crossover(randomizer, mother, father, population);
-                if (child) {
-                    var mutated = mutation.mutate(randomizer, child, population);
-                    breed.push(((mutated) ? mutated : child));
-                }
-                else {
-                    // preserves the parents if the crossover produces no child
-                    breed.push(father);
-                    
-                    if (breed.length < size) {
-                        breed.push(mother);
-                    }
+                if (breed.length < size) {
+                    breed.push(mother);
                 }
             }
-            
-            population.replaceGeneration(breed);
         }
         
-        return population.best();
+        population.replaceGeneration(breed);
+
+        if (!stopCondition.interrupt(getStatistics())) {
+            setTimeout(processEvolution, 10);
+        }
     };
     
     /**
@@ -245,7 +247,7 @@ Hybrid.Engine = function(options) {
     this.setMutation = function(newMutation) {
         mutation = newMutation;
     };
-    
+ 
     /**
      * Randomizer object used by this engine to handle random number
      * generation.
@@ -294,6 +296,16 @@ Hybrid.Engine = function(options) {
     var mutation = options.mutation ||
         new Hybrid.Reproduction.Mutation();
     
+    /**
+     * Stop condition used by this engine to dermine when to interrupt the
+     * evolution.
+     * @property stopCondition
+     * @type Hybrid.Stop.Condition
+     * @private
+     */
+    var stopCondition = options.stopCondition ||
+        new Hybrid.Stop.ElapsedGeneration();
+
     /**
      * Event handler used by this engine to notify third party objects about
      * the current state of the evolution.

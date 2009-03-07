@@ -96,6 +96,8 @@ var StopCondition = function(expected) {
     this.interrupt = function(event) {
         var best = event.population.best();
         if (best.word == expected) {
+            // Re-enable the button and show a message
+            $('#evolve').val('Start the evolution!').attr('disabled', false);
             alert('The algorithm took ' + event.population.getGeneration() + ' generations to find your word.');
             return true;
         }
@@ -115,17 +117,15 @@ function evolve() {
     // Expected word that should be found by our genetic algorithm
     var expected = $('#expected').val();
     if (!/^[a-z]+$/.test(expected)) {
-        alert('Only lowercase characters between "a" and "z"; no numbers or punctuations!');
+        alert('Only lowercase characters between "a" and "z" are allowed.');
         return;
     }
     
-    var tournamentSize = parseFloat($('#tournamentSize').val());
-
     // Selection strategy used to select individuals for breeding based on their fitness
     var selectionStrategy = $('#selectionStrategy').val();
     var selection = ((selectionStrategy == 1) ?
             new Hybrid.Selection.Ranking() :
-            new Hybrid.Selection.Tournament(tournamentSize));
+            new Hybrid.Selection.Tournament(parseFloat($('#tournamentSize').val())));
 
     // Set up the opulation to be evolved
     var wordPopulation = new Hybrid.Population({
@@ -137,21 +137,26 @@ function evolve() {
     // Plug elitism listener if needed
     var elitismSize = parseInt($('#elitismSize').val());
     if (elitismSize > 0) {
-        new Hybrid.Population.Elitism(elitismSize, wordPopulation);
+        Hybrid.Population.addElitism({
+            to: wordPopulation,
+            size: elitismSize
+        });
     }
     
+    // Condition that specifies when the evolution should be interrupted
+    var stopCondition = new StopCondition(expected);
+
     // Create the evolution engine
     var engine = new Hybrid.Engine({
+        stopCondition: stopCondition,
         population: wordPopulation,
         selection: selection,
         crossover: new WordCrossover(crossoverProbability/100, expected),
         mutation: new WordMutation(mutationProbability/100, expected)
     });
     
-    // Condition that specifies when the evolution should be interrupted
-    var stopCondition = new StopCondition(expected);
-
-    // Evolve!
-    engine.evolve(stopCondition);
+    // Start the evolution and disable the button
+    engine.evolve();
+    $('#evolve').val('Please wait...').attr('disabled', true);
 }
 
