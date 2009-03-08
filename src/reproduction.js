@@ -1,31 +1,35 @@
 /**
+ * @fileOverview Provides base classes for genetic operators such as
+ * crossover and mutation.
+ * @author <a href="mailto:daniel.tritone@gmail.com">Daniel F. Martins</a>
+ */
+
+/**
  * The Reproduction module provides examples on how to create crossover and
  * mutation strategies for your Genetic Algorithms.
- * @module reproduction
- * @namespace Hybrid.Reproduction
- * @title Reproduction
+ * @namespace
  */
 Hybrid.Reproduction = {};
 
 /**
- * Abstract class that shows how to implement a crossover strategy. In Genetic
- * Algorithms, the crossover is used to vary the programming of an individual
- * or individuals from one generation to the next. It is analogous to
- * reproduction and biological crossover, upon which Genetic Algorithms are
+ * Creates a new dummy crossover strategy, which always returns
+ * <code>null</code>.
+ * @class Dummy class that shows how to implement a crossover strategy. In
+ * Genetic Algorithms, the crossover is used to vary the programming of an
+ * individual or individuals from one generation to the next. It is analogous
+ * to reproduction and biological crossover, upon which Genetic Algorithms are
  * based.
- * @class Crossover
  * @constructor
  */
 Hybrid.Reproduction.Crossover = function() {
-    
+
     /**
      * Combines two individuals in order to produce a child individual that
      * shares many of the characteristics of its parents.
-     * @method crossover
-     * @param randomizer {Hybrid.Randomizer} Randomizer object.
-     * @param mother {object} Individual.
-     * @param father {object} Other individual.
-     * @param population {Hybrid.Population} Current population.
+     * @param {Hybrid.Randomizer} randomizer Randomizer object.
+     * @param {object} mother Individual.
+     * @param {object} father Other individual.
+     * @param {Hybrid.Population} population Current population.
      * @return {object} Child individual.
      */
     this.crossover = function(randomizer, mother, father, population) {
@@ -34,20 +38,19 @@ Hybrid.Reproduction.Crossover = function() {
 };
 
 /**
- * Abstract class that shows how to implement a mutation strategy, which is
+ * Creates a new dummy mutation strategy, which always returns <code>null</code>.
+ * @class Dummy class that shows how to implement a mutation strategy, which is
  * used to maintain genetic diversity from one generation of a population of
- * chromosomes to the next. It is analogous to biological mutation.
- * @class Mutation
+ * individuals to the next. It is analogous to biological mutation.
  * @constructor
  */
 Hybrid.Reproduction.Mutation = function() {
     
     /**
      * Returns a mutated copy of the given individual.
-     * @method mutate
-     * @param randomizer {Hybrid.Randomizer} Randomizer object.
-     * @param individual {object} Individual.
-     * @param population {Hybrid.Population} Current population.
+     * @param {Hybrid.Randomizer} randomizer Randomizer object.
+     * @param {object} individual Individual.
+     * @param {Hybrid.Population} population Current population.
      * @return {object} Mutated individual.
      */
     this.mutate = function(randomizer, individual, population) {

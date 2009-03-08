@@ -1,26 +1,27 @@
 /**
- * The Util module provides utilitary methods to be used throughout the
- * framework codebase.
- * @module util
- * @namespace Hybrid.Util
- * @title Util
+ * @fileOverview Utilitary classes and methods.
  */
 
+/**
+ * The Util module provides utilitary methods to be used throughout the
+ * framework codebase.
+ * @namespace
+ */
 Hybrid.Util = {};
 
 /**
- * Utilitary class that contains array-related functions.
+ * Array util methods.
  * @static
- * @class Array
+ * @namespace
  */
 Hybrid.Util.Array = {
+
     /**
      * Returns an array with the results of applying the function to the items
      * of the given array. All null or undefined results are not added to the
      * result list.
-     * @method filter
-     * @param array {array} Array.
-     * @param func {function} Function to be applied to the items of the array.
+     * @param {array} array Array.
+     * @param {function} func Function to be applied to the items of the array.
      * This function should accept an argument, which is the element being
      * processed.
      * @return {array} Result array.
@@ -49,7 +50,8 @@ Hybrid.Util.Array = {
 };
 
 /**
- * Class that makes it easy to deal with random numbers generation.
+ * Creates a new randomizer.
+ * @class Class that makes it easy to deal with random numbers.
  * @class Randomizer
  * @constructor
  */
@@ -58,8 +60,7 @@ Hybrid.Util.Randomizer = function() {
     /**
      * Gets a random number between the given range. If this method is called
      * with no arguments, it returns a random number between 0 and 1.
-     * @method next
-     * @param range {Hybrid.Util.Range} Range. (Optional)
+     * @param {Hybrid.Util.Range} [range] Range.
      * @return {number} If a range is provided, returns a random number between
      * the range. Otherwise returns a number between 0 and 1.
      */
@@ -76,7 +77,7 @@ Hybrid.Util.Randomizer = function() {
     
     /**
      * Checks the probability of some event.
-     * @param percent {number} Number between 0 and 1 that represents the
+     * @param {number} percent Number between 0 and 1 that represents the
      * chances of some event to happen.
      * @return {boolean} Whether the event should happen or not.
      */
@@ -86,18 +87,33 @@ Hybrid.Util.Randomizer = function() {
 };
 
 /**
- * Very simple class to express ranges between two numbers.
- * @class Range
+ * Creates a new range.
+ * @class Very simple class to express ranges between two numbers.
  * @constructor
- * @param start {number} Range start.
- * @param end {number} Range end.
+ * @param {number} [start] Range start. Defaults to 0.
+ * @param {number} end Range end.
  */
 Hybrid.Util.Range = function(start, end) {
+
+    /**
+     * Range start.
+     * @name start
+     * @property
+     * @type number
+     * @private
+     */
     if (end == null) {
         end = (!start ? 0 : start);
         start = 0;
     }
     
+    /**
+     * Range end.
+     * @name end
+     * @property
+     * @type number
+     * @private
+     */
     if (start > end) {
         var temp = start;
         start = end;
@@ -105,24 +121,7 @@ Hybrid.Util.Range = function(start, end) {
     }
     
     /**
-     * Range start.
-     * @property start
-     * @type number
-     * @private
-     */
-    start;
-    
-    /**
-     * Range end.
-     * @property end
-     * @type number
-     * @private
-     */
-    end;
-    
-    /**
      * Gets the range start.
-     * @method getStart
      * @return {number} Range start.
      */
     this.getStart = function() {
@@ -131,7 +130,6 @@ Hybrid.Util.Range = function(start, end) {
     
     /**
      * Gets the range end.
-     * @method getEnd
      * @return {number} Range end.
      */
     this.getEnd = function() {
@@ -140,8 +138,7 @@ Hybrid.Util.Range = function(start, end) {
     
     /**
      * Checks if the given number is between the range's edges.
-     * @method isMember
-     * @param num {number} Number.
+     * @param {number} num Number.
      * @return {boolean} Whether the given number is somewhere between the range's
      * edges.
      */
@@ -151,7 +148,6 @@ Hybrid.Util.Range = function(start, end) {
     
     /**
      * Gets the difference between the range's edges.
-     * @method delta
      * @return {boolean} Difference between the range's edges.
      */
     this.delta = function() {

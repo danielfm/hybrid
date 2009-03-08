@@ -113,18 +113,6 @@ var TestCases = {
         }
     }},
     
-    testReset: function() { with(this) {
-        population.initialize(randomizer);
-        population.reset(2);
-        
-        assertEqual(0, population.getGeneration());
-        assertEqual(0, population.getSize());
-        assertFalse(population.isInitialized());
-        
-        population.initialize(randomizer);
-        assertEqual(2, population.getSize());
-    }},
-    
     testInitializeTwice: function() { with(this) {
         population.initialize(randomizer);
         

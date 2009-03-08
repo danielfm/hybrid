@@ -1,17 +1,15 @@
 /**
- * The Individual module provides classes to create and handle individuals. In
+ * @fileOverview Provides classes to create and handle individuals. In
  * Genetic Algorithms, an individual is an abstract representation of a
  * candidate solution to an optimization problem that evolves toward better
  * solutions.
- * @module individual
- * @namespace Hybrid
- * @title Individual
+ * @author <a href="mailto:daniel.tritone@gmail.com">Daniel Fernandes Martins</a>
  */
 
 /**
- * This class provides methods to monkeypatch individuals in order to allow
- * them to easily calculate, cache and reset their fitness values.
- * @class Individual
+ * Provides methods to monkeypatch individuals in order to allow them to
+ * easily calculate, cache and reset their fitness values.
+ * @namespace
  * @static
  */
 Hybrid.Individual = {
@@ -19,18 +17,33 @@ Hybrid.Individual = {
     /**
      * Adds some methods to the individual object in order to allow it to
      * easily calculate, cache and reset its fitness value.
-     * @method plugFitnessLogic
-     * @param individual {object} Individual.
-     * @param population {Hybrid.Population} Current population.
+     * @param {object} individual Individual.
+     * @param {Hybrid.Population} population Current population.
      * @static
      */
     plugFitnessLogic: function(individual, population) {
         Hybrid.Individual.assertMonkeypatch(individual);
+
         var fitness = null;
         
-        individual.fitness = {
+        /**
+         * All patched invididuals receive a <code>fitness</code> attribute,
+         * which allows it to calculate its own fitness and compare itself
+         * with other individuals without require any external dependencies
+         * (such as the fitness comparator and the fitness evaluator).
+         */
+        var patch = {
+
+            /**
+             * This attribute is used to identify that an individual
+             * has been patched successfully by this method.
+             */
             _$: true,
             
+            /**
+             * Calculates the fitness for this individual.
+             * @return {number} Fitness value.
+             */
             get: function() {
                 if (fitness != null) {
                     return fitness;
@@ -39,22 +52,37 @@ Hybrid.Individual = {
                 return fitness;
             },
             
+            /**
+             * It's recommended to always work with <em>immutable</em>
+             * individuals. However, in some situations, the individuals
+             * must have the hability to change its internal state
+             * during the evolution. Since all fitness values are
+             * cached to improve performance, this method should be used
+             * to invalidate the cached fitness.
+             */
             reset: function() {
                 fitness = null;
                 population.expireCache();
             },
             
+            /**
+             * Compares this individual with another.
+             * @param {object} other Other individual.
+             * @return Whether this individual is considered better
+             * than the other.
+             */
             isBetterThan: function(other) {
                 return population.compareIndividuals(other, individual) > 0;
             }
         };
+
+        individual.fitness = patch;
     },
     
     /**
      * Check if the individual can be monkeypatched without override any
      * of its properties or methods.
-     * @method assertMonkeypatch
-     * @param individual {object} Individual.
+     * @param {object} individual Individual.
      * @return {boolean} Whether the given individual can be patched or not.
      * @throws Hybrid.Individual.PlugFitnessError
      * @static
@@ -68,20 +96,18 @@ Hybrid.Individual = {
 
 
 /**
- * When a population is initialized, it uses an instance of this class to
+ * Creates a new factory of individuals.
+ * @class When a population is initialized, it uses an instance of this class to
  * produce an arbitrary number of random individuals to serve as the first
  * generation.
- * produce the first generation.
- * @class Individual.Factory
  * @constructor
  */
 Hybrid.Individual.Factory = function() {
     
     /**
      * Creates a random individual.
-     * @method create
-     * @param randomizer {Hybrid.Randomizer} Randomizer object.
-     * @param population {Hybrid.Population} Current population.
+     * @param {Hybrid.Randomizer} randomizer Randomizer object.
+     * @param {Hybrid.Population} population Current population.
      * @return {object} Individual.
      */
     this.create = function(randomizer, population) {
@@ -90,23 +116,24 @@ Hybrid.Individual.Factory = function() {
 };
 
 /**
- * This error is thrown when an individual cannot be monkeypatched.
- * @class Individual.PlugFitnessError
+ * Creates a plug fitness error.
+ * @class This error is thrown when an individual cannot be monkeypatched.
  * @constructor
- * @param attr {string} Name of the attribute that is already being used by the
- * individual before the patching.
+ * @param {string} attr Name of the attribute that is already being used by the
+ * individual before the monkeypatching.
  */
 Hybrid.Individual.PlugFitnessError = function(attr) {
+
     /**
      * Error message.
-     * @property message
+     * @propertymessage
      * @type string
      */
     this.message = 'Cannot override individual attribute: ' + attr;
     
     /**
      * Error name.
-     * @property name
+     * @propertyname
      * @type string
      */
     this.name = 'PlugFitnessError';

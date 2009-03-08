@@ -1,28 +1,25 @@
 /**
- * The Selection module provides some default selection strategies you can
- * use in your Genetic Algorithms. In Genetic Algorithms, during each
- * successive generation, a proportion of the existing population is selected
- * to breed a new generation. Individual solutions are selected through a
- * fitness-based process, where fitter solutions (as measured by a fitness
- * function) are typically more likely to be selected.
- * @module selection
- * @namespace Hybrid
- * @title Selection
+ * @fileOverview The Selection module provides some default selection
+ * strategies you can use in your Genetic Algorithms. In Genetic Algorithms,
+ * during each successive generation, a proportion of the existing population
+ * is selected to breed a new generation. Individual solutions are selected
+ * through a fitness-based process, where fitter solutions (as measured by a
+ * fitness function) are typically more likely to be selected.
+ * @author <a href="mailto:daniel.tritone@gmail.com">Daniel Fernandes Martins</a>
  */
 
 /**
- * Dummy selection strategy implementation that just returns a random
+ * Creates a new selection strategy.
+ * @class Dummy selection strategy implementation that just returns a random
  * individual from the population without consider its fitness.
- * @class Selection
  * @constructor
  */
 Hybrid.Selection = function() {
     
     /**
      * Returns a random individual.
-     * @method select
-     * @param randomizer {Hybrid.Randomizer} Randomizer object.
-     * @param population {Hybrid.Population} Current population.
+     * @param {Hybrid.Util.Randomizer} randomizer Randomizer object.
+     * @param {Hybrid.Population} population Current population.
      * @return {object} Random individual.
      */
     this.select = function(randomizer, population) {
@@ -32,23 +29,21 @@ Hybrid.Selection = function() {
 };
 
 /**
- * Implementation of the Tournament selection, which runs a "tournament" among
+ * Creates a new tournament selection.
+ * @class Implementation of the Tournament selection, which runs a "tournament" among
  * a few individuals chosen at random from the population and selects the
- * winner (the one with the best fitness).
- * @class Selection.Tournament
  * @constructor
- * @param rate {number} Number between 0 and 1 that determines the number
+ * @param {number} [rate] Number between 0 and 1 that determines the number
  * of individuals that will compete in the tournament. For example, if your
  * population contains 100 individuals, 0.5 means that this selection strategy
- * will pick 50 random individuals and return the best one.
+ * will pick 50 random individuals and return the best one. Defaults to 0.1.
  */
 Hybrid.Selection.Tournament = function(rate) {
     
     /**
      * Picks random individuals from the population and returns the best.
-     * @method select
-     * @param randomizer {Hybrid.Randomizer} Randomizer object.
-     * @param population {Hybrid.Population} Current population.
+     * @param {Hybrid.Util.Randomizer} randomizer Randomizer object.
+     * @param {Hybrid.Population} population Current population.
      * @return {object} Selected individual.
      */
     this.select = function(randomizer, population) {
@@ -72,28 +67,27 @@ Hybrid.Selection.Tournament = function(rate) {
     /**
      * Number between 0 and 1 that determines the number of individuals that
      * will compete in the tournament.
-     * @property rate
-     * @private
+     * @property
      * @type number
+     * @private
      */
     rate = ((!rate || rate < 0) ? 0.1 : (rate > 1 ? 1 : rate));
 };
 
 /**
- * Implementation of the Ranking selection. This selection strategy first ranks
- * the individuals in such a way that the worst will have fitness 1, second
- * worst 2 etc. and the best will have fitness N (number of individuals in
- * the population). This method can lead to slower convergence, because best
- * individuals do not differ so much from other ones.
- * @class Selection.Ranking
+ * Creates a new ranking selection.
+ * @class Implementation of the Ranking selection. This selection strategy
+ * first ranks the individuals in such a way that the worst will have fitness
+ * 1, second worst 2 etc. and the best will have fitness N (number of
+ * individuals in the population). This method can lead to slower convergence,
+ * because best individuals do not differ so much from other ones.
  * @constructor
  */
 Hybrid.Selection.Ranking = function() {
     
     /**
      * Gets the sum of rankings of all individuals of the given population.
-     * @method getWheelSize
-     * @param population {Hybrid.Population} Current population.
+     * @param {Hybrid.Population} population Current population.
      * @return {number} Sum of rankings of all individuals of the given
      * population.
      * @private
@@ -113,9 +107,8 @@ Hybrid.Selection.Ranking = function() {
      * Picks a random individual from the population in such a way that
      * individuals with better fitness values are more likely to be selected
      * than other ones.
-     * @method select
-     * @param randomizer {Hybrid.Randomizer} Randomizer object.
-     * @param population {Hybrid.Population} Current population.
+     * @param {Hybrid.Util.Randomizer} randomizer Randomizer object.
+     * @param {Hybrid.Population} population Current population.
      * @return {object} Selected individual.
      */
     this.select = function(randomizer, population) {

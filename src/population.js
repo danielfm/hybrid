@@ -1,68 +1,44 @@
 /**
- * The Population module provides classes and methods to handle populations.
- * Genetic algorithms are implemented as a computer simulation in which a
- * population of abstract representations of candidate solutions (individuals)
- * to an optimization problem evolves toward better solutions.
- * @module population
- * @namespace Hybrid
- * @title Population
+ * @fileOverview The Population module provides classes and methods to handle
+ * populations. Genetic algorithms are implemented as a computer simulation in
+ * which a population of abstract representations of candidate solutions
+ * (individuals) to an optimization problem evolves toward better solutions.
+ * @author <a href="mailto:daniel.tritone@gmail.com">Daniel Fernandes Martins</a>
  */
 
 /**
- * Default Population model that provides several methods to manage and monitor
- * the evolution of its individuals, as well as to define how the natural
- * selection should work.
- * @class Population
+ * Creates a new population.
+ * @class Default Population model that provides several methods to manage and
+ * monitor the evolution of its individuals, as well as to define how the
+ * natural selection should work.
  * @constructor
- * @param options {object} Configuration object that might contain one or more
- * of the following attributes:
- * <ul>
- *   <li><code>generation</code>: Initial generation <code>number</code>;</li>
- *   <li><code>statisticsProvider</code>: Instance of <code>Hybrid.Population.StatisticsProvider</code>
- *   that should be used by this population to compute statistics for its
- *   individuals;</li>
- *   <li><code>individuals</code>: List of individuals to serve as the first
- *   generation;</li>
- *   <li><code>initialSize</code>: If the <code>individuals</code> parameter is
- *   provided, this attribute will be ignored. Otherwise, this attribute
- *   sets the number of individuals that this population should produce during
- *   its initialization;</li>
- *   <li><code>individualFactory</code>: Instance of <code>Hybrid.Individual.Factory</code>
- *   used to create the first generation of individuals;</li>
- *   <li><code>fitnessEvaluator</code>: Instance of <code>Hybrid.Fitness.Evaluator</code>
- *   used by this population to calculate the fitness for its individuals;</li>
- *   <li><code>fitnessComparator</code>: Instance of <code>Hybrid.Reproduction.Mutation</code>
- *   that should be used to sort this population's individuals according to
- *   their fitness.
- *   individuals;</li>
- * </ul>
+ * @param {object} options Configuration object.
+ * @param {number} [options.generation] Initial generation number. Defaults
+ * to 0.
+ * @param {array} [options.individuals] List of individuals to serve as the
+ * first generation. Defaults to [].
+ * @param {Hybrid.Individual.Factory} options.individualFactory Factory used to
+ * initialize this population. This attribute is only used if no individuals
+ * are provided in <code>options.individuals</code>.
+ * @param {number} [options.initialSize] Number of individuals to create
+ * during the initialization of this population when no individuals are
+ * provided in <code>options.individuals</code>. Defaults to 100.
+ * @param {Hybrid.Fitness.Comparator} [options.fitnessComparator] Fitness comparator
+ * used to sort this population's individuals according to their fitness.
+ * @param {Hybrid.Fitness.Evaluator} options.fitnessEvaluator Fitness evaluator
+ * used to calculate the fitness of each population's individuals.
  */
 Hybrid.Population = function(options) {
     var self = this;
     options = options || {};
     
     /**
-     * Resets this population to allow it to restart the evolution.
-     * @method reset
-     * @param newInitialSize {number} Sets the new initial size to be used
-     * during the initialization of this population.
-     */
-    this.reset = function(newInitialSize) {
-        initialized = false;
-        individuals = [];
-        dirty = false;
-        generation = 0;
-        initialSize = newInitialSize;
-    };
-    
-    /**
      * Initializes this population. This method raises the following events:
      * <ul>
-     *   <li>beforeInitialize</li>
-     *   <li>afterInitialize</li>
+     *   <li><code>beforeInitialize</code> - Before the ininitialization.</li>
+     *   <li><code>afterInitialize</code> - After the initialization.</li>
      * </ul>
-     * @method initialize
-     * @param randomizer {Hybrid.Util.Randomizer} Randomizer object being used
+     * @param {Hybrid.Util.Randomizer} randomizer Randomizer object being used
      * by the engine.
      * @throws {Hybrid.Population.AlreadyInitializedError} If this population
      * is already initialized
@@ -93,10 +69,10 @@ Hybrid.Population = function(options) {
      * increments the generation counter. This method raises the following
      * events:
      * <ul>
-     *   <li>replaceGeneration</li>
+     *   <li><code>replaceGeneration</code> - Before replace the current
+     *   generation.</li>
      * </ul>
-     * @method replaceGeneration
-     * @param newIndividuals {array} Array of individuals that should replace
+     * @param {array} newIndividuals Array of individuals that should replace
      * the current population.
      */
     this.replaceGeneration = function(newIndividuals) {
@@ -117,8 +93,8 @@ Hybrid.Population = function(options) {
     };
     
     /**
-     * Sorts this population's individuals according to their fitness.
-     * @method sort
+     * Sorts this population's individuals according to their fitness
+     * if necessary.
      */
     this.sort = function() {
         if (dirty) {
@@ -129,8 +105,7 @@ Hybrid.Population = function(options) {
     
     /**
      * Adds an individual to this population.
-     * @method add
-     * @param individual {object} Individual.
+     * @param {object} individual Individual.
      */
     this.add = function(individual) {
         this.notify('addIndividual', {
@@ -143,8 +118,7 @@ Hybrid.Population = function(options) {
     
     /**
      * Adds all the given individuals to this population.
-     * @method addAll
-     * @param individuals {array} List of individuals.
+     * @param {array} individuals List of individuals.
      */
     this.addAll = function(individuals) {
         var size = individuals.length;
@@ -154,8 +128,8 @@ Hybrid.Population = function(options) {
     };
     
     /**
-     * Gets the current best individual
-     * @method best
+     * Gets the current best individual.
+     * @param {number} n Number of best individuals to get.
      * @return {object} Best individual.
      */
     this.best = function(n) {
@@ -171,7 +145,6 @@ Hybrid.Population = function(options) {
     
     /**
      * Gets the number of individuals being managed by this population.
-     * @method getSize
      * @return {number} Number of individuals.
      */
     this.getSize = function() {
@@ -180,40 +153,36 @@ Hybrid.Population = function(options) {
     
     /**
      * Registers a listener to be called when the given event happens.
-     * @method on
-     * @param type {string} Event type.
-     * @param listener {function} Listener to be invoked when the event happens.
-     * @param params {object} Object that contains all parameters needed by
+     * @param {object} eventType Event type.
+     * @param {function} listener Listener to be invoked when the event happens.
+     * @param {object} params Object that contains all parameters needed by
      * the listener.
      */
-    this.on = function(type, listener, params) {
-        eventHandler.addListener(type, listener, params);
+    this.on = function(eventType, listener, params) {
+        eventHandler.addListener(eventType, listener, params);
     };
     
     /**
      * Removes the given listener.
-     * @method unsubscribe
-     * @param listener {function} Listener.
+     * @param {function} listener Listener.
      */
     this.unsubscribe = function(listener) {
         eventHandler.removeListener(listener);
     };
     
     /**
-     * Notifies the listeners about the ocurrence of some event.
-     * @method notify
-     * @param type {string} Event type used to determine which listeners
+     * Notifies the listeners about the occurrence of some event.
+     * @param {object} eventType Event type used to determine which listeners
      * should be notified.
-     * @param event {object} Event object which usually contains useful
+     * @param {object} event Event object which usually contains useful
      * information about the event in question.
      */
-    this.notify = function(type, event) {
-        eventHandler.notifyListeners(type, event);
+    this.notify = function(eventType, event) {
+        eventHandler.notifyListeners(eventType, event);
     };
     
     /**
      * Gets the event handler being used by this population.
-     * @method getEventHandler
      * @return {Hybrid.Event.Handler} Event handler.
      */
     this.getEventHandler = function() {
@@ -222,7 +191,6 @@ Hybrid.Population = function(options) {
     
     /**
      * Gets the individual factory being used by this population.
-     * @method getIndividualFactory
      * @return {Hybrid.Individual.Factory} Individual factory.
      */
     this.getIndividualFactory = function() {
@@ -231,8 +199,7 @@ Hybrid.Population = function(options) {
     
     /**
      * Sets the individual factory to be used by this population.
-     * @method setIndividualFactory
-     * @param factory {Hybrid.Individual.Factory} Individual factory.
+     * @param {Hybrid.Individual.Factory} factory Individual factory.
      */
     this.setIndividualFactory = function(factory) {
         individualFactory = factory;
@@ -240,8 +207,7 @@ Hybrid.Population = function(options) {
     
     /**
      * Evaluate the fitness values of the given individual.
-     * @method evaluateFitness
-     * @param individual {object} Individual.
+     * @param {object} individual Individual.
      * @return {number} Fitness value.
      */
     this.evaluateFitness = function(individual) {
@@ -250,7 +216,6 @@ Hybrid.Population = function(options) {
     
     /**
      * Gets the fitness evaluator being used by this population.
-     * @method getFitnessEvaluator
      * @return {Hybrid.Fitness.Evaluator} Fitness evaluator.
      */
     this.getFitnessEvaluator = function() {
@@ -259,8 +224,7 @@ Hybrid.Population = function(options) {
     
     /**
      * Sets the fitness evaluator to be used by this population.
-     * @method setFitnessEvaluator
-     * @param evaluator {Hybrid.Fitness.Evaluator} Fitness evaluator.
+     * @param {Hybrid.Fitness.Evaluator} evaluator Fitness evaluator.
      */
     this.setFitnessEvaluator = function(evaluator) {
         fitnessEvaluator = evaluator;
@@ -268,9 +232,8 @@ Hybrid.Population = function(options) {
     
     /**
      * Compares the given individuals based on their fitness.
-     * @method compareIndividuals
-     * @param individual {object} Individual.
-     * @param other {object} Other individual.
+     * @param {object} individual Individual.
+     * @param {object} other Other individual.
      * @return {number} Returns something smaller than zero if
      * <code>individual</code> is considered better than <code>other</code>.
      * Returns something greater than zero if <code>individual</code> is
@@ -283,7 +246,6 @@ Hybrid.Population = function(options) {
     
     /**
      * Gets the fitness comparator being used by this population.
-     * @method getFitnessComparator
      * @return {Hybrid.Fitness.Comparator} Fitness comparator.
      */
     this.getFitnessComparator = function() {
@@ -292,8 +254,7 @@ Hybrid.Population = function(options) {
     
     /**
      * Sets the fitness comparator to be used by this population.
-     * @method setFitnessComparator
-     * @param comparator {Hybrid.Fitness.Comparator} Fitness comparator.
+     * @param {Hybrid.Fitness.Comparator} comparator Fitness comparator.
      */
     this.setFitnessComparator = function(comparator) {
         fitnessComparator = comparator;
@@ -302,7 +263,6 @@ Hybrid.Population = function(options) {
     /**
      * Gets the generation counter, which is a number that tells how many
      * generations have been processed so far.
-     * @method getGeneration
      * @return {number} Number of generations proessed so far.
      */
     this.getGeneration = function() {
@@ -311,7 +271,6 @@ Hybrid.Population = function(options) {
     
     /**
      * Returns if this population is already initialized.
-     * @method isInitialized
      * @return {boolean} If this population is already initialized.
      */
     this.isInitialized = function() {
@@ -323,7 +282,6 @@ Hybrid.Population = function(options) {
      * performance, but when some individual's internal state is changed or
      * new individuals are added to this population, the cache should be
      * expired to avoid stale data.
-     * @method expireCache
      */
     this.expireCache = function() {
         dirty = true;
@@ -332,7 +290,6 @@ Hybrid.Population = function(options) {
     /**
      * Gets the initial number of individuals this population should
      * produce during its initialization.
-     * @method getInitialSize
      * @return {number} Initial number of individuals.
      */
     this.getInitialSize = function() {
@@ -341,8 +298,7 @@ Hybrid.Population = function(options) {
     
     /**
      * Gets the individual located at the given index.
-     * @method getIndividual
-     * @param i {number} Index.
+     * @param {number} i Index.
      * @return {object} Individual.
      */
     this.getIndividual = function(i) {
@@ -351,7 +307,6 @@ Hybrid.Population = function(options) {
     
     /**
      * Returns a copy of the current list of individuals.
-     * @method getIndividuals
      * @return {array} List of individuals.
      */
     this.getIndividuals = function() {
@@ -360,7 +315,6 @@ Hybrid.Population = function(options) {
     
     /**
      * Computes and returns the current statistics for this population.
-     * @method getStatistics
      * @return {object} Statistics.
      */
     this.getStatistics = function() {
@@ -369,7 +323,6 @@ Hybrid.Population = function(options) {
     
     /**
      * Gets the statistics provider being used by this population.
-     * @method getStatisticsProvider
      * @return {Hybrid.Population.StatisticsProvider} Statistics provider.
      */
     this.getStatisticsProvider = function() {
@@ -378,8 +331,7 @@ Hybrid.Population = function(options) {
     
     /**
      * Sets the statistics provider to be used by this population.
-     * @method getStatisticsProvider
-     * @param provider {Hybrid.Population.StatisticsProvider} Statistics
+     * @param {Hybrid.Population.StatisticsProvider} provider Statistics
      * provider.
      */
     this.setStatisticsProvider = function(provider) {
@@ -388,7 +340,7 @@ Hybrid.Population = function(options) {
     
     /**
      * Generation counter.
-     * @property generation
+     * @property
      * @type number
      * @private
      */
@@ -401,7 +353,7 @@ Hybrid.Population = function(options) {
     /**
      * Event handler used by this population to notify third party objects
      * about the current state of the evolution.
-     * @name eventHandler
+     * @property
      * @type Hybrid.Event.Handler
      * @private
      */
@@ -410,7 +362,7 @@ Hybrid.Population = function(options) {
     /**
      * Statistics provider used by this population to compute statistics for
      * its individuals.
-     * @property statisticsProvider
+     * @property
      * @type Hybrid.Population.StatisticsProvider
      * @private
      */
@@ -420,7 +372,7 @@ Hybrid.Population = function(options) {
     /**
      * Number of individuals this population should produce during its
      * initialization.
-     * @property initialSize
+     * @property
      * @type number
      * @private
      */
@@ -429,7 +381,7 @@ Hybrid.Population = function(options) {
     
     /**
      * Individual factory used to create the first generation of individuals.
-     * @property individualFactory
+     * @property
      * @type Hybrid.Individual.Factory
      * @private
      */
@@ -439,7 +391,7 @@ Hybrid.Population = function(options) {
     /**
      * Fitness evaluator used to calculate the fitness value for this
      * population's individuals.
-     * @property fitnessEvaluator
+     * @property
      * @type Hybrid.Fitness.Evaluator
      * @private
      */
@@ -448,21 +400,23 @@ Hybrid.Population = function(options) {
     
     /**
      * Fitness comparator used to sort individuals according to their fitness.
-     * @property fitnessComparator
+     * @property
      * @type Hybrid.Fitness.Comparator
      * @private
      */
     var fitnessComparator = options.fitnessComparator ||
         new Hybrid.Fitness.Comparator();
     
-    /* monkeypatch individuals before add them to this population */
+    /*
+     * Monkeypatch individuals before add them to this population.
+     */
     this.on('addIndividual', function(event) {
         Hybrid.Individual.plugFitnessLogic(event.individual, self);
     });
     
     /**
      * List of individuals being managed by this population.
-     * @property individuals
+     * @property
      * @type array
      * @private
      */
@@ -473,7 +427,7 @@ Hybrid.Population = function(options) {
     
     /**
      * Indicates whether this population is initialized or not.
-     * @property initialized
+     * @property
      * @type boolean
      * @private
      */
@@ -481,7 +435,7 @@ Hybrid.Population = function(options) {
     
     /**
      * Indicates the cache state.
-     * @property dirty
+     * @property
      * @type boolean
      * @private
      */
@@ -494,16 +448,11 @@ Hybrid.Population = function(options) {
  * in the next  generation. Elitism can very rapidly increase performance of
  * the Genetic Algorithm, because it prevents losing the best found solution
  * to date.
- * @method addElitism
- * @param options {object} Configuration object that must provide the following
- * attributes:
- * <ul>
- *   <li>to: Instance of <code>Hybrid.Population</code> that should support
- *   elitism.</li>
- *   <li>size: Number of best individuals to keep from generation to
- *   generation.</li>
- * </ul>
- * @param population {Hybrid.Population} Population.
+ * @param {object} options Elitism parameters.
+ * @param {Hybrid.Population} options.to Population that should support
+ * elitism.
+ * @param {number} options.size Number of best individuals to keep from
+ * generation to generation.
  * @static
  */
 Hybrid.Population.addElitism = function(options) {
@@ -529,17 +478,16 @@ Hybrid.Population.addElitism = function(options) {
 };
 
 /**
- * Simple class that is used to get statistical data for a population.
- * @class Population.StatisticsProvider
+ * Creates a new statistics provider.
+ * @class Simple class that is used to get statistical data for a population.
  * @constructor
  */
 Hybrid.Population.StatisticsProvider = function() {
     
     /**
      * Returns statistical data for the given population.
-     * @method compute
-     * @param population {Hybrid.Population} Population.
-     * @return {object}
+     * @param {Hybrid.Population} population Population.
+     * @return {object} Population statistics.
      */
     this.compute = function(population) {
         return {
@@ -549,25 +497,25 @@ Hybrid.Population.StatisticsProvider = function() {
 };
 
 /**
- * This exception is thrown when initializing an already initialized
+ * Creates a new initialization error.
+ * @class This exception is thrown when initializing an already initialized
  * population.
- * @class Population.AlreadyInitializedError
  * @constructor
  */
 Hybrid.Population.AlreadyInitializedError = function() {};
 
 /**
- * This exception is thrown when trying to replace the population's individuals
- * with a breed that contains a different number of individuals.
- * @class Population.IncompatibleBreedError
+ * Creates a new breed replacement error.
+ * @class This exception is thrown when trying to replace the population's
+ * individuals with a breed that contains a different number of individuals.
  * @constructor
  */
 Hybrid.Population.IncompatibleBreedError = function() {};
 
 /**
- * This exception is thrown when trying to add elitism support to a population
+ * Creates a new elitism configuration error.
+ * @class This exception is thrown when trying to add elitism support to a population
  * without specify either the population or the elitism size.
- * @class Population.IllegalElitismOptionsError
  * @constructor
  */
 Hybrid.Population.IllegalElitismOptionsError = function() {};

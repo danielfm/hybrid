@@ -9,17 +9,19 @@
  * Date:     @DATE
  */
 
+/**
+ * @fileOverview Implementation of the main loop of a Genetic Algorithm.
+ * @author <a href="mailto:daniel.tritone@gmail.com">Daniel Fernandes Martins</a>
+ */
 
 /**
- * The Hybrid module provides a common implementation of the main loop of a
- * Genetic Algorithm.
- * @module hybrid
- * @namespace Hybrid
- * @title Hybrid
+ * Provides an implementation of the main loop of a Genetic Algorithm.
+ * @namespace
  */
 Hybrid = {
+
     /**
-     * This field is used to keep the build number that created the file.
+     * Keeps the build number that created the file.
      * @property version
      * @type string
      * @static
@@ -28,7 +30,8 @@ Hybrid = {
 };
 
 /**
- * Basic implementation of the main loop of a Genetic Algorithm, which
+ * Creates a new evolution engine.
+ * @class Basic implementation of the main loop of a Genetic Algorithm, which
  * consists in:
  * <ol>
  *   <li>Produce initial population;</li>
@@ -41,24 +44,14 @@ Hybrid = {
  *   </ol>
  *   </li>
  * </ol>
- * @class Engine
  * @constructor
- * @param options {object} Configuration object that might contain one or more
- * of the following attributes:
- * <ul>
- *   <li><code>randomizer</code>: Instance of <code>Hybrid.Util.Randomizer</code>
- *   that should be used to handle random number generation;</li>
- *   <li><code>population</code>: Instance of <code>Hybrid.Population</code>
- *   that should be evolved;</li>
- *   <li><code>selection</code>: Instance of <code>Hybrid.Selection</code>
- *   that should be used as the selection strategy;</li>
- *   <li><code>crossover</code>: Instance of <code>Hybrid.Reproduction.Crossover</code>
- *   that should be used to perform the recombination of population's
- *   individuals;</li>
- *   <li><code>mutation</code>: Instance of <code>Hybrid.Reproduction.Mutation</code>
- *   that should be used to perform the mutation of population's
- *   individuals;</li>
- * </ul>
+ * @param {object} options Engine configuration.
+ * @param {Hybrid.Population} options.population Population to be evolved.
+ * @param {Hybrid.Util.Randomizer} [options.randomizer] Randomizer instance.
+ * @param {Hybrid.Selection} [options.selection] Selection strategy. Default:
+ * {@link Hybrid.Selection.Ranking}.
+ * @param {Hybrid.Reproduction.Crossover} options.crossover Crossover strategy.
+ * @param {Hybrid.Reproduction.Mutation} options.mutation Mutation strategy.
  */
 Hybrid.Engine = function(options) {
     var self = this;
@@ -66,7 +59,6 @@ Hybrid.Engine = function(options) {
     
     /**
      * Gets statistics for the current population.
-     * @method getStatistics
      * @return {object} Statistics for the current population.
      * @private
      */
@@ -77,9 +69,8 @@ Hybrid.Engine = function(options) {
     }
     
     /**
-     * Initializes the population and processes the evolution.
-     * @method evolve
-     * by the algorithm.
+     * Initializes the population and processes the evolution by the
+     * algorithm.
      */
     this.evolve = function() {
         population.initialize(randomizer);
@@ -88,7 +79,6 @@ Hybrid.Engine = function(options) {
 
     /**
      * Processes the evolution.
-     * @method processEvolution
      * @private
      */
     function processEvolution() {
@@ -129,21 +119,19 @@ Hybrid.Engine = function(options) {
     
     /**
      * Registers a listener to be called when the given event happens.
-     * @method on
-     * @param type {string} Event type.
-     * @param listener {function} Listener to be invoked when the event
+     * @param {string} eventType Event type.
+     * @param {function} listener Listener to be invoked when the event
      * happens.
-     * @param params {object} Object that contains all parameters needed by
+     * @param {object} params Object that contains all parameters needed by
      * the listener.
      */
-    this.on = function(type, listener, params) {
-        eventHandler.addListener(type, listener, params);
+    this.on = function(eventType, listener, params) {
+        eventHandler.addListener(eventType, listener, params);
     };
     
     /**
      * Removes the given listener.
-     * @method unsubscribe
-     * @param listener {function} Listener to be removed.
+     * @param {function} listener Listener to be removed.
      */
     this.unsubscribe = function(listener) {
         eventHandler.removeListener(listener);
@@ -151,19 +139,17 @@ Hybrid.Engine = function(options) {
     
     /**
      * Notifies the listeners about the ocurrence of some event.
-     * @method notifyListeners
-     * @param type {string} Event type used to determine which listeners
+     * @param {string} eventType Event type used to determine which listeners
      * should be notified.
-     * @param event {object} Event object which usually contains useful
+     * @param {object} event Event object which usually contains useful
      * information about the event in question.
      */
-    this.notify = function(type, event) {
-        eventHandler.notifyListeners(type, event);
+    this.notify = function(eventType, event) {
+        eventHandler.notifyListeners(eventType, event);
     };
     
     /**
      * Gets the event handler being used by this engine.
-     * @method getEventHandler
      * @return {Hybrid.Event.Handler} The event handler.
      */
     this.getEventHandler = function() {
@@ -172,7 +158,6 @@ Hybrid.Engine = function(options) {
     
     /**
      * Gets the randomizer being used by this engine.
-     * @method getRandomizer
      * @return {Hybrid.Util.Randomizer} Randomizer being used by this engine.
      */
     this.getRandomizer = function() {
@@ -181,8 +166,7 @@ Hybrid.Engine = function(options) {
     
     /**
      * Sets the randomizer to be used by this engine.
-     * @method setRandomizer
-     * @param newRandomizer {Hybrid.Util.Randomizer} Randomizer to be used by
+     * @param {Hybrid.Util.Randomizer} newRandomizer Randomizer to be used by
      * this engine.
      */
     this.setRandomizer = function(newRandomizer) {
@@ -191,7 +175,6 @@ Hybrid.Engine = function(options) {
     
     /**
      * Gets the selection strategy being used by this engine.
-     * @method getSelection
      * @return {Hybrid.Selection} Selection strategy being used by this engine.
      */
     this.getSelection = function() {
@@ -200,8 +183,7 @@ Hybrid.Engine = function(options) {
     
     /**
      * Sets the selection strategy to be used by this engine.
-     * @method setSelection
-     * @param newSelection {Hybrid.Selection} Selection strategy to be used by
+     * @param {Hybrid.Selection} newSelection Selection strategy to be used by
      * this engine.
      */
     this.setSelection = function(newSelection) {
@@ -210,7 +192,6 @@ Hybrid.Engine = function(options) {
     
     /**
      * Gets the crossover strategy being used by this engine.
-     * @method getCrossover
      * @return {Hybrid.Reproduction.Crossover} Crossover strategy being used by
      * this engine.
      */
@@ -220,8 +201,7 @@ Hybrid.Engine = function(options) {
     
     /**
      * Sets the crossover strategy to be used by this engine.
-     * @method setCrossover
-     * @param newCrossover {Hybrid.Reproduction.Crossover} Crossover strategy
+     * @param {Hybrid.Reproduction.Crossover} newCrossover Crossover strategy
      * to be used by this engine
      */
     this.setCrossover = function(newCrossover) {
@@ -230,7 +210,6 @@ Hybrid.Engine = function(options) {
     
     /**
      * Gets the mutation strategy being used by this engine.
-     * @method getMutation
      * @return {Hybrid.Reproduction.Mutation} Mutation strategy being used by
      * this engine.
      */
@@ -240,8 +219,7 @@ Hybrid.Engine = function(options) {
     
     /**
      * Sets the mutation strategy to be used by this engine.
-     * @method setMutation
-     * @param newMutation {Hybrid.Reproduction.Mutation} Mutation strategy
+     * @param {Hybrid.Reproduction.Mutation} newMutation Mutation strategy
      * to be used by this engine
      */
     this.setMutation = function(newMutation) {
@@ -251,7 +229,7 @@ Hybrid.Engine = function(options) {
     /**
      * Randomizer object used by this engine to handle random number
      * generation.
-     * @property randomizer
+     * @property
      * @type Hybrid.Util.Randomizer
      * @private
      */
@@ -260,7 +238,7 @@ Hybrid.Engine = function(options) {
     
     /**
      * Population to be evolved by this engine.
-     * @property population
+     * @property 
      * @type Hybrid.Population
      * @private
      */
@@ -270,17 +248,17 @@ Hybrid.Engine = function(options) {
     /**
      * Selection strategy used by this engine to select best-ranking
      * individuals to reproduce.
-     * @property selection
+     * @property 
      * @type Hybrid.Selection
      * @private
      */
     var selection = options.selection ||
-        new Hybrid.Reproduction.RandomSelection();
+        new Hybrid.Selection.Ranking();
     
     /**
      * Crossover strategy used by this engine to create offspring based on
      * two parent individuals.
-     * @property crossover
+     * @property 
      * @type Hybrid.Reproduction.Crossover
      * @private
      */
@@ -289,7 +267,7 @@ Hybrid.Engine = function(options) {
     
     /**
      * Mutation strategy used by this engine to mutate individuals.
-     * @property mutation
+     * @property 
      * @type Hybrid.Reproduction.Mutation
      * @private
      */
@@ -299,7 +277,7 @@ Hybrid.Engine = function(options) {
     /**
      * Stop condition used by this engine to dermine when to interrupt the
      * evolution.
-     * @property stopCondition
+     * @property 
      * @type Hybrid.Stop.Condition
      * @private
      */
@@ -309,7 +287,7 @@ Hybrid.Engine = function(options) {
     /**
      * Event handler used by this engine to notify third party objects about
      * the current state of the evolution.
-     * @name eventHandler
+     * @property
      * @type Hybrid.Event.Handler
      * @private
      */

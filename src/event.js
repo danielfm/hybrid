@@ -1,36 +1,37 @@
 /**
- * The Event module provides a simple implementation of the subject/observer
- * design pattern.
- * @module event
- * @namespace Hybrid.Event
- * @title Event
+ * @fileOverview Subject/observer design pattern implementation.
+ * @author <a href="mailto:daniel.tritone@gmail.com">Daniel Fernandes Martins</a>
  */
 
 /**
- * Implementation of the subject/observer design pattern that provides a simple
- * way to plug in functionality to an existing object.
- * @class Handler
- * @constructor
+ * Provides a simple implementation of the subject/observer design pattern.
+ * @namespace
+ * @depends Hybrid
  */
-
 Hybrid.Event = {};
 
+/**
+ * Creates a new event handler.
+ * @class Implementation of the subject/observer design pattern that provides
+ * a simple way to plug in functionality to an existing object.
+ * @constructor
+ * @depends Hybrid.Util
+ */
 Hybrid.Event.Handler = function() {
     
     /**
      * Registers a listener to be called when the given event happens.
-     * @method addListener
-     * @param type {string} Event type.
-     * @param listener {function} Listener to be invoked when the event
+     * @param {object} eventType Event type.
+     * @param {function} listener Listener to be invoked when the event
      * happens.
-     * @param params {object} Object that contains all parameters needed by
-     * the listener.
+     * @param {object} [params] Object to be passed to the listener
+     * when it's called.
      */
-    this.addListener = function(type, listener, params) {
-        if (type && listener) {
+    this.addListener = function(eventType, listener, params) {
+        if (eventType && listener) {
             listeners.push({
                 listener: listener,
-                type: type,
+                type: eventType,
                 params: params
             });
         }
@@ -38,8 +39,7 @@ Hybrid.Event.Handler = function() {
     
     /**
      * Removes the given listener.
-     * @method removeListener
-     * @param listener {function} Listener to be removed.
+     * @param {function} listener Listener to be removed.
      */
     this.removeListener = function(listener) {
         var current = Hybrid.Util.Array.map(listeners, function(element) {
@@ -50,39 +50,36 @@ Hybrid.Event.Handler = function() {
     
     /**
      * Removes all listeners associated with the given event.
-     * @method removeListenersByType
-     * @param type {string} Event type.
+     * @param {object} eventType Event type.
      */
-    this.removeListenersByType = function(type) {
+    this.removeListenersByType = function(eventType) {
         var byType = Hybrid.Util.Array.map(listeners, function(element) {
-            return ((type != element.type) ? element : null);
+            return ((eventType != element.type) ? element : null);
         });
         listeners = byType;
     };
     
     /**
      * Gets all listeners associated with the given event.
-     * @method getListenersByType
-     * @param type {string} Event identifier.
+     * @param {object} eventType Event type.
      * @return {array} Array of listeners.
      */
-    this.getListenersByType = function(type) {
+    this.getListenersByType = function(eventType) {
         return Hybrid.Util.Array.map(listeners, function(element) {
-            return ((type == element.type) ? element.listener : null);
+            return ((eventType == element.type) ? element.listener : null);
         });
     };
     
     /**
-     * Notifies the listeners about the ocurrence of some event.
-     * @method notifyListeners
-     * @param type {string} Event type used to determine which listeners
+     * Notifies the listeners about the occurrence of some event.
+     * @param {object} eventType Event type used to determine which listeners
      * should be notified.
-     * @param event {object} Event object which usually contains useful
-     * information about the event in question.
+     * @param {object} event Event object which usually contains useful
+     * information about the triggered event.
      */
-    this.notifyListeners = function(type, event) {
+    this.notifyListeners = function(eventType, event) {
         var byType = Hybrid.Util.Array.map(listeners, function(element) {
-            return ((element.type == type) ? element : null);
+            return ((element.type == eventType) ? element : null);
         });
         
         for (var i = 0; i < byType.length; i++) {
@@ -93,7 +90,6 @@ Hybrid.Event.Handler = function() {
     
     /**
      * Return the list of registered listeners.
-     * @method getListeners
      * @return {array} List of registered listeners.
      */
     this.getListeners = function() {
@@ -102,7 +98,6 @@ Hybrid.Event.Handler = function() {
     
     /**
      * Return the number of registered listeners.
-     * @method getListenersCount
      * @return {number} Number of registered listeners.
      */
      this.getListenersCount = function() {
@@ -111,8 +106,8 @@ Hybrid.Event.Handler = function() {
     
     /**
      * List of all registered listeners.
-     * @property listeners
-     * @type array
+     * @property
+     * @type {array}
      * @private
      */
     var listeners = [];
