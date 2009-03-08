@@ -1,7 +1,5 @@
 <project name="Hybrid" default="hybrid" basedir=".">
     <property file="build.properties"/>
-    <property name="DIST" value="${BUILD_DIR}/hybrid.js" />
-    <property name="DIST_PACK" value="${BUILD_DIR}/hybrid_minified.js" />
 
     <taskdef resource="net/sf/antcontrib/antcontrib.properties">
         <classpath>
@@ -24,6 +22,7 @@
     </propertyregex>
 
     <target name="hybrid" description="Main jquery build, concatenates source files and replaces @VERSION">
+        <property name="DIST" value="${BUILD_DIR}/hybrid.js" />
         <echo message="Building ${DIST}" />
         <mkdir dir="${BUILD_DIR}" />
         <concat destfile="${DIST}">
@@ -47,8 +46,10 @@
     </target>
     
     <target name="pack" depends="hybrid" description="Remove all comments and whitespace and compress">
+        <property name="DIST_PACK" value="${BUILD_DIR}/hybrid_minified.js" />
         <echo message="Building ${DIST_PACK}" />
-        <java jar="${LIB_DIR}/yuicompressor.jar" fork="true"> <arg value="-o" />
+        <java jar="${APP_DIR}/yuicompressor.jar" fork="true">
+            <arg value="-o" />
             <arg value="${DIST_PACK}" />
             <arg value="${DIST}" />
         </java>
@@ -56,11 +57,20 @@
     </target>
 
     <target name="doc" description="Generate API documentation">
-        <echo message="Generating API docs"/>
+        <echo message="Generating API docs at ${API_DIR}"/>
+        <property name="JSDOC" value="${APP_DIR}/jsdoc-toolkit"/>
+        <java jar="${JSDOC}/jsrun.jar" dir="${JSDOC}" fork="true">
+            <arg value="app/run.js"/>
+            <arg value="-a"/>
+            <arg value="-t=templates/jsdoc"/>
+            <arg value="-d=${API_DIR}"/>
+            <arg value="${SRC_DIR}"/>
+        </java>
+        <echo message="${API_DIR} built."/>
     </target>
 
     <target name="test" depends="hybrid" description="Run the whole test suite">
-        <echo message="Running test cases..."/>
+        <echo message="Running test cases"/>
         <java jar="${LIB_DIR}/js.jar" dir="test" fork="true" resultproperty="exitCode">
             <arg value="testSuite.js"/>
         </java>
