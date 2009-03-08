@@ -55,6 +55,10 @@
         <echo message="${DIST_PACK} built." />
     </target>
 
+    <target name="doc" description="Generate API documentation">
+        <echo message="Generating API docs"/>
+    </target>
+
     <target name="test" depends="hybrid" description="Run the whole test suite">
         <echo message="Running test cases..."/>
         <java jar="${LIB_DIR}/js.jar" dir="test" fork="true" resultproperty="exitCode">
@@ -74,7 +78,7 @@
         <delete dir="${BUILD_DIR}" />
     </target>
 
-    <target name="all" depends="clean,hybrid,pack,test">
+    <target name="all" depends="clean,hybrid,test,pack,doc">
         <echo message="Build complete." />
     </target>
 </project>

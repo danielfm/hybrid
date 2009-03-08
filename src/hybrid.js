@@ -123,7 +123,7 @@ Hybrid.Engine = function(options) {
         population.replaceGeneration(breed);
 
         if (!stopCondition.interrupt(getStatistics())) {
-            setTimeout(processEvolution, 10);
+            setTimeout(processEvolution);
         }
     };
     
