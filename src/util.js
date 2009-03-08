@@ -1,5 +1,6 @@
 /**
  * @fileOverview Utilitary classes and methods.
+ * @author <a href="mailto:daniel.tritone@gmail.com">Daniel F. Martins</a>
  */
 
 /**
