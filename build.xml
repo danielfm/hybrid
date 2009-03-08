@@ -7,6 +7,13 @@
         </classpath>
     </taskdef>
 
+    <taskdef name="jsdoctoolkit" classname="uk.co.darrenhurley.ant.tasks.JsDocToolkit">
+        <classpath>
+            <pathelement location="${LIB_DIR}/js.jar"/>
+            <pathelement location="${LIB_DIR}/jsdoctoolkit-ant-task.jar"/>
+        </classpath>
+    </taskdef>
+
     <exec executable="git-rev-list" outputproperty="GIT_REVISION">
         <arg value="--all"/>
         <arg value="--max-count=1"/>
@@ -58,14 +65,7 @@
 
     <target name="doc" description="Generate API documentation">
         <echo message="Generating API docs at ${API_DIR}"/>
-        <property name="JSDOC" value="${APP_DIR}/jsdoc-toolkit"/>
-        <java jar="${JSDOC}/jsrun.jar" dir="${JSDOC}" fork="true">
-            <arg value="app/run.js"/>
-            <arg value="-a"/>
-            <arg value="-t=templates/jsdoc"/>
-            <arg value="-d=${API_DIR}"/>
-            <arg value="${SRC_DIR}"/>
-        </java>
+        <jsdoctoolkit jsdochome="${APP_DIR}/jsdoc-toolkit/" template="jsdoc" outputdir="${API_DIR}" inputdir="${SRC_DIR}" />
         <echo message="${API_DIR} built."/>
     </target>
 
