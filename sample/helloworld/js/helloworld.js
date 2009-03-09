@@ -13,7 +13,7 @@ $('document').ready(function() {
     });
 });
 
-/*
+/**
  * Only characters between 'a' and 'z'.
  * @param {Hybrid.Util.Randomizer} randomizer Randomizer instance.
  * @return {string} Random character between 'a' and 'z'.
