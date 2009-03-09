@@ -22,8 +22,6 @@ function getRandomChar(randomizer) {
     return String.fromCharCode(randomizer.next(new Hybrid.Util.Range(97, 123)));
 };
 
-// TODO Se a palavra for muito pequena (1-3 caracteres), o botao 'evolve' nao e reativado
-
 /**
  * Creates a new word factory.
  * @class Factory used to create random words.
