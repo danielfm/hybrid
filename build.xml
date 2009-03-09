@@ -65,7 +65,7 @@
 
     <target name="doc" description="Generate API documentation">
         <echo message="Generating API docs at ${API_DIR}"/>
-        <jsdoctoolkit jsdochome="${APP_DIR}/jsdoc-toolkit/" template="jsdoc" outputdir="${API_DIR}">
+        <jsdoctoolkit jsdochome="${APP_DIR}/jsdoc-toolkit/" template="outline" outputdir="${API_DIR}">
             <source file="${SRC_DIR}/hybrid.js"/>
             <source file="${SRC_DIR}/stop.js"/>
             <source file="${SRC_DIR}/util.js"/>
