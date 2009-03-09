@@ -14,14 +14,21 @@ $('document').ready(function() {
 });
 
 /*
- * Only characters between 'a' and 'z'
+ * Only characters between 'a' and 'z'.
+ * @param {Hybrid.Util.Randomizer} randomizer Randomizer instance.
+ * @return {string} Random character between 'a' and 'z'.
  */
 function getRandomChar(randomizer) {
     return String.fromCharCode(randomizer.next(new Hybrid.Util.Range(97, 123)));
 };
 
-/*
- * Factory used to create random words
+// TODO Se a palavra for muito pequena (1-3 caracteres), o botao 'evolve' nao e reativado
+
+/**
+ * Creates a new word factory.
+ * @class Factory used to create random words.
+ * @constructor
+ * @param {number} size Word length in characters.
  */
 var WordFactory = function(size) {
     this.create = function(randomizer, population) {
@@ -33,9 +40,12 @@ var WordFactory = function(size) {
     };
 };
 
-/*
- * The fitness value is calculated based on how similar a word is compared
- * to the expected one.
+/**
+ * Creates a new word fitness evaluator.
+ * @class The fitness value is calculated based on how similar a word is
+ * compared to the expected one.
+ * @constructor
+ * @param {string} expected Expected word to compare against.
  */
 var WordFitnessEvaluator = function(expected) {
     this.evaluate = function(individual, population) {
@@ -50,8 +60,13 @@ var WordFitnessEvaluator = function(expected) {
     };
 };
 
-/*
- * The crossover strategy consists in merging two words into one.
+/**
+ * Creates a new word crossover strategy.
+ * @class The crossover strategy consists in merging two words into one.
+ * @constructor
+ * @param {number} probability Crossover probability number between 0.0 and
+ * 1.0.
+ * @param {string} expected Expected word.
  */
 var WordCrossover = function(probability, expected) {
     this.expectedRange = new Hybrid.Util.Range(expected.length);
@@ -69,9 +84,14 @@ var WordCrossover = function(probability, expected) {
     }
 };
 
-/*
- * The mutation strategy consists in replacing a letter with a randomly
- * generated character.
+/**
+ * Creates a new word mutation strategy.
+ * @class The mutation strategy consists in replacing a letter with a
+ * randomly generated character.
+ * @constructor
+ * @param {number} probability Mutation probability number between 0.0 and
+ * 1.0.
+ * @param {string} expected Expected word.
  */
 var WordMutation = function(probability, expected) {
     this.expectedRange = new Hybrid.Util.Range(expected.length);
@@ -89,8 +109,11 @@ var WordMutation = function(probability, expected) {
     }
 };
 
-/*
- * We should keep the evolution running until we get the expected word.
+/**
+ * Creates a new stop condition.
+ * @class We should keep the evolution running until we get the expected word.
+ * @constructor
+ * @param {string} expected Expected word.
  */
 var StopCondition = function(expected) {
     this.interrupt = function(event) {
@@ -104,6 +127,9 @@ var StopCondition = function(expected) {
     };
 };
 
+/**
+ * Evolves a population of random words.
+ */
 function evolve() {
     // Number of individuals of the population
     var populationSize = parseInt($('#populationSize').val());
@@ -155,8 +181,8 @@ function evolve() {
         mutation: new WordMutation(mutationProbability/100, expected)
     });
     
-    // Start the evolution and disable the button
-    engine.evolve();
+    //  Disable the button and start the evolution
     $('#evolve').val('Please wait...').attr('disabled', true);
+    engine.evolve();
 }
 
