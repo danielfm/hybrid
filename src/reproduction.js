@@ -5,8 +5,8 @@
  */
 
 /**
- * The Reproduction module provides examples on how to create crossover and
- * mutation strategies for your Genetic Algorithms.
+ * Provides examples on how to create crossover and mutation strategies for
+ * your Genetic Algorithms.
  * @namespace
  */
 Hybrid.Reproduction = {};

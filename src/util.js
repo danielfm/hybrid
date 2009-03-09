@@ -4,8 +4,7 @@
  */
 
 /**
- * The Util module provides utilitary methods to be used throughout the
- * framework codebase.
+ * Provides utilitary methods to be used throughout the framework codebase.
  * @namespace
  */
 Hybrid.Util = {};
@@ -61,7 +60,7 @@ Hybrid.Util.Randomizer = function() {
     /**
      * Gets a random number between the given range. If this method is called
      * with no arguments, it returns a random number between 0 and 1.
-     * @param {Hybrid.Util.Range} [range] Range.
+     * @param {Hybrid.Util.Range} [range=undefined] Range.
      * @return {number} If a range is provided, returns a random number between
      * the range. Otherwise returns a number between 0 and 1.
      */
@@ -91,7 +90,7 @@ Hybrid.Util.Randomizer = function() {
  * Creates a new range.
  * @class Very simple class to express ranges between two numbers.
  * @constructor
- * @param {number} [start] Range start. Defaults to 0.
+ * @param {number} [start=0] Range start.
  * @param {number} end Range end.
  */
 Hybrid.Util.Range = function(start, end) {

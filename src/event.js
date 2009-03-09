@@ -24,7 +24,7 @@ Hybrid.Event.Handler = function() {
      * @param {object} eventType Event type.
      * @param {function} listener Listener to be invoked when the event
      * happens.
-     * @param {object} [params] Object to be passed to the listener
+     * @param {object} [params=undefined] Object to be passed to the listener
      * when it's called.
      */
     this.addListener = function(eventType, listener, params) {

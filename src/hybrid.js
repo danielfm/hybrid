@@ -47,7 +47,8 @@ Hybrid = {
  * @constructor
  * @param {object} options Engine configuration.
  * @param {Hybrid.Population} options.population Population to be evolved.
- * @param {Hybrid.Util.Randomizer} [options.randomizer] Randomizer instance.
+ * @param {Hybrid.Util.Randomizer}
+ * [options.randomizer=new Hybrid.Util.Randomizer()] Randomizer instance.
  * @param {Hybrid.Selection} [options.selection] Selection strategy. Default:
  * {@link Hybrid.Selection.Ranking}.
  * @param {Hybrid.Reproduction.Crossover} options.crossover Crossover strategy.
@@ -122,8 +123,8 @@ Hybrid.Engine = function(options) {
      * @param {string} eventType Event type.
      * @param {function} listener Listener to be invoked when the event
      * happens.
-     * @param {object} params Object that contains all parameters needed by
-     * the listener.
+     * @param {object} [params=undefined] Object that contains all parameters
+     * needed by the listener.
      */
     this.on = function(eventType, listener, params) {
         eventHandler.addListener(eventType, listener, params);

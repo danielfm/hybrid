@@ -41,10 +41,10 @@ Hybrid.Fitness.Evaluator = function() {
  * @class Default comparator used to sort the individuals according to its
  * fitness.
  * @constructor
- * @param {boolean} inverse By default, Hybrid considers greater fitness values
- * better than smaller fitness values, but this is not a rule. So, to make
- * Hybrid consider smaller fitness values better than greater ones, pass
- * <code>true</code> to this argument.
+ * @param {boolean} [inverse=false] By default, Hybrid considers greater
+ * fitness values better than smaller fitness values, but this is not a rule.
+ * So, to make Hybrid consider smaller fitness values better than greater
+ * ones, pass <code>true</code> to this argument.
  */
 Hybrid.Fitness.Comparator = function(inverse) {
     

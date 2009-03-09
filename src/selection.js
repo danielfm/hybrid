@@ -33,10 +33,10 @@ Hybrid.Selection = function() {
  * @class Implementation of the Tournament selection, which runs a "tournament" among
  * a few individuals chosen at random from the population and selects the
  * @constructor
- * @param {number} [rate] Number between 0 and 1 that determines the number
+ * @param {number} [rate=0.1] Number between 0 and 1 that determines the number
  * of individuals that will compete in the tournament. For example, if your
  * population contains 100 individuals, 0.5 means that this selection strategy
- * will pick 50 random individuals and return the best one. Defaults to 0.1.
+ * will pick 50 random individuals and return the best one.
  */
 Hybrid.Selection.Tournament = function(rate) {
     

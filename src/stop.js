@@ -16,7 +16,7 @@ Hybrid.Stop = {};
  * @class Stop condition that evolves a population for the given number of
  * generations before interrupts the evolution.
  * @constructor
- * @param {number} generations Number of generations to evolve.
+ * @param {number} [generations=100] Number of generations to evolve.
  */
 Hybrid.Stop.ElapsedGeneration = function(generations) {
 

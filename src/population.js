@@ -13,18 +13,19 @@
  * natural selection should work.
  * @constructor
  * @param {object} options Configuration object.
- * @param {number} [options.generation] Initial generation number. Defaults
- * to 0.
- * @param {array} [options.individuals] List of individuals to serve as the
- * first generation. Defaults to [].
+ * @param {number} [options.generation=0] Initial generation number.
+ * @param {array} [options.individuals=[]] List of individuals to serve as the
+ * first generation.
  * @param {Hybrid.Individual.Factory} options.individualFactory Factory used to
  * initialize this population. This attribute is only used if no individuals
  * are provided in <code>options.individuals</code>.
- * @param {number} [options.initialSize] Number of individuals to create
+ * @param {number} [options.initialSize=100] Number of individuals to create
  * during the initialization of this population when no individuals are
- * provided in <code>options.individuals</code>. Defaults to 100.
- * @param {Hybrid.Fitness.Comparator} [options.fitnessComparator] Fitness comparator
- * used to sort this population's individuals according to their fitness.
+ * provided in <code>options.individuals</code>.
+ * @param {Hybrid.Fitness.Comparator}
+ * [options.fitnessComparator=new Hybrid.Fitness.Comparator()] Fitness
+ * comparator used to sort this population's individuals according to their
+ * fitness.
  * @param {Hybrid.Fitness.Evaluator} options.fitnessEvaluator Fitness evaluator
  * used to calculate the fitness of each population's individuals.
  */
@@ -155,8 +156,8 @@ Hybrid.Population = function(options) {
      * Registers a listener to be called when the given event happens.
      * @param {object} eventType Event type.
      * @param {function} listener Listener to be invoked when the event happens.
-     * @param {object} params Object that contains all parameters needed by
-     * the listener.
+     * @param {object} [params=undefined] Object that contains all parameters
+     * needed by the listener.
      */
     this.on = function(eventType, listener, params) {
         eventHandler.addListener(eventType, listener, params);
