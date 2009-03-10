@@ -12,30 +12,51 @@
 Hybrid.Stop = {};
 
 /**
+ * Creates a useless stop condition. :)
+ * @class A do-nothing stop condition.
+ * @constructor
+ */
+Hybrid.Stop.Condition = new Hybrid.Class();
+
+/**
+ * Returns whether the evolution should be interrupted or not.
+ * @param {object} event Event object provided by {@link Hybrid.Engine}.
+ * @return {boolean} Whether the evolution should be interrupted or not.
+ */
+Hybrid.Stop.Condition.prototype.interrupt = function(event) {
+    // Interrupts by default
+    return true;
+};
+
+/**
  * Creates a new generation-based stop condition.
  * @class Stop condition that evolves a population for the given number of
  * generations before interrupts the evolution.
  * @constructor
  * @param {number} [generations=100] Number of generations to evolve.
  */
-Hybrid.Stop.ElapsedGeneration = function(generations) {
+Hybrid.Stop.ElapsedGeneration = new Hybrid.Class.extend(Hybrid.Stop.Condition,
+    function(generations) {
+        Hybrid.Stop.ElapsedGeneration.superClass.call(this);
 
-    /**
-     * Number of generations to evolve before interrupt the evolution.
-     * @private
-     * @property
-     * @type number
-     */
-    generations = ((!generations || generations < 0) ? 100 : generations);
-    
-    /**
-     * Interrupts the evolution after evolving a given number of generations.
-     * @param {object} event Event object provided by {@link Hybrid.Engine}.
-     * @return {boolean} Whether the Genetic Algorithm should be interrupted
-     * or not.
-     */
-    this.interrupt = function(event) {
-        return (event.population.getGeneration() == generations);
-    };
-};
+        /**
+         * Number of generations to evolve before interrupt the evolution.
+         * @private
+         * @property
+         * @type number
+         */
+        generations = ((!generations || generations < 0) ? 100 : generations);
+        
+        /**
+         * Interrupts the evolution after evolving a given number of generations.
+         * @param {object} event Event object provided by {@link Hybrid.Engine}.
+         * @return {boolean} Whether the Genetic Algorithm should be interrupted
+         * or not.
+         * @memberOf Hybrid.Stop.ElapsedGeneration.prototype
+         */
+        this.interrupt = function(event) {
+            return (event.population.getGeneration() >= generations);
+        };
+    }
+);
 

@@ -34,6 +34,7 @@
         <mkdir dir="${BUILD_DIR}" />
         <concat destfile="${DIST}">
             <fileset dir="${SRC_DIR}" includes="hybrid.js" />
+            <fileset dir="${SRC_DIR}" includes="class.js" />
             <fileset dir="${SRC_DIR}" includes="stop.js" />
             <fileset dir="${SRC_DIR}" includes="util.js" />
             <fileset dir="${SRC_DIR}" includes="reproduction.js" />
@@ -67,6 +68,7 @@
         <echo message="Generating API docs at ${API_DIR}"/>
         <jsdoctoolkit jsdochome="${APP_DIR}/jsdoc-toolkit/" template="outline" outputdir="${API_DIR}">
             <source file="${SRC_DIR}/hybrid.js"/>
+            <source file="${SRC_DIR}/class.js"/>
             <source file="${SRC_DIR}/stop.js"/>
             <source file="${SRC_DIR}/util.js"/>
             <source file="${SRC_DIR}/reproduction.js"/>
