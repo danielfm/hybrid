@@ -68,13 +68,13 @@ var WordFitnessEvaluator = function(expected) {
  */
 var WordCrossover = function(probability, expected) {
     this.expectedRange = new Hybrid.Util.Range(expected.length);
-    
+
     this.crossover = function(randomizer, mother, father, population) {
         // We skip the crossover according to the configuration
         if (!randomizer.probability(probability)) {
             return null;
         }
-        
+
         var point = parseInt(randomizer.next(this.expectedRange));
         var word = father.word.substr(0, point);
         word += mother.word.substr(point);
@@ -93,13 +93,13 @@ var WordCrossover = function(probability, expected) {
  */
 var WordMutation = function(probability, expected) {
     this.expectedRange = new Hybrid.Util.Range(expected.length);
-    
+
     this.mutate = function(randomizer, individual, population) {
         // We skip the mutation according to the configuration
         if (!randomizer.probability(probability)) {
             return null;
         }
-        
+
         var word = individual.word;
         var point = parseInt(randomizer.next(this.expectedRange));
         word = word.substr(0, point) + getRandomChar(randomizer) + word.substr(point + 1);
@@ -144,7 +144,7 @@ function evolve() {
         alert('Only lowercase characters between "a" and "z" are allowed.');
         return;
     }
-    
+
     // Selection strategy used to select individuals for breeding based on their fitness
     var selectionStrategy = $('#selectionStrategy').val();
     var selection = ((selectionStrategy == 1) ?
@@ -157,7 +157,7 @@ function evolve() {
         individualFactory: new WordFactory(expected.length),
         fitnessEvaluator: new WordFitnessEvaluator(expected)
     });
-    
+
     // Plug elitism listener if needed
     var elitismSize = parseInt($('#elitismSize').val());
     if (elitismSize > 0) {
@@ -166,7 +166,7 @@ function evolve() {
             size: elitismSize
         });
     }
-    
+
     // Condition that specifies when the evolution should be interrupted
     var stopCondition = new StopCondition(expected);
 
@@ -178,7 +178,7 @@ function evolve() {
         crossover: new WordCrossover(crossoverProbability/100, expected),
         mutation: new WordMutation(mutationProbability/100, expected)
     });
-    
+
     //  Disable the button and start the evolution
     $('#evolve').val('Please wait...').attr('disabled', true);
     engine.evolve();

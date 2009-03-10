@@ -8,10 +8,7 @@
  * @class All Hybrid classes should extend this class.
  * @constructor
  */
-Hybrid.Class = function() {
-    return function() {
-    };
-};
+Hybrid.Class = {};
 
 /**
  * Extends a Hybrid class.
@@ -21,7 +18,9 @@ Hybrid.Class = function() {
  * @static
  */
 Hybrid.Class.extend = function(superConstructor, constructor) {
-    var SurrogateConstructor = new Hybrid.Class();
+    var SurrogateConstructor = function() {
+    };
+
     SurrogateConstructor.prototype = superConstructor.prototype;
 
     var prototypeObject = new SurrogateConstructor();

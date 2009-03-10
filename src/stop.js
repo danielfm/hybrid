@@ -16,7 +16,8 @@ Hybrid.Stop = {};
  * @class A do-nothing stop condition.
  * @constructor
  */
-Hybrid.Stop.Condition = new Hybrid.Class();
+Hybrid.Stop.Condition = new Hybrid.Class.extend(Object, function() {
+});
 
 /**
  * Returns whether the evolution should be interrupted or not.
@@ -46,7 +47,7 @@ Hybrid.Stop.ElapsedGeneration = new Hybrid.Class.extend(Hybrid.Stop.Condition,
          * @type number
          */
         generations = ((!generations || generations < 0) ? 100 : generations);
-        
+
         /**
          * Interrupts the evolution after evolving a given number of generations.
          * @param {object} event Event object provided by {@link Hybrid.Engine}.

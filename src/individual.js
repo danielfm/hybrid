@@ -13,7 +13,7 @@
  * @static
  */
 Hybrid.Individual = {
-    
+
     /**
      * Adds some methods to the individual object in order to allow it to
      * easily calculate, cache and reset its fitness value.
@@ -25,7 +25,7 @@ Hybrid.Individual = {
         Hybrid.Individual.assertMonkeypatch(individual);
 
         var fitness = null;
-        
+
         /**
          * All patched invididuals receive a <code>fitness</code> attribute,
          * which allows it to calculate its own fitness and compare itself
@@ -39,7 +39,7 @@ Hybrid.Individual = {
              * has been patched successfully by this method.
              */
             _$: true,
-            
+
             /**
              * Calculates the fitness for this individual.
              * @return {number} Fitness value.
@@ -51,7 +51,7 @@ Hybrid.Individual = {
                 fitness = population.evaluateFitness(individual);
                 return fitness;
             },
-            
+
             /**
              * It's recommended to always work with <em>immutable</em>
              * individuals. However, in some situations, the individuals
@@ -64,7 +64,7 @@ Hybrid.Individual = {
                 fitness = null;
                 population.expireCache();
             },
-            
+
             /**
              * Compares this individual with another.
              * @param {object} other Other individual.
@@ -78,7 +78,7 @@ Hybrid.Individual = {
 
         individual.fitness = patch;
     },
-    
+
     /**
      * Check if the individual can be monkeypatched without override any
      * of its properties or methods.
@@ -89,21 +89,20 @@ Hybrid.Individual = {
      */
     assertMonkeypatch: function(individual) {
         if (individual.fitness && !individual.fitness._$) {
-            throw new Hybrid.Individual.PlugFitnessError('fitness');
+            throw new Hybrid.Error('Cannot override individual attribute: fitness');
         }
     }
 };
 
-
 /**
  * Creates a new factory of individuals.
- * @class When a population is initialized, it uses an instance of this class to
- * produce an arbitrary number of random individuals to serve as the first
+ * @class When a population is initialized, it uses an instance of this class
+ * to produce an arbitrary number of random individuals to serve as the first
  * generation.
  * @constructor
  */
-Hybrid.Individual.Factory = function() {
-    
+Hybrid.Individual.Factory = new Hybrid.Class.extend(Object, function() {
+
     /**
      * Creates a random individual.
      * @param {Hybrid.Randomizer} randomizer Randomizer object.
@@ -113,29 +112,5 @@ Hybrid.Individual.Factory = function() {
     this.create = function(randomizer, population) {
         return null;
     };
-};
-
-/**
- * Creates a plug fitness error.
- * @class This error is thrown when an individual cannot be monkeypatched.
- * @constructor
- * @param {string} attr Name of the attribute that is already being used by the
- * individual before the monkeypatching.
- */
-Hybrid.Individual.PlugFitnessError = function(attr) {
-
-    /**
-     * Error message.
-     * @propertymessage
-     * @type string
-     */
-    this.message = 'Cannot override individual attribute: ' + attr;
-    
-    /**
-     * Error name.
-     * @propertyname
-     * @type string
-     */
-    this.name = 'PlugFitnessError';
-};
+});
 

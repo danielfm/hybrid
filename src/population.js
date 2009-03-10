@@ -29,10 +29,10 @@
  * @param {Hybrid.Fitness.Evaluator} options.fitnessEvaluator Fitness evaluator
  * used to calculate the fitness of each population's individuals.
  */
-Hybrid.Population = function(options) {
+Hybrid.Population = new Hybrid.Class.extend(Object, function(options) {
     var self = this;
     options = options || {};
-    
+
     /**
      * Initializes this population. This method raises the following events:
      * <ul>
@@ -46,12 +46,14 @@ Hybrid.Population = function(options) {
      */
     this.initialize = function(randomizer) {
         if (initialized) {
-            throw new Hybrid.Population.AlreadyInitializedError();
+            throw new Hybrid.Population.AlreadyInitializedError(
+                'Population already initialized'
+            );
         }
-        
+
         generation = 0;
         this.notify('beforeInitialize', this.getStatistics());
-        
+
         // create the individuals using the individual factory
         for (var i = 0; i < initialSize; i++) {
             var individual = individualFactory.create(randomizer, this);
@@ -59,12 +61,12 @@ Hybrid.Population = function(options) {
                 this.add(individual);
             }
         }
-        
+
         initialSize = individuals.length;
         initialized = true;
         this.notify('afterInitialize', this.getStatistics());
     };
-    
+
     /**
      * Replaces the population's individuals by the given individuals and
      * increments the generation counter. This method raises the following
@@ -80,19 +82,19 @@ Hybrid.Population = function(options) {
         if (newIndividuals.length != individuals.length) {
             throw new Hybrid.Population.IncompatibleBreedError();
         }
-        
+
         var statistics = this.getStatistics();
         statistics.breed = newIndividuals;
-        
+
         this.notify('replaceGeneration', statistics);
-        
+
         individuals = [];
         this.addAll(newIndividuals);
-        
+
         dirty = true;
         generation++;
     };
-    
+
     /**
      * Sorts this population's individuals according to their fitness
      * if necessary.
@@ -103,7 +105,7 @@ Hybrid.Population = function(options) {
             individuals.sort(fitnessComparator.compare);
         }
     };
-    
+
     /**
      * Adds an individual to this population.
      * @param {object} individual Individual.
@@ -116,7 +118,7 @@ Hybrid.Population = function(options) {
         individuals.push(individual);
         dirty = true;
     };
-    
+
     /**
      * Adds all the given individuals to this population.
      * @param {array} individuals List of individuals.
@@ -127,7 +129,7 @@ Hybrid.Population = function(options) {
             this.add(individuals[i]);
         }
     };
-    
+
     /**
      * Gets the current best individual.
      * @param {number} n Number of best individuals to get.
@@ -135,7 +137,7 @@ Hybrid.Population = function(options) {
      */
     this.best = function(n) {
         this.sort();
-        
+
         if (n == null) {
             return individuals[0];
         }
@@ -143,7 +145,7 @@ Hybrid.Population = function(options) {
             return individuals.slice(0, n);
         }
     };
-    
+
     /**
      * Gets the number of individuals being managed by this population.
      * @return {number} Number of individuals.
@@ -151,7 +153,7 @@ Hybrid.Population = function(options) {
     this.getSize = function() {
         return individuals.length;
     };
-    
+
     /**
      * Registers a listener to be called when the given event happens.
      * @param {object} eventType Event type.
@@ -162,7 +164,7 @@ Hybrid.Population = function(options) {
     this.on = function(eventType, listener, params) {
         eventHandler.addListener(eventType, listener, params);
     };
-    
+
     /**
      * Removes the given listener.
      * @param {function} listener Listener.
@@ -170,7 +172,7 @@ Hybrid.Population = function(options) {
     this.unsubscribe = function(listener) {
         eventHandler.removeListener(listener);
     };
-    
+
     /**
      * Notifies the listeners about the occurrence of some event.
      * @param {object} eventType Event type used to determine which listeners
@@ -181,7 +183,7 @@ Hybrid.Population = function(options) {
     this.notify = function(eventType, event) {
         eventHandler.notifyListeners(eventType, event);
     };
-    
+
     /**
      * Gets the event handler being used by this population.
      * @return {Hybrid.Event.Handler} Event handler.
@@ -189,7 +191,7 @@ Hybrid.Population = function(options) {
     this.getEventHandler = function() {
         return eventHandler;
     };
-    
+
     /**
      * Gets the individual factory being used by this population.
      * @return {Hybrid.Individual.Factory} Individual factory.
@@ -197,7 +199,7 @@ Hybrid.Population = function(options) {
     this.getIndividualFactory = function() {
         return individualFactory;
     };
-    
+
     /**
      * Sets the individual factory to be used by this population.
      * @param {Hybrid.Individual.Factory} factory Individual factory.
@@ -205,7 +207,7 @@ Hybrid.Population = function(options) {
     this.setIndividualFactory = function(factory) {
         individualFactory = factory;
     };
-    
+
     /**
      * Evaluate the fitness values of the given individual.
      * @param {object} individual Individual.
@@ -214,7 +216,7 @@ Hybrid.Population = function(options) {
     this.evaluateFitness = function(individual) {
         return fitnessEvaluator.evaluate(individual, this);
     };
-    
+
     /**
      * Gets the fitness evaluator being used by this population.
      * @return {Hybrid.Fitness.Evaluator} Fitness evaluator.
@@ -222,7 +224,7 @@ Hybrid.Population = function(options) {
     this.getFitnessEvaluator = function() {
         return fitnessEvaluator;
     };
-    
+
     /**
      * Sets the fitness evaluator to be used by this population.
      * @param {Hybrid.Fitness.Evaluator} evaluator Fitness evaluator.
@@ -230,7 +232,7 @@ Hybrid.Population = function(options) {
     this.setFitnessEvaluator = function(evaluator) {
         fitnessEvaluator = evaluator;
     };
-    
+
     /**
      * Compares the given individuals based on their fitness.
      * @param {object} individual Individual.
@@ -244,7 +246,7 @@ Hybrid.Population = function(options) {
     this.compareIndividuals = function(individual, other) {
         return fitnessComparator.compare(individual, other);
     };
-    
+
     /**
      * Gets the fitness comparator being used by this population.
      * @return {Hybrid.Fitness.Comparator} Fitness comparator.
@@ -252,7 +254,7 @@ Hybrid.Population = function(options) {
     this.getFitnessComparator = function() {
         return fitnessComparator;
     };
-    
+
     /**
      * Sets the fitness comparator to be used by this population.
      * @param {Hybrid.Fitness.Comparator} comparator Fitness comparator.
@@ -260,7 +262,7 @@ Hybrid.Population = function(options) {
     this.setFitnessComparator = function(comparator) {
         fitnessComparator = comparator;
     };
-    
+
     /**
      * Gets the generation counter, which is a number that tells how many
      * generations have been processed so far.
@@ -269,7 +271,7 @@ Hybrid.Population = function(options) {
     this.getGeneration = function() {
         return generation;
     };
-    
+
     /**
      * Returns if this population is already initialized.
      * @return {boolean} If this population is already initialized.
@@ -277,7 +279,7 @@ Hybrid.Population = function(options) {
     this.isInitialized = function() {
         return initialized;
     };
-    
+
     /**
      * This population avoids redundant sort operations in order to improve
      * performance, but when some individual's internal state is changed or
@@ -287,7 +289,7 @@ Hybrid.Population = function(options) {
     this.expireCache = function() {
         dirty = true;
     };
-    
+
     /**
      * Gets the initial number of individuals this population should
      * produce during its initialization.
@@ -296,7 +298,7 @@ Hybrid.Population = function(options) {
     this.getInitialSize = function() {
         return initialSize;
     };
-    
+
     /**
      * Gets the individual located at the given index.
      * @param {number} i Index.
@@ -305,7 +307,7 @@ Hybrid.Population = function(options) {
     this.getIndividual = function(i) {
         return individuals[i];
     };
-    
+
     /**
      * Returns a copy of the current list of individuals.
      * @return {array} List of individuals.
@@ -313,7 +315,7 @@ Hybrid.Population = function(options) {
     this.getIndividuals = function() {
         return [].concat(individuals);
     };
-    
+
     /**
      * Computes and returns the current statistics for this population.
      * @return {object} Statistics.
@@ -321,7 +323,7 @@ Hybrid.Population = function(options) {
     this.getStatistics = function() {
         return statisticsProvider.compute(this);
     };
-    
+
     /**
      * Gets the statistics provider being used by this population.
      * @return {Hybrid.Population.StatisticsProvider} Statistics provider.
@@ -329,7 +331,7 @@ Hybrid.Population = function(options) {
     this.getStatisticsProvider = function() {
         return statisticsProvider;
     };
-    
+
     /**
      * Sets the statistics provider to be used by this population.
      * @param {Hybrid.Population.StatisticsProvider} provider Statistics
@@ -338,7 +340,7 @@ Hybrid.Population = function(options) {
     this.setStatisticsProvider = function(provider) {
         statisticsProvider = provider;
     };
-    
+
     /**
      * Generation counter.
      * @property
@@ -346,11 +348,11 @@ Hybrid.Population = function(options) {
      * @private
      */
     var generation = options.generation;
-    
+
     if (!generation) {
         generation = 0;
     }
-    
+
     /**
      * Event handler used by this population to notify third party objects
      * about the current state of the evolution.
@@ -359,7 +361,7 @@ Hybrid.Population = function(options) {
      * @private
      */
     var eventHandler = new Hybrid.Event.Handler();
-    
+
     /**
      * Statistics provider used by this population to compute statistics for
      * its individuals.
@@ -369,7 +371,7 @@ Hybrid.Population = function(options) {
      */
     var statisticsProvider = options.statisticsProvider ||
         new Hybrid.Population.StatisticsProvider();
-    
+
     /**
      * Number of individuals this population should produce during its
      * initialization.
@@ -379,7 +381,7 @@ Hybrid.Population = function(options) {
      */
     var initialSize = ((options.individuals) ? options.individuals.length :
         ((options.initialSize) ? options.initialSize: 100));
-    
+
     /**
      * Individual factory used to create the first generation of individuals.
      * @property
@@ -388,7 +390,7 @@ Hybrid.Population = function(options) {
      */
     var individualFactory = options.individualFactory ||
         new Hybrid.Individual.Factory();
-    
+
     /**
      * Fitness evaluator used to calculate the fitness value for this
      * population's individuals.
@@ -398,7 +400,7 @@ Hybrid.Population = function(options) {
      */
     var fitnessEvaluator = options.fitnessEvaluator ||
         new Hybrid.Fitness.Evaluator();
-    
+
     /**
      * Fitness comparator used to sort individuals according to their fitness.
      * @property
@@ -407,14 +409,14 @@ Hybrid.Population = function(options) {
      */
     var fitnessComparator = options.fitnessComparator ||
         new Hybrid.Fitness.Comparator();
-    
+
     /*
      * Monkeypatch individuals before add them to this population.
      */
     this.on('addIndividual', function(event) {
         Hybrid.Individual.plugFitnessLogic(event.individual, self);
     });
-    
+
     /**
      * List of individuals being managed by this population.
      * @property
@@ -425,7 +427,7 @@ Hybrid.Population = function(options) {
     if (options.individuals) {
         this.addAll(options.individuals);
     }
-    
+
     /**
      * Indicates whether this population is initialized or not.
      * @property
@@ -433,7 +435,7 @@ Hybrid.Population = function(options) {
      * @private
      */
     var initialized = !!options.individuals;
-    
+
     /**
      * Indicates the cache state.
      * @property
@@ -441,7 +443,7 @@ Hybrid.Population = function(options) {
      * @private
      */
     var dirty = initialized;
-};
+});
 
 /**
  * Adds Elitism support to a population. Elitism is a technique in which the
@@ -469,10 +471,10 @@ Hybrid.Population.addElitism = function(options) {
     new (function() {
         population.on('replaceGeneration', function(event) {
             var breed = event.breed;
-            
+
             breed = breed.slice(size);
             breed = breed.concat(event.population.best(size));
-            
+
             event.breed = breed;
         });
     })();
@@ -483,27 +485,35 @@ Hybrid.Population.addElitism = function(options) {
  * @class Simple class that is used to get statistical data for a population.
  * @constructor
  */
-Hybrid.Population.StatisticsProvider = function() {
-    
-    /**
-     * Returns statistical data for the given population.
-     * @param {Hybrid.Population} population Population.
-     * @return {object} Population statistics.
-     */
-    this.compute = function(population) {
-        return {
-            population: population
+Hybrid.Population.StatisticsProvider = new Hybrid.Class.extend(Object,
+    function() {
+
+        /**
+         * Returns statistical data for the given population.
+         * @param {Hybrid.Population} population Population.
+         * @return {object} Population statistics.
+         */
+        this.compute = function(population) {
+            return {
+                population: population
+            };
         };
-    };
-};
+    }
+);
 
 /**
  * Creates a new initialization error.
  * @class This exception is thrown when initializing an already initialized
  * population.
  * @constructor
+ * @param {string} msg Error message.
  */
-Hybrid.Population.AlreadyInitializedError = function() {};
+Hybrid.Population.AlreadyInitializedError = new Hybrid.Class.extend(Error,
+    function(msg) {
+        this.name = 'AlreadyInitializedError';
+        this.message = msg;
+    }
+);
 
 /**
  * Creates a new breed replacement error.
@@ -511,7 +521,12 @@ Hybrid.Population.AlreadyInitializedError = function() {};
  * individuals with a breed that contains a different number of individuals.
  * @constructor
  */
-Hybrid.Population.IncompatibleBreedError = function() {};
+Hybrid.Population.IncompatibleBreedError = new Hybrid.Class.extend(Error, 
+    function() {
+        this.name = 'IncompatibleBreedError';
+        this.message = 'Breed cannot replace the current generation with a different number of individuals';
+    }
+);
 
 /**
  * Creates a new elitism configuration error.
@@ -519,5 +534,10 @@ Hybrid.Population.IncompatibleBreedError = function() {};
  * without specify either the population or the elitism size.
  * @constructor
  */
-Hybrid.Population.IllegalElitismOptionsError = function() {};
+Hybrid.Population.IllegalElitismOptionsError = new Hybrid.Class.extend(Error,
+    function() {
+        this.name = 'IllegalElitismError';
+        this.message = '';
+    }
+);
 

@@ -20,8 +20,8 @@ Hybrid.Fitness = {};
  * @class Dummy fitness evaluator.
  * @constructor
  */
-Hybrid.Fitness.Evaluator = function() {
-    
+Hybrid.Fitness.Evaluator = new Hybrid.Class.extend(Object, function() {
+
     /**
      * Compute the fitness value of an individual. This default implementation
      * always returns <code>0</code>.
@@ -33,8 +33,7 @@ Hybrid.Fitness.Evaluator = function() {
     this.evaluate = function(individual, population) {
         return 0.0;
     };
-};
-
+});
 
 /**
  * Creates a fitness comparator.
@@ -46,20 +45,22 @@ Hybrid.Fitness.Evaluator = function() {
  * So, to make Hybrid consider smaller fitness values better than greater
  * ones, pass <code>true</code> to this argument.
  */
-Hybrid.Fitness.Comparator = function(inverse) {
-    
-    /**
-     * Compares two individuals.
-     * @param {object} individual First individual.
-     * @param {object} other Other individual.
-     * @return {number} Returns something smaller than zero if
-     * <code>individual</code> is considered better than <code>other</code>.
-     * Returns something greater than zero if <code>individual</code> is
-     * considered worse than <code>other</code>. Returns zero if both
-     * individuals are considered equivalent.
-     */
-    this.compare = function(individual, other) {
-        return (other.fitness.get() - individual.fitness.get()) * ((inverse) ? -1 : 1);
-    };
-};
+Hybrid.Fitness.Comparator = new Hybrid.Class.extend(Object,
+    function(inverse) {
+
+        /**
+         * Compares two individuals.
+         * @param {object} individual First individual.
+         * @param {object} other Other individual.
+         * @return {number} Returns something smaller than zero if
+         * <code>individual</code> is considered better than <code>other</code>.
+         * Returns something greater than zero if <code>individual</code> is
+         * considered worse than <code>other</code>. Returns zero if both
+         * individuals are considered equivalent.
+         */
+        this.compare = function(individual, other) {
+            return (other.fitness.get() - individual.fitness.get()) * ((inverse) ? -1 : 1);
+        };
+    }
+);
 

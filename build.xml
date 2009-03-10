@@ -29,39 +29,40 @@
     </propertyregex>
 
     <target name="hybrid" description="Main jquery build, concatenates source files and replaces @VERSION">
-        <property name="DIST" value="${BUILD_DIR}/hybrid.js" />
+        <property name="DIST" value="${BUILD_DIR}/hybrid.js"/>
         <echo message="Building ${DIST}" />
         <mkdir dir="${BUILD_DIR}" />
         <concat destfile="${DIST}">
-            <fileset dir="${SRC_DIR}" includes="hybrid.js" />
-            <fileset dir="${SRC_DIR}" includes="class.js" />
-            <fileset dir="${SRC_DIR}" includes="stop.js" />
-            <fileset dir="${SRC_DIR}" includes="util.js" />
-            <fileset dir="${SRC_DIR}" includes="reproduction.js" />
-            <fileset dir="${SRC_DIR}" includes="selection.js" />
-            <fileset dir="${SRC_DIR}" includes="population.js" />
-            <fileset dir="${SRC_DIR}" includes="fitness.js" />
-            <fileset dir="${SRC_DIR}" includes="individual.js" />
-            <fileset dir="${SRC_DIR}" includes="event.js" />
+            <fileset dir="${SRC_DIR}" includes="hybrid.js"/>
+            <fileset dir="${SRC_DIR}" includes="class.js"/>
+            <fileset dir="${SRC_DIR}" includes="engine.js"/>
+            <fileset dir="${SRC_DIR}" includes="stop.js"/>
+            <fileset dir="${SRC_DIR}" includes="util.js"/>
+            <fileset dir="${SRC_DIR}" includes="reproduction.js"/>
+            <fileset dir="${SRC_DIR}" includes="selection.js"/>
+            <fileset dir="${SRC_DIR}" includes="population.js"/>
+            <fileset dir="${SRC_DIR}" includes="fitness.js"/>
+            <fileset dir="${SRC_DIR}" includes="individual.js"/>
+            <fileset dir="${SRC_DIR}" includes="event.js"/>
         </concat>
 
         <echo message="Appending Revision and Date"/>
-        <replaceregexp match="@VERSION" replace="${VERSION}" flags="g" byline="true" file="${DIST}" />
-        <replaceregexp match="@DATE" replace="${DATE}" file="${DIST}" />
-        <replaceregexp match="@REV" replace="${REV}" file="${DIST}" />
+        <replaceregexp match="@VERSION" replace="${VERSION}" flags="g" byline="true" file="${DIST}"/>
+        <replaceregexp match="@DATE" replace="${DATE}" file="${DIST}"/>
+        <replaceregexp match="@REV" replace="${REV}" file="${DIST}"/>
 
-        <echo message="${DIST} built." />
+        <echo message="${DIST} built."/>
     </target>
     
     <target name="pack" depends="hybrid" description="Remove all comments and whitespace and compress">
-        <property name="DIST_PACK" value="${BUILD_DIR}/hybrid_minified.js" />
-        <echo message="Building ${DIST_PACK}" />
+        <property name="DIST_PACK" value="${BUILD_DIR}/hybrid_minified.js"/>
+        <echo message="Building ${DIST_PACK}"/>
         <java jar="${APP_DIR}/yuicompressor.jar" fork="true">
-            <arg value="-o" />
-            <arg value="${DIST_PACK}" />
-            <arg value="${DIST}" />
+            <arg value="-o"/>
+            <arg value="${DIST_PACK}"/>
+            <arg value="${DIST}"/>
         </java>
-        <echo message="${DIST_PACK} built." />
+        <echo message="${DIST_PACK} built."/>
     </target>
 
     <target name="doc" description="Generate API documentation">
@@ -69,6 +70,7 @@
         <jsdoctoolkit jsdochome="${APP_DIR}/jsdoc-toolkit/" template="outline" outputdir="${API_DIR}">
             <source file="${SRC_DIR}/hybrid.js"/>
             <source file="${SRC_DIR}/class.js"/>
+            <source file="${SRC_DIR}/engine.js"/>
             <source file="${SRC_DIR}/stop.js"/>
             <source file="${SRC_DIR}/util.js"/>
             <source file="${SRC_DIR}/reproduction.js"/>
@@ -97,10 +99,10 @@
     </target>
 
     <target name="clean">
-        <delete dir="${BUILD_DIR}" />
+        <delete dir="${BUILD_DIR}"/>
     </target>
 
     <target name="all" depends="clean,hybrid,test,pack,doc">
-        <echo message="Build complete." />
+        <echo message="Build complete."/>
     </target>
 </project>

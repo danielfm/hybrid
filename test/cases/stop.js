@@ -1,12 +1,12 @@
 var TestCases = {
     name: 'Stop Conditions',
-    
+
     setup: function() {
     },
-  
+
     teardown: function() {
     },
-    
+
     testStopCondition: function() { with(this) {
         var stop = new Hybrid.Stop.Condition();
         assertTrue(stop.interrupt());
@@ -29,14 +29,14 @@ var TestCases = {
 
         var generations = 5;
         assertFalse(elapsedStop.interrupt(event));
-        
+
         generations = 10;
         assertTrue(elapsedStop.interrupt(event));
 
         generations = 15;
         assertTrue(elapsedStop.interrupt(event));
     }},
-    
+
     testElapsedGenerationStopDefault: function() { with(this) {
         var elapsedStop = new Hybrid.Stop.ElapsedGeneration();
 
@@ -48,7 +48,7 @@ var TestCases = {
 
         var generations = 10;
         assertFalse(elapsedStop.interrupt(event));
-        
+
         generations = 100;
         assertTrue(elapsedStop.interrupt(event));
 
