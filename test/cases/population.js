@@ -2,44 +2,49 @@ var TestCases = {
     name: 'Population',
 
     setup: function() {
-        var IndividualFactory = function() {
-            this.create = function(randomizer, population) {
-                if (!randomizer) {
-                    throw "Randomizer should not be null";
-                }
-                if (!population) {
-                    throw "Population should not be null";
-                }
+        this.individualFactory = new (new Hybrid.Class.extend(Hybrid.Individual.Factory,
+            function() {
+                this.create = function(randomizer, population) {
+                    if (!randomizer) {
+                        throw "Randomizer should not be null";
+                    }
+                    if (!population) {
+                        throw "Population should not be null";
+                    }
 
-                this.factoryCount++;
-                return {
-                    number: randomizer.next()
+                    this.factoryCount++;
+                    return {
+                        number: randomizer.next()
+                    };
                 };
-            };
-        };
+            }
+        ))();
 
-        var FitnessEvaluator = function() {
-            this.evaluate = function(individual, population) {
-                if (!individual) {
-                    throw "Individual should not be null";
-                }
-                if (!population) {
-                    throw "Population should not be null";
-                }
+        this.fitnessEvaluator = new (new Hybrid.Class.extend(Hybrid.Fitness.Evaluator, 
+            function() {
+                this.evaluate = function(individual, population) {
+                    if (!individual) {
+                        throw "Individual should not be null";
+                    }
+                    if (!population) {
+                        throw "Population should not be null";
+                    }
 
-                this.evaluator++;
-                return individual.number;
-            };
-        };
+                    this.evaluator++;
+                    return individual.number;
+                };
+            }
+        ))();
 
         this.randomizer = new Hybrid.Util.Randomizer();
-        this.individualFactory = new IndividualFactory();
+        this.statisticsProvider = new Hybrid.Population.StatisticsProvider();
+        this.fitnessComparator = new Hybrid.Fitness.Comparator();
 
         this.population = new Hybrid.Population({
             initialSize: 10,
             generation: 10,
             individualFactory: this.individualFactory,
-            fitnessEvaluator: new FitnessEvaluator()
+            fitnessEvaluator: this.fitnessEvaluator
         });
     },
 
@@ -61,14 +66,10 @@ var TestCases = {
         assert(population.getFitnessComparator());
     }},
 
-    testConstructorWithArgs: function() { with(this) {
+    testConstructorWithIndividuals: function() { with(this) {
         var args = {
             individuals: [{}, {}, {}],
-            statisticsProvider: new Hybrid.Population.StatisticsProvider(),
-            individualFactory: {},
-            fitnessEvaluator: {},
-            fitnessComparator: {},
-            generation:19
+            initialSize: 10
         };
 
         population = new Hybrid.Population(args);
@@ -76,12 +77,20 @@ var TestCases = {
         assertEnumEqual(args.individuals, population.getIndividuals());
         assertTrue(population.isInitialized());
         assertEqual(args.individuals.length, population.getInitialSize());
-        assertEqual(args.generation, population.getGeneration());
+    }},
 
-        assertIdentical(args.statisticsProvider, population.getStatisticsProvider());
-        assertIdentical(args.individualFactory, population.getIndividualFactory());
-        assertIdentical(args.fitnessEvaluator, population.getFitnessEvaluator());
-        assertIdentical(args.fitnessComparator, population.getFitnessComparator());
+    testConstructorWithInvalidInitialSize: function() { with(this) {
+        population = new Hybrid.Population({
+            initialSize:0
+        });
+        assertTrue(population.getInitialSize() > 0);
+    }},
+
+    testConstructorWithInvalidGeneration: function() { with(this) {
+        population = new Hybrid.Population({
+            generation:-1
+        });
+        assertTrue(population.getGeneration() >= 0);
     }},
 
     testInitialize: function() { with(this) {
@@ -116,7 +125,7 @@ var TestCases = {
     testInitializeTwice: function() { with(this) {
         population.initialize(randomizer);
 
-        assertRaise(Hybrid.Population.AlreadyInitializedError, function() {
+        assertRaise(Hybrid.Error, function() {
             population.initialize(randomizer);
         });
     }},
@@ -130,6 +139,21 @@ var TestCases = {
 
         assertEqual(1, population.getSize());
         assertEqual('abc', population.getIndividual(0).someProperty);
+    }},
+
+    testAddAll: function() { with(this) {
+        var individuals = [{}, {}];
+        population.addAll(individuals);
+
+        assertEqual(2, population.getSize());
+        assertIdentical(population.getIndividual(0), individuals[0]);
+        assertIdentical(population.getIndividual(1), individuals[1]);
+    }},
+
+    testAddAllWithInvalidArgument: function() { with(this) {
+        assertRaise(Hybrid.Error, function() {
+            population.addAll({});
+        });
     }},
 
     testSort: function() { with(this) {
@@ -188,7 +212,7 @@ var TestCases = {
             breed.push(individualFactory.create(randomizer, population));
         }
 
-        assertRaise(Hybrid.Population.IncompatibleBreedError, function() {
+        assertRaise(Hybrid.Error, function() {
             population.replaceGeneration(breed);
         });
         assertEqual(0, count);
@@ -205,30 +229,6 @@ var TestCases = {
 
         population.unsubscribe(listener);
         assertEqual(count, population.getEventHandler().getListeners().length);
-    }},
-
-    testSetIndividualFactory: function() { with(this) {
-        var factory = {};
-        population.setIndividualFactory(factory);
-        assertIdentical(factory, population.getIndividualFactory());
-    }},
-
-    testSetFitnessEvaluator: function() { with(this) {
-        var evaluator = {};
-        population.setFitnessEvaluator(evaluator);
-        assertIdentical(evaluator, population.getFitnessEvaluator());
-    }},
-
-    testSetFitnessComparator: function() { with(this) {
-        var comparator = {};
-        population.setFitnessComparator(comparator);
-        assertIdentical(comparator, population.getFitnessComparator());
-    }},
-
-    testSetStatisticsProvider: function() { with(this) {
-        var provider = {};
-        population.setStatisticsProvider(provider);
-        assertIdentical(provider, population.getStatisticsProvider());
     }},
 
     testElitismWithSizeZero: function() { with(this) {
@@ -279,17 +279,17 @@ var TestCases = {
     }},
 
     testElitismWithMissingOptions: function() { with(this) {
-        assertRaise(Hybrid.Population.IllegalElitismOptionsError, function() {
+        assertRaise(Hybrid.Error, function() {
             Hybrid.Population.addElitism();
         });
 
-        assertRaise(Hybrid.Population.IllegalElitismOptionsError, function() {
+        assertRaise(Hybrid.Error, function() {
             Hybrid.Population.addElitism({
                 to: population
             });
         });
 
-        assertRaise(Hybrid.Population.IllegalElitismOptionsError, function() {
+        assertRaise(Hybrid.Error, function() {
             Hybrid.Population.addElitism({
                 size: 2
             });
@@ -299,6 +299,86 @@ var TestCases = {
             to: population,
             size: 2
         });
+    }},
+
+    testSetIndividualFactory: function() { with(this) {
+        assertRaise(Hybrid.Error, function() {
+            population.setIndividualFactory({});
+        });
+
+        assertRaise(Hybrid.Error, function() {
+            new Hybrid.Population({
+                individualFactory: {}
+            });
+        });
+
+        population.setIndividualFactory(individualFactory);
+        assertIdentical(individualFactory, population.getIndividualFactory());
+
+        population = new Hybrid.Population({
+            individualFactory: this.individualFactory
+        });
+        assertIdentical(individualFactory, population.getIndividualFactory());
+    }},
+
+    testSetFitnessEvaluator: function() { with(this) {
+        assertRaise(Hybrid.Error, function() {
+            population.setFitnessEvaluator({});
+        });
+
+        assertRaise(Hybrid.Error, function() {
+            new Hybrid.Population({
+                fitnessEvaluator: {}
+            });
+        });
+
+        population.setFitnessEvaluator(this.fitnessEvaluator);
+        assertIdentical(this.fitnessEvaluator, population.getFitnessEvaluator());
+
+        population = new Hybrid.Population({
+            fitnessEvaluator: this.fitnessEvaluator
+        });
+        assertIdentical(this.fitnessEvaluator, population.getFitnessEvaluator());
+    }},
+
+    testSetStatisticsProvider: function() { with(this) {
+        assertRaise(Hybrid.Error, function() {
+            population.setStatisticsProvider({});
+        });
+
+        assertRaise(Hybrid.Error, function() {
+            new Hybrid.Population({
+                statisticsProvider: {}
+            });
+        });
+
+        population.setStatisticsProvider(this.statisticsProvider);
+        assertIdentical(this.statisticsProvider, population.getStatisticsProvider());
+
+        population = new Hybrid.Population({
+            statisticsProvider: this.statisticsProvider
+        });
+        assertIdentical(this.statisticsProvider, population.getStatisticsProvider());
+    }},
+
+    testSetFitnessComparator: function() { with(this) {
+        assertRaise(Hybrid.Error, function() {
+            population.setFitnessComparator({});
+        });
+
+        assertRaise(Hybrid.Error, function() {
+            new Hybrid.Population({
+                fitnessComparator: {}
+            });
+        });
+
+        population.setFitnessComparator(this.fitnessComparator);
+        assertIdentical(this.fitnessComparator, population.getFitnessComparator());
+
+        population = new Hybrid.Population({
+            fitnessComparator: this.fitnessComparator
+        });
+        assertIdentical(this.fitnessComparator, population.getFitnessComparator());
     }}
 };
 

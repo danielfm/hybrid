@@ -41,28 +41,25 @@ Hybrid.Population = new Hybrid.Class.extend(Object, function(options) {
      * </ul>
      * @param {Hybrid.Util.Randomizer} randomizer Randomizer object being used
      * by the engine.
-     * @throws {Hybrid.Population.AlreadyInitializedError} If this population
+     * @throws {Hybrid.Error} If this population
      * is already initialized
      */
     this.initialize = function(randomizer) {
         if (initialized) {
-            throw new Hybrid.Population.AlreadyInitializedError(
-                'Population already initialized'
-            );
+            throw new Hybrid.Error('Population already initialized');
         }
 
         generation = 0;
         this.notify('beforeInitialize', this.getStatistics());
 
         // create the individuals using the individual factory
-        for (var i = 0; i < initialSize; i++) {
+        while (individuals.length < initialSize) {
             var individual = individualFactory.create(randomizer, this);
             if (individual) {
                 this.add(individual);
             }
         }
 
-        initialSize = individuals.length;
         initialized = true;
         this.notify('afterInitialize', this.getStatistics());
     };
@@ -77,10 +74,12 @@ Hybrid.Population = new Hybrid.Class.extend(Object, function(options) {
      * </ul>
      * @param {array} newIndividuals Array of individuals that should replace
      * the current population.
+     * @throws {Hybrid.Error} If the number of new individuals are incompatible
+     * with the current population size.
      */
     this.replaceGeneration = function(newIndividuals) {
         if (newIndividuals.length != individuals.length) {
-            throw new Hybrid.Population.IncompatibleBreedError();
+            throw new Hybrid.Error('Breed should have the same number of individuals of the current population');
         }
 
         var statistics = this.getStatistics();
@@ -122,8 +121,13 @@ Hybrid.Population = new Hybrid.Class.extend(Object, function(options) {
     /**
      * Adds all the given individuals to this population.
      * @param {array} individuals List of individuals.
+     * @throws {Hybrid.Error} If the given object is not an array.
      */
     this.addAll = function(individuals) {
+        if (!(individuals instanceof Array)) {
+            throw new Hybrid.Error('Instance of Array expected');
+        }
+
         var size = individuals.length;
         for (var i = 0; i < size; i++) {
             this.add(individuals[i]);
@@ -203,8 +207,12 @@ Hybrid.Population = new Hybrid.Class.extend(Object, function(options) {
     /**
      * Sets the individual factory to be used by this population.
      * @param {Hybrid.Individual.Factory} factory Individual factory.
+     * @throws {Hybrid.Error} If the object is not a individual factory.
      */
     this.setIndividualFactory = function(factory) {
+        if (!(factory instanceof Hybrid.Individual.Factory)) {
+            throw new Hybrid.Error('Instance of Hybrid.Individual.Factory expected');
+        }
         individualFactory = factory;
     };
 
@@ -228,8 +236,12 @@ Hybrid.Population = new Hybrid.Class.extend(Object, function(options) {
     /**
      * Sets the fitness evaluator to be used by this population.
      * @param {Hybrid.Fitness.Evaluator} evaluator Fitness evaluator.
+     * @throws {Hybrid.Error} If the object is not a fitness evaluator.
      */
     this.setFitnessEvaluator = function(evaluator) {
+        if (!(evaluator instanceof Hybrid.Fitness.Evaluator)) {
+            throw new Hybrid.Error('Instance of Hybrid.Fitness.Evaluator expected');
+        }
         fitnessEvaluator = evaluator;
     };
 
@@ -258,8 +270,12 @@ Hybrid.Population = new Hybrid.Class.extend(Object, function(options) {
     /**
      * Sets the fitness comparator to be used by this population.
      * @param {Hybrid.Fitness.Comparator} comparator Fitness comparator.
+     * @throws {Hybrid.Error} If the object is not a fitness comparator.
      */
     this.setFitnessComparator = function(comparator) {
+        if (!(comparator instanceof Hybrid.Fitness.Comparator)) {
+            throw new Hybrid.Error('Instance of Hybrid.Fitness.Comparator expected');
+        }
         fitnessComparator = comparator;
     };
 
@@ -336,8 +352,12 @@ Hybrid.Population = new Hybrid.Class.extend(Object, function(options) {
      * Sets the statistics provider to be used by this population.
      * @param {Hybrid.Population.StatisticsProvider} provider Statistics
      * provider.
+     * @throws {Hybrid.Error} If the object is not a statistics provider.
      */
     this.setStatisticsProvider = function(provider) {
+        if (!(provider instanceof Hybrid.Population.StatisticsProvider)) {
+            throw new Hybrid.Error('Instance of Hybrid.Population.StatisticsProvider expected');
+        }
         statisticsProvider = provider;
     };
 
@@ -349,7 +369,7 @@ Hybrid.Population = new Hybrid.Class.extend(Object, function(options) {
      */
     var generation = options.generation;
 
-    if (!generation) {
+    if (!generation || generation < 0) {
         generation = 0;
     }
 
@@ -369,8 +389,9 @@ Hybrid.Population = new Hybrid.Class.extend(Object, function(options) {
      * @type Hybrid.Population.StatisticsProvider
      * @private
      */
-    var statisticsProvider = options.statisticsProvider ||
-        new Hybrid.Population.StatisticsProvider();
+    var statisticsProvider;
+    this.setStatisticsProvider(options.statisticsProvider ||
+        new Hybrid.Population.StatisticsProvider());
 
     /**
      * Number of individuals this population should produce during its
@@ -380,7 +401,9 @@ Hybrid.Population = new Hybrid.Class.extend(Object, function(options) {
      * @private
      */
     var initialSize = ((options.individuals) ? options.individuals.length :
-        ((options.initialSize) ? options.initialSize: 100));
+        ((options.initialSize && options.initialSize > 0)
+            ? options.initialSize
+            : 100));
 
     /**
      * Individual factory used to create the first generation of individuals.
@@ -388,8 +411,9 @@ Hybrid.Population = new Hybrid.Class.extend(Object, function(options) {
      * @type Hybrid.Individual.Factory
      * @private
      */
-    var individualFactory = options.individualFactory ||
-        new Hybrid.Individual.Factory();
+    var individualFactory;
+    this.setIndividualFactory(options.individualFactory ||
+        new Hybrid.Individual.Factory());
 
     /**
      * Fitness evaluator used to calculate the fitness value for this
@@ -398,8 +422,9 @@ Hybrid.Population = new Hybrid.Class.extend(Object, function(options) {
      * @type Hybrid.Fitness.Evaluator
      * @private
      */
-    var fitnessEvaluator = options.fitnessEvaluator ||
-        new Hybrid.Fitness.Evaluator();
+    var fitnessEvaluator;
+    this.setFitnessEvaluator(options.fitnessEvaluator ||
+        new Hybrid.Fitness.Evaluator());
 
     /**
      * Fitness comparator used to sort individuals according to their fitness.
@@ -407,8 +432,9 @@ Hybrid.Population = new Hybrid.Class.extend(Object, function(options) {
      * @type Hybrid.Fitness.Comparator
      * @private
      */
-    var fitnessComparator = options.fitnessComparator ||
-        new Hybrid.Fitness.Comparator();
+    var fitnessComparator;
+    this.setFitnessComparator(options.fitnessComparator ||
+        new Hybrid.Fitness.Comparator());
 
     /*
      * Monkeypatch individuals before add them to this population.
@@ -457,6 +483,7 @@ Hybrid.Population = new Hybrid.Class.extend(Object, function(options) {
  * @param {number} options.size Number of best individuals to keep from
  * generation to generation.
  * @static
+ * @throws {Hybrid.Error} If the given options are invalid.
  */
 Hybrid.Population.addElitism = function(options) {
     options = options || {};
@@ -465,7 +492,7 @@ Hybrid.Population.addElitism = function(options) {
     var size = options.size;
 
     if (population == null || size == null) {
-        throw new Hybrid.Population.IllegalElitismOptionsError();
+        throw new Hybrid.Error('Population and elitism size are required');
     }
 
     new (function() {
@@ -498,46 +525,6 @@ Hybrid.Population.StatisticsProvider = new Hybrid.Class.extend(Object,
                 population: population
             };
         };
-    }
-);
-
-/**
- * Creates a new initialization error.
- * @class This exception is thrown when initializing an already initialized
- * population.
- * @constructor
- * @param {string} msg Error message.
- */
-Hybrid.Population.AlreadyInitializedError = new Hybrid.Class.extend(Error,
-    function(msg) {
-        this.name = 'AlreadyInitializedError';
-        this.message = msg;
-    }
-);
-
-/**
- * Creates a new breed replacement error.
- * @class This exception is thrown when trying to replace the population's
- * individuals with a breed that contains a different number of individuals.
- * @constructor
- */
-Hybrid.Population.IncompatibleBreedError = new Hybrid.Class.extend(Error, 
-    function() {
-        this.name = 'IncompatibleBreedError';
-        this.message = 'Breed cannot replace the current generation with a different number of individuals';
-    }
-);
-
-/**
- * Creates a new elitism configuration error.
- * @class This exception is thrown when trying to add elitism support to a population
- * without specify either the population or the elitism size.
- * @constructor
- */
-Hybrid.Population.IllegalElitismOptionsError = new Hybrid.Class.extend(Error,
-    function() {
-        this.name = 'IllegalElitismError';
-        this.message = '';
     }
 );
 

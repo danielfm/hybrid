@@ -7,24 +7,28 @@ var TestCases = {
             individuals.push({number:i});
         }
 
-        this.fitnessEvaluator = new function() {
-            this.evaluate = function(individual, population) {
-                return individual.number;
-            };
-        }();
+        this.fitnessEvaluator = new (new Hybrid.Class.extend(Hybrid.Fitness.Evaluator, 
+            function() {
+                this.evaluate = function(individual, population) {
+                    return individual.number;
+                };
+            }
+        ))();
 
         this.population = new Hybrid.Population({
             fitnessEvaluator: this.fitnessEvaluator,
             individuals: individuals
         });
 
-        this.Randomizer = function(results) {
-            this.current = 0;
+        this.Randomizer = new Hybrid.Class.extend(Hybrid.Util.Randomizer,
+            function(results) {
+                this.current = 0;
 
-            this.next = function(range) {
-                return results[this.current++];
+                this.next = function(range) {
+                    return results[this.current++];
+                }
             }
-        };
+        );
     },
 
     teardown: function() {

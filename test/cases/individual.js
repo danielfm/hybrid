@@ -2,20 +2,21 @@ var TestCases = {
     name: 'Individuals',
 
     setup: function() {
-        var FitnessEvaluator = function() {
-            this.evaluate = function(individual, population) {
-                if (!individual) {
-                    throw "Individual should not be null";
-                }
-                if (!population) {
-                    throw "Population should not be null";
-                }
-                return individual.number;
-            };
-        };
+        this.fitnessEvaluator = new (new Hybrid.Class.extend(Hybrid.Fitness.Evaluator,
+            function() {
+                this.evaluate = function(individual, population) {
+                    if (!individual) {
+                        throw "Individual should not be null";
+                    }
+                    if (!population) {
+                        throw "Population should not be null";
+                    }
+                    return individual.number;
+                };
+            }
+        ))();
 
         this.randomizer = new Hybrid.Util.Randomizer();
-        this.fitnessEvaluator = new FitnessEvaluator();
 
         this.population = new Hybrid.Population({
             fitnessEvaluator: this.fitnessEvaluator

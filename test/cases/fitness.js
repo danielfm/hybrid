@@ -2,20 +2,23 @@ var TestCases = {
     name: 'Fitness',
 
     setup: function() {
-        var FitnessEvaluator = function() {
-            this.evaluate = function(individual, population) {
-                if (!individual) {
-                    throw "Individual should not be null";
-                }
-                if (!population) {
-                    throw "Population should not be null";
-                }
+        this.fitnessEvaluator = new (new Hybrid.Class.extend(Hybrid.Fitness.Evaluator,
+            function() {
+                this.evaluate = function(individual, population) {
+                    if (!individual) {
+                        throw "Individual should not be null";
+                    }
+                    if (!population) {
+                        throw "Population should not be null";
+                    }
 
-                return individual.number;
-            };
-        };
+                    return individual.number;
+                };
+            }
+        ))();
 
-        this.fitnessEvaluator = new FitnessEvaluator();
+        this.fitnessComparator = new Hybrid.Fitness.Comparator();
+        this.inverseFitnessComparator = new Hybrid.Fitness.Comparator(true);
 
         this.population = new Hybrid.Population({
             initialSize: 10,
@@ -28,31 +31,27 @@ var TestCases = {
     },
 
     testFitnessComparator: function() { with(this) {
-        var comparator = new Hybrid.Fitness.Comparator();
-
         var first = {number:5};
         var second = {number:5};
         var third = {number:6};
 
         population.addAll([first, second, third]);
 
-        assertEqual(0, comparator.compare(first, second));
-        assertEqual(1, comparator.compare(second, third));
-        assertEqual(-1, comparator.compare(third, second));
+        assertEqual(0, fitnessComparator.compare(first, second));
+        assertEqual(1, fitnessComparator.compare(second, third));
+        assertEqual(-1, fitnessComparator.compare(third, second));
     }},
 
-    testReverseFitnessComparator: function() { with(this) {
-        var comparator = new Hybrid.Fitness.Comparator(true);
-
+    testInverseFitnessComparator: function() { with(this) {
         var first = {number:5};
         var second = {number:5};
         var third = {number:6};
 
         population.addAll([first, second, third]);
 
-        assertEqual(0, comparator.compare(first, second));
-        assertEqual(-1, comparator.compare(second, third));
-        assertEqual(1, comparator.compare(third, second));
+        assertEqual(0, inverseFitnessComparator.compare(first, second));
+        assertEqual(-1, inverseFitnessComparator.compare(second, third));
+        assertEqual(1, inverseFitnessComparator.compare(third, second));
     }}
 };
 
