@@ -112,4 +112,7 @@ Hybrid.Event.Handler = function() {
      */
     var listeners = [];
 };
+Hybrid.Event.Handler = new Hybrid.Class({
+    constructor: Hybrid.Event.Handler
+});
 

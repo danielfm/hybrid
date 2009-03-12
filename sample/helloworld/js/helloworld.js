@@ -15,7 +15,7 @@ $('document').ready(function() {
 
 /**
  * Only characters between 'a' and 'z'.
- * @param {Hybrid.Util.Randomizer} randomizer Randomizer instance.
+ * @param {Hybrid.Util.Randomizer} randomizer Randomizer.
  * @return {string} Random character between 'a' and 'z'.
  */
 function getRandomChar(randomizer) {
@@ -29,6 +29,13 @@ function getRandomChar(randomizer) {
  * @param {number} size Word length in characters.
  */
 var WordFactory = function(size) {
+
+    /**
+     * Creates a random word.
+     * @param {Hybrid.Util.Randomizer} randomizer Randomizer.
+     * @param {Hybrid.Population} population Population.
+     * @return {object} Random word.
+     */
     this.create = function(randomizer, population) {
         var word = '';
         for (var i = 0; i < size; i++) {
@@ -37,6 +44,10 @@ var WordFactory = function(size) {
         return {word: word};
     };
 };
+WordFactory = new Hybrid.Class({
+    extend: Hybrid.Individual.Factory,
+    constructor: WordFactory
+});
 
 /**
  * Creates a new word fitness evaluator.
@@ -46,6 +57,14 @@ var WordFactory = function(size) {
  * @param {string} expected Expected word to compare against.
  */
 var WordFitnessEvaluator = function(expected) {
+    WordFitnessEvaluator.superClass.call(this);
+
+    /**
+     * Calculates the fitness of a word.
+     * @param {object} individual Word.
+     * @param {Hybrid.Population} population Population.
+     * @return {number} Fitness value.
+     */
     this.evaluate = function(individual, population) {
         var fitness = 0;
         var size = individual.word.length;
@@ -57,6 +76,10 @@ var WordFitnessEvaluator = function(expected) {
         return fitness;
     };
 };
+WordFitnessEvaluator = new Hybrid.Class({
+    extend: Hybrid.Fitness.Evaluator,
+    constructor: WordFitnessEvaluator 
+});
 
 /**
  * Creates a new word crossover strategy.
@@ -67,20 +90,39 @@ var WordFitnessEvaluator = function(expected) {
  * @param {string} expected Expected word.
  */
 var WordCrossover = function(probability, expected) {
-    this.expectedRange = new Hybrid.Util.Range(expected.length);
+    WordCrossover.superClass.call(this);
 
-    this.crossover = function(randomizer, mother, father, population) {
+    /**
+     * Range that represents the length of the expected word.
+     * @property
+     * @type Hybrid.Util.Range
+     * @private
+     */
+    expectedRange = new Hybrid.Util.Range(expected.length);
+
+    /**
+     * Recombine two words.
+     * @param {Hybrid.Util.Randomizer} randomizer Randomizer.
+     * @param {object} mother Word.
+     * @param {object} father Other word.
+     * @return {object} Child word.
+     */
+    this.crossover = function(randomizer, mother, father) {
         // We skip the crossover according to the configuration
         if (!randomizer.probability(probability)) {
             return null;
         }
 
-        var point = parseInt(randomizer.next(this.expectedRange));
+        var point = parseInt(randomizer.next(expectedRange));
         var word = father.word.substr(0, point);
         word += mother.word.substr(point);
         return {word: word};
     }
 };
+WordCrossover = new Hybrid.Class({
+    extend: Hybrid.Reproduction.Crossover,
+    constructor: WordCrossover 
+});
 
 /**
  * Creates a new word mutation strategy.
@@ -92,20 +134,38 @@ var WordCrossover = function(probability, expected) {
  * @param {string} expected Expected word.
  */
 var WordMutation = function(probability, expected) {
-    this.expectedRange = new Hybrid.Util.Range(expected.length);
+    WordMutation.superClass.call(this);
 
-    this.mutate = function(randomizer, individual, population) {
+    /**
+     * Range that represents the length of the expected word.
+     * @property
+     * @type Hybrid.Util.Range
+     * @private
+     */
+    var expectedRange = new Hybrid.Util.Range(expected.length);
+
+    /**
+     * Mutate a word.
+     * @param {Hybrid.Util.Randomizer} randomizer Randomizer.
+     * @param {object} individual Word.
+     * @return {object} Mutated word.
+     */
+    this.mutate = function(randomizer, individual) {
         // We skip the mutation according to the configuration
         if (!randomizer.probability(probability)) {
             return null;
         }
 
         var word = individual.word;
-        var point = parseInt(randomizer.next(this.expectedRange));
+        var point = parseInt(randomizer.next(expectedRange));
         word = word.substr(0, point) + getRandomChar(randomizer) + word.substr(point + 1);
         return {word:word};
     }
 };
+WordMutation = new Hybrid.Class({
+    extend: Hybrid.Reproduction.Mutation,
+    constructor: WordMutation 
+});
 
 /**
  * Creates a new stop condition.
@@ -114,16 +174,27 @@ var WordMutation = function(probability, expected) {
  * @param {string} expected Expected word.
  */
 var StopCondition = function(expected) {
+    StopCondition.superClass.call(this);
+
+    /**
+     * Interrupts the evolution when the best word matches the expected word.
+     * @param {object} event Event object.
+     * @return {boolean} Whether the evolution should be interrupted.
+     */
     this.interrupt = function(event) {
         var best = event.population.best();
         if (best.word == expected) {
             // Re-enable the button and show a message
-            $('#evolve').val('Start the evolution!').attr('disabled', false);
+            $('#evolve').val('Start the evolution!').removeAttr('disabled');
             alert('The algorithm took ' + event.population.getGeneration() + ' generations to find your word.');
             return true;
         }
     };
 };
+StopCondition = new Hybrid.Class({
+    extend: Hybrid.Stop.Condition,
+    constructor: StopCondition 
+});
 
 /**
  * Evolves a population of random words.
@@ -180,7 +251,7 @@ function evolve() {
     });
 
     //  Disable the button and start the evolution
-    $('#evolve').val('Please wait...').attr('disabled', true);
     engine.evolve();
+    $('#evolve').val('Please wait...').attr('disabled', 'disabled');
 }
 

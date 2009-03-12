@@ -101,7 +101,7 @@ Hybrid.Individual = {
  * generation.
  * @constructor
  */
-Hybrid.Individual.Factory = new Hybrid.Class.extend(Object, function() {
+Hybrid.Individual.Factory = function() {
 
     /**
      * Creates a random individual.
@@ -112,5 +112,9 @@ Hybrid.Individual.Factory = new Hybrid.Class.extend(Object, function() {
     this.create = function(randomizer, population) {
         return null;
     };
+};
+
+Hybrid.Individual.Factory = new Hybrid.Class({
+    constructor: Hybrid.Individual.Factory
 });
 

@@ -1,3 +1,25 @@
+var Selection_FitnessEvaluator = function() {
+    this.evaluate = function(individual, population) {
+        return individual.number;
+    };
+};
+Selection_FitnessEvaluator = new Hybrid.Class({
+    extend: Hybrid.Fitness.Evaluator,
+    constructor: Selection_FitnessEvaluator
+});
+
+var Selection_Randomizer = function(results) {
+    this.current = 0;
+
+    this.next = function(range) {
+        return results[this.current++];
+    }
+};
+Selection_Randomizer = new Hybrid.Class({
+    extend: Hybrid.Util.Randomizer,
+    constructor: Selection_Randomizer
+});
+
 var TestCases = {
     name: 'Selection',
 
@@ -7,35 +29,19 @@ var TestCases = {
             individuals.push({number:i});
         }
 
-        this.fitnessEvaluator = new (new Hybrid.Class.extend(Hybrid.Fitness.Evaluator, 
-            function() {
-                this.evaluate = function(individual, population) {
-                    return individual.number;
-                };
-            }
-        ))();
+        this.fitnessEvaluator = new Selection_FitnessEvaluator();
 
         this.population = new Hybrid.Population({
             fitnessEvaluator: this.fitnessEvaluator,
             individuals: individuals
         });
-
-        this.Randomizer = new Hybrid.Class.extend(Hybrid.Util.Randomizer,
-            function(results) {
-                this.current = 0;
-
-                this.next = function(range) {
-                    return results[this.current++];
-                }
-            }
-        );
     },
 
     teardown: function() {
     },
 
     testDummySelect: function() { with(this) {
-        var randomizer = new Randomizer([0, 4, 9]);
+        var randomizer = new Selection_Randomizer([0, 4, 9]);
         var selection = new Hybrid.Selection();
 
         var individual = selection.select(randomizer, population);
@@ -49,7 +55,7 @@ var TestCases = {
     }},
 
     testTournamentSelect: function() { with(this) {
-        var randomizer = new Randomizer([2, 4, 3, 6, 4, 5, 8, 1, 9]);
+        var randomizer = new Selection_Randomizer([2, 4, 3, 6, 4, 5, 8, 1, 9]);
         var selection = new Hybrid.Selection.Tournament(0.3);
 
         var individual = selection.select(randomizer, population);
@@ -63,7 +69,7 @@ var TestCases = {
     }},
 
     testRankingSelect: function() { with(this) {
-        var randomizer = new Randomizer([36, 16, 7, 44]);
+        var randomizer = new Selection_Randomizer([36, 16, 7, 44]);
         var selection = new Hybrid.Selection.Ranking();
 
         var individual = selection.select(randomizer, population);

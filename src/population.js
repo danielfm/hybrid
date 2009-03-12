@@ -29,7 +29,7 @@
  * @param {Hybrid.Fitness.Evaluator} options.fitnessEvaluator Fitness evaluator
  * used to calculate the fitness of each population's individuals.
  */
-Hybrid.Population = new Hybrid.Class.extend(Object, function(options) {
+Hybrid.Population = function(options) {
     var self = this;
     options = options || {};
 
@@ -469,6 +469,9 @@ Hybrid.Population = new Hybrid.Class.extend(Object, function(options) {
      * @private
      */
     var dirty = initialized;
+};
+Hybrid.Population = new Hybrid.Class({
+    constructor: Hybrid.Population
 });
 
 /**
@@ -512,19 +515,20 @@ Hybrid.Population.addElitism = function(options) {
  * @class Simple class that is used to get statistical data for a population.
  * @constructor
  */
-Hybrid.Population.StatisticsProvider = new Hybrid.Class.extend(Object,
-    function() {
+Hybrid.Population.StatisticsProvider = function() {
 
-        /**
-         * Returns statistical data for the given population.
-         * @param {Hybrid.Population} population Population.
-         * @return {object} Population statistics.
-         */
-        this.compute = function(population) {
-            return {
-                population: population
-            };
+    /**
+     * Returns statistical data for the given population.
+     * @param {Hybrid.Population} population Population.
+     * @return {object} Population statistics.
+     */
+    this.compute = function(population) {
+        return {
+            population: population
         };
-    }
-);
+    };
+};
+Hybrid.Population.StatisticsProvider = new Hybrid.Class({
+    constructor: Hybrid.Population.StatisticsProvider
+});
 

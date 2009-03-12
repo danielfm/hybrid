@@ -50,7 +50,7 @@ Hybrid.Engine = function(options) {
     this.evolve = function() {
         population.initialize(randomizer);
         processEvolution();
-    }
+    };
 
     /**
      * Processes the evolution.
@@ -268,6 +268,9 @@ Hybrid.Engine = function(options) {
      */
     var eventHandler = new Hybrid.Event.Handler();
 };
+Hybrid.Engine = new Hybrid.Class({
+    constructor: Hybrid.Engine
+});
 
 /**
  * Creates a Hybrid error.
@@ -276,7 +279,7 @@ Hybrid.Engine = function(options) {
  * @constructor
  * @param {string} msg Error message
  */
-Hybrid.Error = new Hybrid.Class.extend(Error, function(msg) {
+Hybrid.Error = function(msg) {
 
     /**
      * Error name.
@@ -291,4 +294,8 @@ Hybrid.Error = new Hybrid.Class.extend(Error, function(msg) {
      * @type string
      */
     this.message = msg;
+};
+Hybrid.Error = new Hybrid.Class({
+    constructor: Hybrid.Error
 });
+

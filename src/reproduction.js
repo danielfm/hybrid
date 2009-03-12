@@ -21,7 +21,7 @@ Hybrid.Reproduction = {};
  * based.
  * @constructor
  */
-Hybrid.Reproduction.Crossover = new Hybrid.Class.extend(Object, function() {
+Hybrid.Reproduction.Crossover = function() {
 
     /**
      * Combines two individuals in order to produce a child individual that
@@ -35,6 +35,9 @@ Hybrid.Reproduction.Crossover = new Hybrid.Class.extend(Object, function() {
     this.crossover = function(randomizer, mother, father, population) {
         return null;
     };
+};
+Hybrid.Reproduction.Crossover = new Hybrid.Class({
+    constructor: Hybrid.Reproduction.Crossover
 });
 
 /**
@@ -44,7 +47,7 @@ Hybrid.Reproduction.Crossover = new Hybrid.Class.extend(Object, function() {
  * individuals to the next. It is analogous to biological mutation.
  * @constructor
  */
-Hybrid.Reproduction.Mutation = new Hybrid.Class.extend(Object, function() {
+Hybrid.Reproduction.Mutation = function() {
  
     /**
      * Returns a mutated copy of the given individual.
@@ -56,5 +59,9 @@ Hybrid.Reproduction.Mutation = new Hybrid.Class.extend(Object, function() {
     this.mutate = function(randomizer, individual, population) {
         return null;
     };
+};
+
+Hybrid.Reproduction.Mutation = new Hybrid.Class({
+    constructor: Hybrid.Reproduction.Mutation
 });
 

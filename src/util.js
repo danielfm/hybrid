@@ -55,7 +55,7 @@ Hybrid.Util.Array = {
  * @class Randomizer
  * @constructor
  */
-Hybrid.Util.Randomizer = new Hybrid.Class.extend(Object, function() {
+Hybrid.Util.Randomizer = function() {
 
     /**
      * Gets a random number between the given range. If this method is called
@@ -84,6 +84,9 @@ Hybrid.Util.Randomizer = new Hybrid.Class.extend(Object, function() {
     this.probability = function(percent) {
         return this.next() <= percent;
     };
+};
+Hybrid.Util.Randomizer = new Hybrid.Class({
+    constructor: Hybrid.Util.Randomizer
 });
 
 /**
@@ -93,7 +96,7 @@ Hybrid.Util.Randomizer = new Hybrid.Class.extend(Object, function() {
  * @param {number} [start=0] Range start.
  * @param {number} end Range end.
  */
-Hybrid.Util.Range = new Hybrid.Class.extend(Object, function(start, end) {
+Hybrid.Util.Range = function(start, end) {
 
     /**
      * Range start.
@@ -153,5 +156,9 @@ Hybrid.Util.Range = new Hybrid.Class.extend(Object, function(start, end) {
     this.delta = function() {
         return end - start;
     };
+};
+
+Hybrid.Util.Range = new Hybrid.Class({
+    constructor: Hybrid.Util.Range
 });
 

@@ -14,18 +14,21 @@
  * individual from the population without consider its fitness.
  * @constructor
  */
-Hybrid.Selection = new Hybrid.Class.extend(Object, function() {
+Hybrid.Selection = function() {
 
     /**
      * Returns a random individual.
-     * @param {Hybrid.Util.Randomizer} randomizer Randomizer object.
-     * @param {Hybrid.Population} population Current population.
+     * @param {Hybrid.Util.Randomizer} randomizer Randomizer.
+     * @param {Hybrid.Population} population Population.
      * @return {object} Random individual.
      */
     this.select = function(randomizer, population) {
         var range = new Hybrid.Util.Range(population.getSize());
         return population.getIndividual(randomizer.next(range));
     };
+};
+Hybrid.Selection = new Hybrid.Class({
+    constructor: Hybrid.Selection
 });
 
 /**
@@ -38,43 +41,46 @@ Hybrid.Selection = new Hybrid.Class.extend(Object, function() {
  * population contains 100 individuals, 0.5 means that this selection strategy
  * will pick 50 random individuals and return the best one.
  */
-Hybrid.Selection.Tournament = new Hybrid.Class.extend(Hybrid.Selection,
-    function(rate) {
+Hybrid.Selection.Tournament = function(rate) {
 
-        /**
-         * Picks random individuals from the population and returns the best.
-         * @param {Hybrid.Util.Randomizer} randomizer Randomizer object.
-         * @param {Hybrid.Population} population Current population.
-         * @return {object} Selected individual.
-         */
-        this.select = function(randomizer, population) {
-            var best = null;
+    /**
+     * Number between 0 and 1 that determines the number of individuals that
+     * will compete in the tournament.
+     * @property
+     * @type number
+     * @private
+     */
+    rate = ((!rate || rate < 0) ? 0.1 : (rate > 1 ? 1 : rate));
 
-            var size = population.getSize();
-            var range = new Hybrid.Util.Range(size);
-            var total = size * rate;
+    /**
+     * Selects some random individuals from the population and returns the best
+     * one.
+     * @param {Hybrid.Util.Randomizer} randomizer Randomizer.
+     * @param {Hybrid.Population} population Population.
+     * @return {object} Best selected individual.
+     */
+    this.select = function(randomizer, population) {
+        var best = null;
 
-            for (var i = 0; i < total; i++) {
-                var chosen = parseInt(randomizer.next(range));
-                var individual = population.getIndividual(chosen);
-                if (best == null || individual.fitness.isBetterThan(best)) {
-                    best = individual;
-                }
+        var size = population.getSize();
+        var range = new Hybrid.Util.Range(size);
+        var total = size * rate;
+
+        for (var i = 0; i < total; i++) {
+            var chosen = parseInt(randomizer.next(range));
+            var individual = population.getIndividual(chosen);
+            if (best == null || individual.fitness.isBetterThan(best)) {
+                best = individual;
             }
+        }
 
-            return best;
-        };
-
-        /**
-         * Number between 0 and 1 that determines the number of individuals that
-         * will compete in the tournament.
-         * @property
-         * @type number
-         * @private
-         */
-        rate = ((!rate || rate < 0) ? 0.1 : (rate > 1 ? 1 : rate));
-    }
-);
+        return best;
+    };
+};
+Hybrid.Selection.Tournament = new Hybrid.Class({
+    extend: Hybrid.Selection,
+    constructor: Hybrid.Selection.Tournament
+});
 
 /**
  * Creates a new ranking selection.
@@ -85,52 +91,52 @@ Hybrid.Selection.Tournament = new Hybrid.Class.extend(Hybrid.Selection,
  * because best individuals do not differ so much from other ones.
  * @constructor
  */
-Hybrid.Selection.Ranking = new Hybrid.Class.extend(Hybrid.Selection,
-    function() {
+Hybrid.Selection.Ranking = function() {
 
-        /**
-         * Gets the sum of rankings of all individuals of the given population.
-         * @param {Hybrid.Population} population Current population.
-         * @return {number} Sum of rankings of all individuals of the given
-         * population.
-         * @private
-         */
-        function getWheelSize(population) {
-            population.sort();
+    /**
+     * Sums all ranking positions.
+     * @param {Hybrid.Population} population Population.
+     * @return {number} Sum of all ranking positions.
+     */
+    function getRankingSum(population) {
+        population.sort();
 
-            var total = 0;
-            var size = population.getSize();
-            for (var i = 0; i < size; i++) {
-                total += i;
+        var total = 0;
+        var size = population.getSize();
+        for (var i = 0; i < size; i++) {
+            total += i;
+        }
+        return total;
+    }
+
+    /**
+     * Picks a random individual from the population in such a way that
+     * individuals with better fitness values are more likely to be selected
+     * than other ones.
+     * @param {Hybrid.Util.Randomizer} randomizer Randomizer object.
+     * @param {Hybrid.Population} population Current population.
+     * @return {object} Selected individual.
+     */
+    this.select = function(randomizer, population) {
+        var currentSum = 0;
+
+        var size = population.getSize();
+        var rankingSum = getRankingSum(population);
+        var point = randomizer.next(new Hybrid.Util.Range(rankingSum));
+        var last = size - 1;
+
+        for (var i = 0; i < size; i++, last--) {
+            currentSum += last;
+            if (point < currentSum) {
+                return population.getIndividual(i);
             }
-            return total;
         }
 
-        /**
-         * Picks a random individual from the population in such a way that
-         * individuals with better fitness values are more likely to be selected
-         * than other ones.
-         * @param {Hybrid.Util.Randomizer} randomizer Randomizer object.
-         * @param {Hybrid.Population} population Current population.
-         * @return {object} Selected individual.
-         */
-        this.select = function(randomizer, population) {
-            var currentSum = 0;
-
-            var size = population.getSize();
-            var wheelSize = getWheelSize(population);
-            var point = randomizer.next(new Hybrid.Util.Range(wheelSize));
-            var last = size - 1;
-
-            for (var i = 0; i < size; i++, last--) {
-                currentSum += last;
-                if (point < currentSum) {
-                    return population.getIndividual(i);
-                }
-            }
-
-            return population.best();
-        };
-    }
-);
+        return population.best();
+    };
+};
+Hybrid.Selection.Ranking = new Hybrid.Class({
+    extend: Hybrid.Selection,
+    constructor: Hybrid.Selection.Ranking
+});
 
