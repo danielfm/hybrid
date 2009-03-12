@@ -12,15 +12,16 @@
 Hybrid.Stop = {};
 
 /**
- * Creates a useless stop condition. :)
- * @class A do-nothing stop condition.
+ * Creates a useless stop condition that always interrupts the evolution. :)
+ * @class A do-nothing stop condition to be used as base class to other custom
+ * stop conditions.
  * @constructor
  */
 Hybrid.Stop.Condition = new Hybrid.Class();
 
 /**
  * Returns whether the evolution should be interrupted or not.
- * @param {object} event Event object provided by {@link Hybrid.Engine}.
+ * @param {object} event Event object provided by the engine.
  * @return {boolean} Whether the evolution should be interrupted or not.
  */
 Hybrid.Stop.Condition.prototype.interrupt = function(event) {
@@ -36,7 +37,7 @@ Hybrid.Stop.Condition.prototype.interrupt = function(event) {
  * @param {number} [generations=100] Number of generations to evolve.
  */
 Hybrid.Stop.ElapsedGeneration = function(generations) {
-    Hybrid.Stop.ElapsedGeneration.superClass.call(this);
+    Hybrid.Stop.ElapsedGeneration.superClass.apply(this, arguments);
 
     /**
      * Number of generations to evolve before interrupt the evolution.
@@ -48,7 +49,7 @@ Hybrid.Stop.ElapsedGeneration = function(generations) {
 
     /**
      * Interrupts the evolution after evolving a given number of generations.
-     * @param {object} event Event object provided by {@link Hybrid.Engine}.
+     * @param {object} event Event object provided by the engine.
      * @return {boolean} Whether the Genetic Algorithm should be interrupted
      * or not.
      */

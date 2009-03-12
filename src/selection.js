@@ -97,6 +97,7 @@ Hybrid.Selection.Ranking = function() {
      * Sums all ranking positions.
      * @param {Hybrid.Population} population Population.
      * @return {number} Sum of all ranking positions.
+     * @private
      */
     function getRankingSum(population) {
         population.sort();

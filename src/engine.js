@@ -23,8 +23,8 @@
  * @param {Hybrid.Population} options.population Population to be evolved.
  * @param {Hybrid.Util.Randomizer}
  * [options.randomizer=new Hybrid.Util.Randomizer()] Randomizer instance.
- * @param {Hybrid.Selection} [options.selection] Selection strategy. Default:
- * {@link Hybrid.Selection.Ranking}.
+ * @param {Hybrid.Selection} [options.selection=new Hybrid.Selection.Ranking()]
+ * Selection strategy.
  * @param {Hybrid.Reproduction.Crossover} options.crossover Crossover strategy.
  * @param {Hybrid.Reproduction.Mutation} options.mutation Mutation strategy.
  */
@@ -44,8 +44,7 @@ Hybrid.Engine = function(options) {
     }
     
     /**
-     * Initializes the population and processes the evolution by the
-     * algorithm.
+     * Initializes the population and processes the evolution.
      */
     this.evolve = function() {
         population.initialize(randomizer);
@@ -53,7 +52,8 @@ Hybrid.Engine = function(options) {
     };
 
     /**
-     * Processes the evolution.
+     * Processes the evolution. This method gets called until the stop
+     * condition being used by this engine tells us to keep going.
      * @private
      */
     function processEvolution() {
@@ -97,8 +97,8 @@ Hybrid.Engine = function(options) {
      * @param {string} eventType Event type.
      * @param {function} listener Listener to be invoked when the event
      * happens.
-     * @param {object} [params=undefined] Object that contains all parameters
-     * needed by the listener.
+     * @param {object} [params=undefined] Object to be passed to the
+     * listener when it's called.
      */
     this.on = function(eventType, listener, params) {
         eventHandler.addListener(eventType, listener, params);
@@ -113,11 +113,11 @@ Hybrid.Engine = function(options) {
     };
     
     /**
-     * Notifies the listeners about the ocurrence of some event.
+     * Notifies the listeners about the occurrence of some event.
      * @param {string} eventType Event type used to determine which listeners
      * should be notified.
      * @param {object} event Event object which usually contains useful
-     * information about the event in question.
+     * information about the triggered event.
      */
     this.notify = function(eventType, event) {
         eventHandler.notifyListeners(eventType, event);
@@ -177,7 +177,7 @@ Hybrid.Engine = function(options) {
     /**
      * Sets the crossover strategy to be used by this engine.
      * @param {Hybrid.Reproduction.Crossover} newCrossover Crossover strategy
-     * to be used by this engine
+     * to be used by this engine.
      */
     this.setCrossover = function(newCrossover) {
         crossover = newCrossover;
@@ -195,7 +195,7 @@ Hybrid.Engine = function(options) {
     /**
      * Sets the mutation strategy to be used by this engine.
      * @param {Hybrid.Reproduction.Mutation} newMutation Mutation strategy
-     * to be used by this engine
+     * to be used by this engine.
      */
     this.setMutation = function(newMutation) {
         mutation = newMutation;

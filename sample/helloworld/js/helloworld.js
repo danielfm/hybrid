@@ -57,7 +57,7 @@ WordFactory = new Hybrid.Class({
  * @param {string} expected Expected word to compare against.
  */
 var WordFitnessEvaluator = function(expected) {
-    WordFitnessEvaluator.superClass.call(this);
+    WordFitnessEvaluator.superClass.apply(this, arguments);
 
     /**
      * Calculates the fitness of a word.
@@ -90,7 +90,7 @@ WordFitnessEvaluator = new Hybrid.Class({
  * @param {string} expected Expected word.
  */
 var WordCrossover = function(probability, expected) {
-    WordCrossover.superClass.call(this);
+    WordCrossover.superClass.apply(this, arguments);
 
     /**
      * Range that represents the length of the expected word.
@@ -134,7 +134,7 @@ WordCrossover = new Hybrid.Class({
  * @param {string} expected Expected word.
  */
 var WordMutation = function(probability, expected) {
-    WordMutation.superClass.call(this);
+    WordMutation.superClass.apply(this, arguments);
 
     /**
      * Range that represents the length of the expected word.
@@ -174,7 +174,7 @@ WordMutation = new Hybrid.Class({
  * @param {string} expected Expected word.
  */
 var StopCondition = function(expected) {
-    StopCondition.superClass.call(this);
+    StopCondition.superClass.apply(this, arguments);
 
     /**
      * Interrupts the evolution when the best word matches the expected word.

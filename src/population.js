@@ -15,29 +15,34 @@
  * @param {object} options Configuration object.
  * @param {number} [options.generation=0] Initial generation number.
  * @param {array} [options.individuals=[]] List of individuals to serve as the
- * first generation.
+ * first generation. If not provided, this engine will use an individual
+ * factory create the first generation during its initialization.
  * @param {Hybrid.Individual.Factory} options.individualFactory Factory used to
  * initialize this population. This attribute is only used if no individuals
- * are provided in <code>options.individuals</code>.
+ * are provided in <b>options.individuals</b>.
  * @param {number} [options.initialSize=100] Number of individuals to create
- * during the initialization of this population when no individuals are
- * provided in <code>options.individuals</code>.
+ * during the initialization of this population. This attribute is only used if
+ * no individuals are provided in <b>options.individuals</b>.
  * @param {Hybrid.Fitness.Comparator}
  * [options.fitnessComparator=new Hybrid.Fitness.Comparator()] Fitness
  * comparator used to sort this population's individuals according to their
  * fitness.
  * @param {Hybrid.Fitness.Evaluator} options.fitnessEvaluator Fitness evaluator
- * used to calculate the fitness of each population's individuals.
+ * used to calculate the fitness of all individuals in this population.
  */
 Hybrid.Population = function(options) {
     var self = this;
     options = options || {};
 
     /**
-     * Initializes this population. This method raises the following events:
+     * Initializes this population. This method is usually called by the
+     * {@link Hybrid.Engine} when no initial generation is provided when
+     * creating this population.<p>
+     *
+     * This method triggers the following events:
      * <ul>
-     *   <li><code>beforeInitialize</code> - Before the ininitialization.</li>
-     *   <li><code>afterInitialize</code> - After the initialization.</li>
+     *   <li><b>beforeInitialize</b> - Before the ininitialization.</li>
+     *   <li><b>afterInitialize</b> - After the initialization.</li>
      * </ul>
      * @param {Hybrid.Util.Randomizer} randomizer Randomizer object being used
      * by the engine.
@@ -65,11 +70,12 @@ Hybrid.Population = function(options) {
     };
 
     /**
-     * Replaces the population's individuals by the given individuals and
-     * increments the generation counter. This method raises the following
-     * events:
+     * Replaces this population's individuals by the given individuals and
+     * increments the generation counter.<p>
+     *
+     * This method triggers the following events:
      * <ul>
-     *   <li><code>replaceGeneration</code> - Before replace the current
+     *   <li><b>replaceGeneration</b> - Before replace the current
      *   generation.</li>
      * </ul>
      * @param {array} newIndividuals Array of individuals that should replace
@@ -96,7 +102,9 @@ Hybrid.Population = function(options) {
 
     /**
      * Sorts this population's individuals according to their fitness
-     * if necessary.
+     * if necessary. The first element (index 0) will hold the best
+     * individual, the second element (index 1) the second best and
+     * so on.
      */
     this.sort = function() {
         if (dirty) {
@@ -135,9 +143,9 @@ Hybrid.Population = function(options) {
     };
 
     /**
-     * Gets the current best individual.
+     * Gets the N best individuals.
      * @param {number} n Number of best individuals to get.
-     * @return {object} Best individual.
+     * @return {object} Best individuals.
      */
     this.best = function(n) {
         this.sort();
@@ -161,9 +169,10 @@ Hybrid.Population = function(options) {
     /**
      * Registers a listener to be called when the given event happens.
      * @param {object} eventType Event type.
-     * @param {function} listener Listener to be invoked when the event happens.
-     * @param {object} [params=undefined] Object that contains all parameters
-     * needed by the listener.
+     * @param {function} listener Listener to be invoked when the event
+     * happens.
+     * @param {object} [params=undefined] Object to be passed to the
+     * listener when it's called.
      */
     this.on = function(eventType, listener, params) {
         eventHandler.addListener(eventType, listener, params);
@@ -182,7 +191,7 @@ Hybrid.Population = function(options) {
      * @param {object} eventType Event type used to determine which listeners
      * should be notified.
      * @param {object} event Event object which usually contains useful
-     * information about the event in question.
+     * information about the triggered event.
      */
     this.notify = function(eventType, event) {
         eventHandler.notifyListeners(eventType, event);
@@ -217,7 +226,7 @@ Hybrid.Population = function(options) {
     };
 
     /**
-     * Evaluate the fitness values of the given individual.
+     * Evaluates the fitness values of the given individual.
      * @param {object} individual Individual.
      * @return {number} Fitness value.
      */
@@ -250,9 +259,9 @@ Hybrid.Population = function(options) {
      * @param {object} individual Individual.
      * @param {object} other Other individual.
      * @return {number} Returns something smaller than zero if
-     * <code>individual</code> is considered better than <code>other</code>.
-     * Returns something greater than zero if <code>individual</code> is
-     * considered worse than <code>other</code>. Returns zero if both
+     * <b>individual</b> is considered better than <b>other</b>.
+     * Returns something greater than zero if <b>individual</b> is
+     * considered worse than <b>other</b>. Returns zero if both
      * individuals are considered equivalent.
      */
     this.compareIndividuals = function(individual, other) {
@@ -282,15 +291,15 @@ Hybrid.Population = function(options) {
     /**
      * Gets the generation counter, which is a number that tells how many
      * generations have been processed so far.
-     * @return {number} Number of generations proessed so far.
+     * @return {number} Number of generations processed so far.
      */
     this.getGeneration = function() {
         return generation;
     };
 
     /**
-     * Returns if this population is already initialized.
-     * @return {boolean} If this population is already initialized.
+     * Returns if this population is already initialized or not.
+     * @return {boolean} If this population is already initialized or not.
      */
     this.isInitialized = function() {
         return initialized;
@@ -334,7 +343,7 @@ Hybrid.Population = function(options) {
 
     /**
      * Computes and returns the current statistics for this population.
-     * @return {object} Statistics.
+     * @return {object} Statistics for this population.
      */
     this.getStatistics = function() {
         return statisticsProvider.compute(this);
@@ -478,7 +487,7 @@ Hybrid.Population = new Hybrid.Class({
  * Adds Elitism support to a population. Elitism is a technique in which the
  * best individual (or a few best individuals) is copied to the population
  * in the next  generation. Elitism can very rapidly increase performance of
- * the Genetic Algorithm, because it prevents losing the best found solution
+ * the Genetic Algorithm, because it prevents losing the best found solutions
  * to date.
  * @param {object} options Elitism parameters.
  * @param {Hybrid.Population} options.to Population that should support
@@ -512,7 +521,7 @@ Hybrid.Population.addElitism = function(options) {
 
 /**
  * Creates a new statistics provider.
- * @class Simple class that is used to get statistical data for a population.
+ * @class Simple class used to get statistical data for a population.
  * @constructor
  */
 Hybrid.Population.StatisticsProvider = function() {

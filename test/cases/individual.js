@@ -1,4 +1,6 @@
 var Individual_FitnessEvaluator = function() {
+    Individual_FitnessEvaluator.superClass.apply(this, arguments);
+
     this.evaluate = function(individual, population) {
         if (!individual) {
             throw "Individual should not be null";

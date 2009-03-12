@@ -1,5 +1,5 @@
 var TestCases = {
-    name: 'Hybrid',
+    name: 'Engine',
 
     setup: function() {
     },
@@ -32,5 +32,5 @@ var TestCases = {
     }}
 };
 
-new Test.Unit.Runner(TestCases, {'testLog':'hybridLog', 'logger':testLogger});
+new Test.Unit.Runner(TestCases, {'testLog':'engineLog', 'logger':testLogger});
 

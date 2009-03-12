@@ -83,8 +83,7 @@ Hybrid.Individual = {
      * Check if the individual can be monkeypatched without override any
      * of its properties or methods.
      * @param {object} individual Individual.
-     * @return {boolean} Whether the given individual can be patched or not.
-     * @throws Hybrid.Individual.PlugFitnessError
+     * @throws {Hybrid.Error} If the given individual cannot be patched.
      * @static
      */
     assertMonkeypatch: function(individual) {

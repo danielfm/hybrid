@@ -1,4 +1,6 @@
 var Population_IndividualFactory = function() {
+    Population_IndividualFactory.superClass.apply(this.arguments);
+
     this.create = function(randomizer, population) {
         if (!randomizer) {
             throw "Randomizer should not be null";
@@ -19,6 +21,8 @@ Population_IndividualFactory = new Hybrid.Class({
 });
 
 var Population_FitnessEvaluator = function() {
+    Population_FitnessEvaluator.superClass.apply(this, arguments);
+
     this.evaluate = function(individual, population) {
         if (!individual) {
             throw "Individual should not be null";

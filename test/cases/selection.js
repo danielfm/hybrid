@@ -1,4 +1,6 @@
 var Selection_FitnessEvaluator = function() {
+    Selection_FitnessEvaluator.superClass.apply(this, arguments);
+
     this.evaluate = function(individual, population) {
         return individual.number;
     };
@@ -9,6 +11,8 @@ Selection_FitnessEvaluator = new Hybrid.Class({
 });
 
 var Selection_Randomizer = function(results) {
+    Selection_Randomizer.superClass.apply(this, arguments);
+
     this.current = 0;
 
     this.next = function(range) {

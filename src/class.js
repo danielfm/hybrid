@@ -4,12 +4,12 @@
  */
 
 /**
- * Extends a class.
+ * Creates a new class.
+ * @constructor Creates a new class.
  * @param {object} options Options.
  * @param {class} [options.extend=Object] Super class.
  * @param {function} [options.constructor=function(){}] Constructor function.
- * @return {function} <code>options.constructor</code>.
- * @static
+ * @return {function} <b>options.constructor</b>.
  */
 Hybrid.Class = function(options) {
     options = options || {};
