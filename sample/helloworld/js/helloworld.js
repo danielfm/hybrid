@@ -85,8 +85,7 @@ WordFitnessEvaluator = new Hybrid.Class({
  * Creates a new word crossover strategy.
  * @class The crossover strategy consists in merging two words into one.
  * @constructor
- * @param {number} probability Crossover probability number between 0.0 and
- * 1.0.
+ * @param {number} probability Number between 0.01 and 1.0.
  * @param {string} expected Expected word.
  */
 var WordCrossover = function(probability, expected) {
@@ -107,12 +106,7 @@ var WordCrossover = function(probability, expected) {
      * @param {object} father Other word.
      * @return {object} Child word.
      */
-    this.crossover = function(randomizer, mother, father) {
-        // We skip the crossover according to the configuration
-        if (!randomizer.probability(probability)) {
-            return null;
-        }
-
+    this.performCrossover = function(randomizer, mother, father) {
         var point = parseInt(randomizer.next(expectedRange));
         var word = father.word.substr(0, point);
         word += mother.word.substr(point);
@@ -129,8 +123,7 @@ WordCrossover = new Hybrid.Class({
  * @class The mutation strategy consists in replacing a letter with a
  * randomly generated character.
  * @constructor
- * @param {number} probability Mutation probability number between 0.0 and
- * 1.0.
+ * @param {number} probability Number between 0.0 and 1.0.
  * @param {string} expected Expected word.
  */
 var WordMutation = function(probability, expected) {
@@ -150,12 +143,7 @@ var WordMutation = function(probability, expected) {
      * @param {object} individual Word.
      * @return {object} Mutated word.
      */
-    this.mutate = function(randomizer, individual) {
-        // We skip the mutation according to the configuration
-        if (!randomizer.probability(probability)) {
-            return null;
-        }
-
+    this.performMutation = function(randomizer, individual) {
         var word = individual.word;
         var point = parseInt(randomizer.next(expectedRange));
         word = word.substr(0, point) + getRandomChar(randomizer) + word.substr(point + 1);

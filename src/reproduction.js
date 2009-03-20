@@ -20,12 +20,25 @@ Hybrid.Reproduction = {};
  * to reproduction and biological crossover, upon which Genetic Algorithms are
  * based.
  * @constructor
+ * @param {number} probability Number between 0.01 and 1.0 that represents the
+ * mutation probability.
  */
-Hybrid.Reproduction.Crossover = function() {
+Hybrid.Reproduction.Crossover = function(probability) {
+
+    probability = ((!probability || probability < 0.01) ? 0.01 :
+          ((probability > 1) ? 1 : probability));
 
     /**
-     * Combines two individuals in order to produce a child individual that
-     * shares many of the characteristics of its parents.
+     * Get the probability.
+     * @return {number} Number between 0.01 and 1.0 that represents the
+     * mutation probability.
+     */
+    this.getProbability = function() {
+        return probability;
+    };
+
+    /**
+     * Invokes the crossover logic according to probability.
      * @param {Hybrid.Randomizer} randomizer Randomizer object.
      * @param {object} mother Individual.
      * @param {object} father Other individual.
@@ -33,6 +46,22 @@ Hybrid.Reproduction.Crossover = function() {
      * @return {object} Child individual.
      */
     this.crossover = function(randomizer, mother, father, population) {
+        if (randomizer.probability(probability)) {
+            return this.performCrossover(randomizer, mother, father, population);
+        }
+        return null;
+    };
+
+    /**
+     * Recombines two individuals and returns a child individual. This is a
+     * do-nothing method and should be overriden by subclasses.
+     * @param {Hybrid.Randomizer} randomizer Randomizer object.
+     * @param {object} mother Individual.
+     * @param {object} father Other individual.
+     * @param {Hybrid.Population} population Current population.
+     * @return {object} Child individual.
+     */
+    this.performMutation = function(randomizer, individual, population) {
         return null;
     };
 };
@@ -46,17 +75,46 @@ Hybrid.Reproduction.Crossover = new Hybrid.Class({
  * used to maintain genetic diversity from one generation of a population of
  * individuals to the next. It is analogous to biological mutation.
  * @constructor
+ * @param {number} probability Number between 0.0 and 1.0 that represents the
+ * mutation probability.
  */
-Hybrid.Reproduction.Mutation = function() {
+Hybrid.Reproduction.Mutation = function(probability) {
  
+    probability = ((!probability || probability < 0) ? 0 :
+          ((probability > 1) ? 1 : probability));
+
     /**
-     * Returns a mutated copy of the given individual.
+     * Get the probability.
+     * @return {number} Number between 0.01 and 1.0 that represents the
+     * mutation probability.
+     */
+    this.getProbability = function() {
+        return probability;
+    };
+
+    /**
+     * Invokes the mutation logic according to probability.
      * @param {Hybrid.Randomizer} randomizer Randomizer object.
      * @param {object} individual Individual.
      * @param {Hybrid.Population} population Current population.
      * @return {object} Mutated individual.
      */
     this.mutate = function(randomizer, individual, population) {
+        if (randomizer.probability(probability)) {
+            return this.performMutation(randomizer, individual, population);
+        }
+        return null;
+    };
+
+    /**
+     * Returns a mutated copy of the given individual. This is a do-nothing
+     * method and should be overriden by subclasses.
+     * @param {Hybrid.Randomizer} randomizer Randomizer object.
+     * @param {object} individual Individual.
+     * @param {Hybrid.Population} population Current population.
+     * @return {object} Mutated individual.
+     */
+    this.performMutation = function(randomizer, individual, population) {
         return null;
     };
 };
