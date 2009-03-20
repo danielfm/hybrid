@@ -1,29 +1,3 @@
-var Selection_FitnessEvaluator = function() {
-    Selection_FitnessEvaluator.superClass.apply(this, arguments);
-
-    this.evaluate = function(individual, population) {
-        return individual.number;
-    };
-};
-Selection_FitnessEvaluator = new Hybrid.Class({
-    extend: Hybrid.Fitness.Evaluator,
-    constructor: Selection_FitnessEvaluator
-});
-
-var Selection_Randomizer = function(results) {
-    Selection_Randomizer.superClass.apply(this, arguments);
-
-    this.current = 0;
-
-    this.next = function(range) {
-        return results[this.current++];
-    }
-};
-Selection_Randomizer = new Hybrid.Class({
-    extend: Hybrid.Util.Randomizer,
-    constructor: Selection_Randomizer
-});
-
 var TestCases = {
     name: 'Selection',
 
@@ -33,7 +7,8 @@ var TestCases = {
             individuals.push({number:i});
         }
 
-        this.fitnessEvaluator = new Selection_FitnessEvaluator();
+        this.fitnessEvaluator = new FitnessEvaluatorStub();
+        this.randomizer = new RandomizerStub();
 
         this.population = new Hybrid.Population({
             fitnessEvaluator: this.fitnessEvaluator,
@@ -45,8 +20,8 @@ var TestCases = {
     },
 
     testDummySelect: function() { with(this) {
-        var randomizer = new Selection_Randomizer([0, 4, 9]);
         var selection = new Hybrid.Selection();
+        randomizer.setResults([0, 4, 9]);
 
         var individual = selection.select(randomizer, population);
         assertEqual(0, individual.number);
@@ -59,8 +34,8 @@ var TestCases = {
     }},
 
     testTournamentSelect: function() { with(this) {
-        var randomizer = new Selection_Randomizer([2, 4, 3, 6, 4, 5, 8, 1, 9]);
         var selection = new Hybrid.Selection.Tournament(0.3);
+        randomizer.setResults([2, 4, 3, 6, 4, 5, 8, 1, 9]);
 
         var individual = selection.select(randomizer, population);
         assertEqual(4, individual.number);
@@ -73,8 +48,8 @@ var TestCases = {
     }},
 
     testRankingSelect: function() { with(this) {
-        var randomizer = new Selection_Randomizer([36, 16, 7, 44]);
         var selection = new Hybrid.Selection.Ranking();
+        randomizer.setResults([36, 16, 7, 44]);
 
         var individual = selection.select(randomizer, population);
         assertEqual(4, individual.number);

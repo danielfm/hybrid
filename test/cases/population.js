@@ -1,52 +1,10 @@
-var Population_IndividualFactory = function() {
-    Population_IndividualFactory.superClass.apply(this.arguments);
-
-    this.create = function(randomizer, population) {
-        if (!randomizer) {
-            throw "Randomizer should not be null";
-        }
-        if (!population) {
-            throw "Population should not be null";
-        }
-
-        this.factoryCount++;
-        return {
-            number: randomizer.next()
-        };
-    };
-};
-Population_IndividualFactory = new Hybrid.Class({
-    extend: Hybrid.Individual.Factory,
-    constructor: Population_IndividualFactory
-});
-
-var Population_FitnessEvaluator = function() {
-    Population_FitnessEvaluator.superClass.apply(this, arguments);
-
-    this.evaluate = function(individual, population) {
-        if (!individual) {
-            throw "Individual should not be null";
-        }
-        if (!population) {
-            throw "Population should not be null";
-        }
-
-        this.evaluator++;
-        return individual.number;
-    };
-};
-Population_FitnessEvaluator = new Hybrid.Class({
-    extend: Hybrid.Fitness.Evaluator,
-    constructor: Population_FitnessEvaluator
-});
-
 var TestCases = {
     name: 'Population',
 
     setup: function() {
-        this.individualFactory = new Population_IndividualFactory();
-        this.fitnessEvaluator = new Population_FitnessEvaluator();
-        this.randomizer = new Hybrid.Util.Randomizer();
+        this.individualFactory = new IndividualFactoryStub();
+        this.fitnessEvaluator = new FitnessEvaluatorStub();
+        this.randomizer = new RandomizerStub();
         this.statisticsProvider = new Hybrid.Population.StatisticsProvider();
         this.fitnessComparator = new Hybrid.Fitness.Comparator();
 

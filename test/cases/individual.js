@@ -1,27 +1,9 @@
-var Individual_FitnessEvaluator = function() {
-    Individual_FitnessEvaluator.superClass.apply(this, arguments);
-
-    this.evaluate = function(individual, population) {
-        if (!individual) {
-            throw "Individual should not be null";
-        }
-        if (!population) {
-            throw "Population should not be null";
-        }
-        return individual.number;
-    };
-};
-Individual_FitnessEvaluator = new Hybrid.Class({
-    extend: Hybrid.Fitness.Evaluator,
-    constructor: Individual_FitnessEvaluator
-});
-
 var TestCases = {
     name: 'Individuals',
 
     setup: function() {
-        this.fitnessEvaluator = new Individual_FitnessEvaluator();
-        this.randomizer = new Hybrid.Util.Randomizer();
+        this.fitnessEvaluator = new FitnessEvaluatorStub();
+        this.randomizer = new RandomizerStub();
 
         this.population = new Hybrid.Population({
             fitnessEvaluator: this.fitnessEvaluator

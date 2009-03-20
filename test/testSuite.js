@@ -12,6 +12,7 @@ var testCases = [].concat(arguments);
 
 load('assets/jsunittest_rhino.js');
 load('../build/hybrid.js');
+load('util.js');
 
 // If no test case is specified, all test cases are selected
 if (!arguments.length) {
