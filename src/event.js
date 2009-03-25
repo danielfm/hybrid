@@ -4,20 +4,13 @@
  */
 
 /**
- * Provides a simple implementation of the subject/observer design pattern.
- * @namespace
- * @depends Hybrid
- */
-Hybrid.Event = {};
-
-/**
  * Creates a new event handler.
  * @class Implementation of the subject/observer design pattern that provides
  * a simple way to plug in functionality to an existing object.
  * @constructor
  * @depends Hybrid.Util
  */
-Hybrid.Event.Handler = function() {
+Hybrid.EventHandler = function() {
     
     /**
      * Registers a listener to be called when the given event happens.
@@ -112,7 +105,7 @@ Hybrid.Event.Handler = function() {
      */
     var listeners = [];
 };
-Hybrid.Event.Handler = new Hybrid.Class({
-    constructor: Hybrid.Event.Handler
+Hybrid.EventHandler = new Hybrid.Class({
+    constructor: Hybrid.EventHandler
 });
 

@@ -17,12 +17,9 @@
  * @param {array} [options.individuals=[]] List of individuals to serve as the
  * first generation. If not provided, this engine will use an individual
  * factory create the first generation during its initialization.
- * @param {Hybrid.Individual.Factory} options.individualFactory Factory used to
+ * @param {Hybrid.Individual.Factory} options.factory Factory used to
  * initialize this population. This attribute is only used if no individuals
  * are provided in <b>options.individuals</b>.
- * @param {number} [options.initialSize=100] Number of individuals to create
- * during the initialization of this population. This attribute is only used if
- * no individuals are provided in <b>options.individuals</b>.
  * @param {Hybrid.Fitness.Comparator}
  * [options.fitnessComparator=new Hybrid.Fitness.Comparator()] Fitness
  * comparator used to sort this population's individuals according to their
@@ -57,13 +54,7 @@ Hybrid.Population = function(options) {
         generation = 0;
         this.notify('beforeInitialize', this.getStatistics());
 
-        // create the individuals using the individual factory
-        while (individuals.length < initialSize) {
-            var individual = individualFactory.create(randomizer, this);
-            if (individual) {
-                this.add(individual);
-            }
-        }
+        factory.createInitialPopulation(randomizer, this);
 
         initialized = true;
         this.notify('afterInitialize', this.getStatistics());
@@ -198,19 +189,31 @@ Hybrid.Population = function(options) {
     };
 
     /**
+     * Adds elitism support to this population.
+     * @param {number} size Number of best individuals to keep from
+     * generation to generation.
+     */
+    this.setElitism = function(size) {
+        Hybrid.Population.setElitism({
+            to: this,
+            size: size
+        });
+    };
+
+    /**
      * Gets the event handler being used by this population.
-     * @return {Hybrid.Event.Handler} Event handler.
+     * @return {Hybrid.EventHandler} Event handler.
      */
     this.getEventHandler = function() {
         return eventHandler;
     };
 
     /**
-     * Gets the individual factory being used by this population.
-     * @return {Hybrid.Individual.Factory} Individual factory.
+     * Gets the factory being used by this population.
+     * @return {Hybrid.Individual.Factory} Factory.
      */
-    this.getIndividualFactory = function() {
-        return individualFactory;
+    this.getFactory = function() {
+        return factory;
     };
 
     /**
@@ -218,11 +221,11 @@ Hybrid.Population = function(options) {
      * @param {Hybrid.Individual.Factory} factory Individual factory.
      * @throws {Hybrid.Error} If the object is not a individual factory.
      */
-    this.setIndividualFactory = function(factory) {
-        if (!(factory instanceof Hybrid.Individual.Factory)) {
+    this.setFactory = function(newFactory) {
+        if (!(newFactory instanceof Hybrid.Individual.Factory)) {
             throw new Hybrid.Error('Instance of Hybrid.Individual.Factory expected');
         }
-        individualFactory = factory;
+        factory = newFactory;
     };
 
     /**
@@ -316,15 +319,6 @@ Hybrid.Population = function(options) {
     };
 
     /**
-     * Gets the initial number of individuals this population should
-     * produce during its initialization.
-     * @return {number} Initial number of individuals.
-     */
-    this.getInitialSize = function() {
-        return initialSize;
-    };
-
-    /**
      * Gets the individual located at the given index.
      * @param {number} i Index.
      * @return {object} Individual.
@@ -386,10 +380,10 @@ Hybrid.Population = function(options) {
      * Event handler used by this population to notify third party objects
      * about the current state of the evolution.
      * @property
-     * @type Hybrid.Event.Handler
+     * @type Hybrid.EventHandler
      * @private
      */
-    var eventHandler = new Hybrid.Event.Handler();
+    var eventHandler = new Hybrid.EventHandler();
 
     /**
      * Statistics provider used by this population to compute statistics for
@@ -403,26 +397,13 @@ Hybrid.Population = function(options) {
         new Hybrid.Population.StatisticsProvider());
 
     /**
-     * Number of individuals this population should produce during its
-     * initialization.
-     * @property
-     * @type number
-     * @private
-     */
-    var initialSize = ((options.individuals) ? options.individuals.length :
-        ((options.initialSize && options.initialSize > 0)
-            ? options.initialSize
-            : 100));
-
-    /**
-     * Individual factory used to create the first generation of individuals.
+     * Factory used to create the first generation of individuals.
      * @property
      * @type Hybrid.Individual.Factory
      * @private
      */
-    var individualFactory;
-    this.setIndividualFactory(options.individualFactory ||
-        new Hybrid.Individual.Factory());
+    var factory;
+    this.setFactory(options.factory || new Hybrid.Individual.Factory());
 
     /**
      * Fitness evaluator used to calculate the fitness value for this
@@ -451,6 +432,10 @@ Hybrid.Population = function(options) {
     this.on('addIndividual', function(event) {
         Hybrid.Individual.plugFitnessLogic(event.individual, self);
     });
+
+    if (options.elitismSize > 0) {
+        this.setElitism(options.elitismSize);
+    }
 
     /**
      * List of individuals being managed by this population.
@@ -497,7 +482,7 @@ Hybrid.Population = new Hybrid.Class({
  * @static
  * @throws {Hybrid.Error} If the given options are invalid.
  */
-Hybrid.Population.addElitism = function(options) {
+Hybrid.Population.setElitism = function(options) {
     options = options || {};
 
     var population = options.to;
@@ -507,15 +492,28 @@ Hybrid.Population.addElitism = function(options) {
         throw new Hybrid.Error('Population and elitism size are required');
     }
 
-    new (function() {
-        population.on('replaceGeneration', function(event) {
+    var handler = population.getEventHandler();
+
+    // Remove any previously added elitism listeners from the population
+    var listeners = handler.getListenersByType('replaceGeneration');
+    for (var i = 0; i < listeners.length; i++) {
+        var listener = listeners[i];
+        if (listener._isElitismListener) {
+            handler.removeListener(listener);
+        }
+    }
+
+    (function() {
+        var listener = function(event) {
             var breed = event.breed;
 
             breed = breed.slice(size);
             breed = breed.concat(event.population.best(size));
 
             event.breed = breed;
-        });
+        };
+        listener._isElitismListener = true;
+        population.on('replaceGeneration', listener);
     })();
 };
 

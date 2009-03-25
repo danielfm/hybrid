@@ -1,5 +1,5 @@
 var TestCases = {
-    name: 'Individuals',
+    name: 'Candidates',
 
     setup: function() {
         this.fitnessEvaluator = new FitnessEvaluatorStub();
@@ -51,8 +51,14 @@ var TestCases = {
         assertFalse(other.fitness.isBetterThan(other));
     }},
 
-    testDefaultIndividualFactory: function() { with(this) {
-        assertNull(new Hybrid.Individual.Factory().create());
+    testFactoryConstructor: function() { with(this) {
+        assertEqual(100, new Hybrid.Individual.Factory().getInitialSize());
+        assertEqual(100, new Hybrid.Individual.Factory(0).getInitialSize());
+        assertEqual(50, new Hybrid.Individual.Factory(50).getInitialSize());
+    }},
+
+    testDefaultFactory: function() { with(this) {
+        assert(new Hybrid.Individual.Factory().createIndividual());
     }}
 };
 

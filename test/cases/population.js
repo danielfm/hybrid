@@ -2,16 +2,15 @@ var TestCases = {
     name: 'Population',
 
     setup: function() {
-        this.individualFactory = new IndividualFactoryStub();
+        this.factory = new FactoryStub(10);
         this.fitnessEvaluator = new FitnessEvaluatorStub();
         this.randomizer = new RandomizerStub();
         this.statisticsProvider = new Hybrid.Population.StatisticsProvider();
         this.fitnessComparator = new Hybrid.Fitness.Comparator();
 
         this.population = new Hybrid.Population({
-            initialSize: 10,
             generation: 10,
-            individualFactory: this.individualFactory,
+            factory: this.factory,
             fitnessEvaluator: this.fitnessEvaluator
         });
     },
@@ -24,34 +23,34 @@ var TestCases = {
 
         assertEqual(0, population.getSize());
         assertFalse(population.isInitialized());
-        assertEqual(100, population.getInitialSize());
         assertEqual(0, population.getGeneration());
 
         assert(population.getEventHandler());
         assert(population.getStatisticsProvider());
-        assert(population.getIndividualFactory());
+        assert(population.getFactory());
         assert(population.getFitnessEvaluator());
         assert(population.getFitnessComparator());
+    }},
+
+    testConstructorWithElitism: function() { with(this) {
+        var defaultListeners = population.getEventHandler().getListenersCount();
+
+        population = new Hybrid.Population({
+            elitismSize: 10
+        });
+
+        assert(defaultListeners+1, population.getEventHandler().getListenersCount());
     }},
 
     testConstructorWithIndividuals: function() { with(this) {
         var args = {
             individuals: [{}, {}, {}],
-            initialSize: 10
         };
 
         population = new Hybrid.Population(args);
 
         assertEnumEqual(args.individuals, population.getIndividuals());
         assertTrue(population.isInitialized());
-        assertEqual(args.individuals.length, population.getInitialSize());
-    }},
-
-    testConstructorWithInvalidInitialSize: function() { with(this) {
-        population = new Hybrid.Population({
-            initialSize:0
-        });
-        assertTrue(population.getInitialSize() > 0);
     }},
 
     testConstructorWithInvalidGeneration: function() { with(this) {
@@ -159,7 +158,7 @@ var TestCases = {
 
         var breed = [];
         for (var i = 0; i < population.getSize(); i++) {
-            breed.push(individualFactory.create(randomizer, population));
+            breed.push(factory.createIndividual(randomizer, population));
         }
 
         population.replaceGeneration(breed, true);
@@ -177,7 +176,7 @@ var TestCases = {
 
         var breed = [];
         for (var i = 0; i < population.getSize() / 2; i++) {
-            breed.push(individualFactory.create(randomizer, population));
+            breed.push(factory.createIndividual(randomizer, population));
         }
 
         assertRaise(Hybrid.Error, function() {
@@ -210,7 +209,7 @@ var TestCases = {
             breed: breed
         };
 
-        Hybrid.Population.addElitism({
+        Hybrid.Population.setElitism({
             to: population,
             size: 0
         });
@@ -233,7 +232,7 @@ var TestCases = {
             breed: breed
         };
 
-        Hybrid.Population.addElitism({
+        Hybrid.Population.setElitism({
             to: population,
             size: 2
         });
@@ -246,47 +245,72 @@ var TestCases = {
         assertEqual(8, event.breed[4].number);
     }},
 
+    testSetTwoElitismListeners: function() { with(this) {
+        var breed = population.getIndividuals().slice(0, 5);
+        var event = {
+            population: population,
+            breed: breed
+        };
+
+        for (var i = 0; i < 5; i++) {
+            Hybrid.Population.setElitism({
+                to: population,
+                size: i
+            });
+        }
+
+        var listeners = population.getEventHandler().getListenersByType('replaceGeneration');
+        assertEqual(1, listeners.length);
+        listeners[0](event);
+    }},
+
     testElitismWithMissingOptions: function() { with(this) {
         assertRaise(Hybrid.Error, function() {
-            Hybrid.Population.addElitism();
+            Hybrid.Population.setElitism();
         });
 
         assertRaise(Hybrid.Error, function() {
-            Hybrid.Population.addElitism({
+            Hybrid.Population.setElitism({
                 to: population
             });
         });
 
         assertRaise(Hybrid.Error, function() {
-            Hybrid.Population.addElitism({
+            Hybrid.Population.setElitism({
                 size: 2
             });
         });
 
-        Hybrid.Population.addElitism({
+        Hybrid.Population.setElitism({
             to: population,
             size: 2
         });
     }},
 
-    testSetIndividualFactory: function() { with(this) {
+    testSetElitism: function() { with(this) {
+        var defaultListeners = population.getEventHandler().getListenersCount();
+        population.setElitism(10);
+        assert(defaultListeners+1, population.getEventHandler().getListenersCount());
+    }},
+
+    testSetFactory: function() { with(this) {
         assertRaise(Hybrid.Error, function() {
-            population.setIndividualFactory({});
+            population.setFactory({});
         });
 
         assertRaise(Hybrid.Error, function() {
             new Hybrid.Population({
-                individualFactory: {}
+                factory: {}
             });
         });
 
-        population.setIndividualFactory(individualFactory);
-        assertIdentical(individualFactory, population.getIndividualFactory());
+        population.setFactory(factory);
+        assertIdentical(factory, population.getFactory());
 
         population = new Hybrid.Population({
-            individualFactory: this.individualFactory
+            factory: this.factory
         });
-        assertIdentical(individualFactory, population.getIndividualFactory());
+        assertIdentical(factory, population.getFactory());
     }},
 
     testSetFitnessEvaluator: function() { with(this) {

@@ -2,7 +2,7 @@ var TestCases = {
     name: 'Event',
 
     setup: function() {
-        this.handler = new Hybrid.Event.Handler();
+        this.handler = new Hybrid.EventHandler();
     },
 
     teardown: function() {

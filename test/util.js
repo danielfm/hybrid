@@ -1,9 +1,9 @@
-var IndividualFactoryStub = function() {
-    IndividualFactoryStub.superClass.apply(this.arguments);
+var FactoryStub = function(initialSize) {
+    FactoryStub.superClass.apply(this, arguments);
     
     this.factoryCount = 0;
 
-    this.create = function(randomizer, population) {
+    this.createIndividual = function(randomizer, population) {
         if (!randomizer) {
             throw "Randomizer should not be null";
         }
@@ -15,9 +15,9 @@ var IndividualFactoryStub = function() {
         return {number: randomizer.next()};
     };
 };
-IndividualFactoryStub = new Hybrid.Class({
+FactoryStub = new Hybrid.Class({
     extend: Hybrid.Individual.Factory,
-    constructor: IndividualFactoryStub
+    constructor: FactoryStub
 });
 
 var FitnessEvaluatorStub = function() {

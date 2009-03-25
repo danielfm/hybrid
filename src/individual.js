@@ -97,19 +97,48 @@ Hybrid.Individual = {
  * Creates a new factory of individuals.
  * @class When a population is initialized, it uses an instance of this class
  * to produce an arbitrary number of random individuals to serve as the first
- * generation.
+ * generation if none is given.
  * @constructor
+ * @param {number} Number of individuals that should be created by this
+ * factory during the population initialization.
  */
-Hybrid.Individual.Factory = function() {
+Hybrid.Individual.Factory = function(initialSize) {
+
+    initialSize = ((!initialSize || initialSize < 0) ? 100 : initialSize);
 
     /**
-     * Creates a random individual.
+     * Get the number of individuals that should be created by this factory
+     * during the population initialization.
+     * @return {number} Number of individuals.
+     */
+    this.getInitialSize = function() {
+        return initialSize;
+    };
+
+    /**
+     * Default method that fills the given population with an arbitrary
+     * number of random individuals.
      * @param {Hybrid.Randomizer} randomizer Randomizer object.
+     * @param {Hybrid.Population} population Current population.
+     */
+    this.createInitialPopulation = function(randomizer, population) {
+        while (population.getSize() < initialSize) {
+            var individual = this.createIndividual(randomizer, population);
+            if (individual) {
+                population.add(individual);
+            }
+        }
+    };
+
+    /**
+     * Create a random individual. This method should be overriden by
+     * subclasses.
+     * @param {Hybrid.Util.Randomizer} randomizer Randomizer object.
      * @param {Hybrid.Population} population Current population.
      * @return {object} Individual.
      */
-    this.create = function(randomizer, population) {
-        return null;
+    this.createIndividual = function(randomizer, population) {
+        return {};
     };
 };
 

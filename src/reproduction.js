@@ -38,16 +38,16 @@ Hybrid.Reproduction.Crossover = function(probability) {
     };
 
     /**
-     * Invokes the crossover logic according to probability.
+     * Executes the crossover logic according to probability.
      * @param {Hybrid.Randomizer} randomizer Randomizer object.
      * @param {object} mother Individual.
      * @param {object} father Other individual.
      * @param {Hybrid.Population} population Current population.
      * @return {object} Child individual.
      */
-    this.crossover = function(randomizer, mother, father, population) {
+    this.execute = function(randomizer, mother, father, population) {
         if (randomizer.probability(probability)) {
-            return this.performCrossover(randomizer, mother, father, population);
+            return this.crossover(randomizer, mother, father, population);
         }
         return null;
     };
@@ -61,7 +61,7 @@ Hybrid.Reproduction.Crossover = function(probability) {
      * @param {Hybrid.Population} population Current population.
      * @return {object} Child individual.
      */
-    this.performMutation = function(randomizer, individual, population) {
+    this.crossover = function(randomizer, individual, population) {
         return null;
     };
 };
@@ -93,15 +93,15 @@ Hybrid.Reproduction.Mutation = function(probability) {
     };
 
     /**
-     * Invokes the mutation logic according to probability.
+     * Executes the mutation logic according to probability.
      * @param {Hybrid.Randomizer} randomizer Randomizer object.
      * @param {object} individual Individual.
      * @param {Hybrid.Population} population Current population.
      * @return {object} Mutated individual.
      */
-    this.mutate = function(randomizer, individual, population) {
+    this.execute = function(randomizer, individual, population) {
         if (randomizer.probability(probability)) {
-            return this.performMutation(randomizer, individual, population);
+            return this.mutate(randomizer, individual, population);
         }
         return null;
     };
@@ -114,7 +114,7 @@ Hybrid.Reproduction.Mutation = function(probability) {
      * @param {Hybrid.Population} population Current population.
      * @return {object} Mutated individual.
      */
-    this.performMutation = function(randomizer, individual, population) {
+    this.mutate = function(randomizer, individual, population) {
         return null;
     };
 };
