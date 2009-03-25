@@ -61,3 +61,33 @@ RandomizerStub = new Hybrid.Class({
     extend: Hybrid.Util.Randomizer,
     constructor: RandomizerStub
 });
+
+var CrossoverStub = function(probability) {
+    CrossoverStub.superClass.apply(this, arguments);
+
+    this.crossover = function(randomizer, mother, father, population) {
+        this.randomizer = randomizer;
+        this.mother = mother;
+        this.father = father;
+        this.population = population;
+    };
+};
+CrossoverStub = new Hybrid.Class({
+    extend: Hybrid.Reproduction.Crossover,
+    constructor: CrossoverStub 
+});
+
+var MutationStub = function(probability) {
+    MutationStub.superClass.apply(this, arguments);
+
+    this.mutate = function(randomizer, individual, population) {
+        this.randomizer = randomizer;
+        this.individual = individual;
+        this.population = population;
+    };
+};
+MutationStub = new Hybrid.Class({
+    extend: Hybrid.Reproduction.Mutation,
+    constructor: MutationStub 
+});
+

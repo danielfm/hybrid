@@ -38,6 +38,25 @@ var TestCases = {
 
         crossover = new Hybrid.Reproduction.Crossover(2);
         assertEqual(1, crossover.getProbability());
+    }},
+
+    testCrossoverDelegation: function() { with(this) {
+        crossover = new CrossoverStub(1);
+        crossover.execute(randomizer, 1, 2, 3);
+
+        assertEqual(randomizer, crossover.randomizer);
+        assertEqual(1, crossover.mother);
+        assertEqual(2, crossover.father);
+        assertEqual(3, crossover.population);
+    }},
+
+    testMutationDelegation: function() { with(this) {
+        mutation = new MutationStub(1);
+        mutation.execute(randomizer, 1, 2);
+
+        assertEqual(randomizer, mutation.randomizer);
+        assertEqual(1, mutation.individual);
+        assertEqual(2, mutation.population);
     }}
 };
 
