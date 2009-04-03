@@ -30,7 +30,7 @@
 
     <target name="hybrid" description="Main jquery build, concatenates source files and replaces @VERSION">
         <property name="DIST" value="${BUILD_DIR}/hybrid.js"/>
-        <echo message="Building ${DIST}" />
+        <echo message="Creating ${DIST}" />
         <mkdir dir="${BUILD_DIR}" />
         <concat destfile="${DIST}">
             <fileset dir="${SRC_DIR}" includes="hybrid.js"/>
@@ -46,27 +46,24 @@
             <fileset dir="${SRC_DIR}" includes="individual.js"/>
         </concat>
 
-        <echo message="Appending Revision and Date"/>
         <replaceregexp match="@VERSION" replace="${VERSION}" flags="g" byline="true" file="${DIST}"/>
         <replaceregexp match="@DATE" replace="${DATE}" file="${DIST}"/>
         <replaceregexp match="@REV" replace="${REV}" file="${DIST}"/>
-
-        <echo message="${DIST} built."/>
     </target>
     
     <target name="pack" depends="hybrid" description="Remove all comments and whitespace and compress">
         <property name="DIST_PACK" value="${BUILD_DIR}/hybrid_minified.js"/>
-        <echo message="Building ${DIST_PACK}"/>
+        <echo message="Packing ${DIST}"/>
         <java jar="${APP_DIR}/yuicompressor.jar" fork="true">
             <arg value="-o"/>
             <arg value="${DIST_PACK}"/>
             <arg value="${DIST}"/>
         </java>
-        <echo message="${DIST_PACK} built."/>
+        <echo message="Packed version created at ${DIST_PACK}"/>
     </target>
 
     <target name="doc" description="Generate API documentation">
-        <echo message="Generating API docs at ${API_DIR}"/>
+        <echo message="Creating API docs"/>
         <jsdoctoolkit jsdochome="${APP_DIR}/jsdoc-toolkit/" template="outline" outputdir="${API_DIR}">
             <source file="${SRC_DIR}/hybrid.js"/>
             <source file="${SRC_DIR}/class.js"/>
@@ -80,7 +77,7 @@
             <source file="${SRC_DIR}/fitness.js"/>
             <source file="${SRC_DIR}/individual.js"/>
         </jsdoctoolkit>
-        <echo message="${API_DIR} built."/>
+        <echo message="API docs created at ${API_DIR}"/>
     </target>
 
     <target name="test" depends="hybrid" description="Run the whole test suite">
