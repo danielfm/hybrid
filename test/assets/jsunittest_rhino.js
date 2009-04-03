@@ -156,6 +156,7 @@ JsUnitTest.Unit.Logger.prototype.overallSummary = function() {
   println('');
   println('Overall Test Execution Summary');
   println('------------------------------');
+  println('Tests      : ' + this.loggedTests.length);
   println('Assertions : ' + this.getTotalAssertions());
   println('Failures   : ' + this.getTotalFailures());
   println('Errors     : ' + this.getTotalErrors());
