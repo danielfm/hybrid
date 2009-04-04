@@ -28,7 +28,7 @@ Hybrid.Selection = function() {
     };
 };
 Hybrid.Selection = new Hybrid.Class({
-    constructor: Hybrid.Selection
+    initializer: Hybrid.Selection
 });
 
 /**
@@ -79,7 +79,7 @@ Hybrid.Selection.Tournament = function(rate) {
 };
 Hybrid.Selection.Tournament = new Hybrid.Class({
     extend: Hybrid.Selection,
-    constructor: Hybrid.Selection.Tournament
+    initializer: Hybrid.Selection.Tournament
 });
 
 /**
@@ -138,6 +138,6 @@ Hybrid.Selection.Ranking = function() {
 };
 Hybrid.Selection.Ranking = new Hybrid.Class({
     extend: Hybrid.Selection,
-    constructor: Hybrid.Selection.Ranking
+    initializer: Hybrid.Selection.Ranking
 });
 

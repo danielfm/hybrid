@@ -1,7 +1,7 @@
 var FactoryStub = function(initialSize) {
     FactoryStub.superClass.apply(this, arguments);
     
-    this.factoryCount = 0;
+    this.invocations = 0;
 
     this.createIndividual = function(randomizer, population) {
         if (!randomizer) {
@@ -11,13 +11,13 @@ var FactoryStub = function(initialSize) {
             throw "Population should not be null";
         }
 
-        this.factoryCount++;
+        this.invocations++;
         return {number: randomizer.next()};
     };
 };
 FactoryStub = new Hybrid.Class({
     extend: Hybrid.Individual.Factory,
-    constructor: FactoryStub
+    initializer: FactoryStub
 });
 
 var FitnessEvaluatorStub = function() {
@@ -35,7 +35,7 @@ var FitnessEvaluatorStub = function() {
 };
 FitnessEvaluatorStub = new Hybrid.Class({
     extend: Hybrid.Fitness.Evaluator,
-    constructor: FitnessEvaluatorStub
+    initializer: FitnessEvaluatorStub
 });
 
 var RandomizerStub = function() {
@@ -59,35 +59,55 @@ var RandomizerStub = function() {
 };
 RandomizerStub = new Hybrid.Class({
     extend: Hybrid.Util.Randomizer,
-    constructor: RandomizerStub
+    initializer: RandomizerStub
 });
 
 var CrossoverStub = function(probability) {
     CrossoverStub.superClass.apply(this, arguments);
 
-    this.crossover = function(randomizer, mother, father, population) {
+    this.emptyReturns = 0;
+    this.nonEmptyReturns = 0;
+
+    this.execute = function(randomizer, mother, father, population) {
         this.randomizer = randomizer;
         this.mother = mother;
         this.father = father;
         this.population = population;
+
+        if (randomizer.probability(0.5)) {
+            this.nonEmptyReturns++;
+            return mother;
+        }
+
+        this.emptyReturns++;
     };
 };
 CrossoverStub = new Hybrid.Class({
     extend: Hybrid.Reproduction.Crossover,
-    constructor: CrossoverStub 
+    initializer: CrossoverStub 
 });
 
 var MutationStub = function(probability) {
     MutationStub.superClass.apply(this, arguments);
 
-    this.mutate = function(randomizer, individual, population) {
+    this.emptyReturns = 0;
+    this.nonEmptyReturns = 0;
+
+    this.execute = function(randomizer, individual, population) {
         this.randomizer = randomizer;
         this.individual = individual;
         this.population = population;
+
+        if (randomizer.probability(0.5)) {
+            this.nonEmptyReturns++;
+            return individual;
+        }
+
+        this.emptyReturns++;
     };
 };
 MutationStub = new Hybrid.Class({
     extend: Hybrid.Reproduction.Mutation,
-    constructor: MutationStub 
+    initializer: MutationStub 
 });
 

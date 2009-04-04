@@ -465,7 +465,7 @@ Hybrid.Population = function(options) {
     var dirty = initialized;
 };
 Hybrid.Population = new Hybrid.Class({
-    constructor: Hybrid.Population
+    initializer: Hybrid.Population
 });
 
 /**
@@ -536,6 +536,6 @@ Hybrid.Population.StatisticsProvider = function() {
     };
 };
 Hybrid.Population.StatisticsProvider = new Hybrid.Class({
-    constructor: Hybrid.Population.StatisticsProvider
+    initializer: Hybrid.Population.StatisticsProvider
 });
 

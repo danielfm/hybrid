@@ -86,7 +86,7 @@ Hybrid.Util.Randomizer = function() {
     };
 };
 Hybrid.Util.Randomizer = new Hybrid.Class({
-    constructor: Hybrid.Util.Randomizer
+    initializer: Hybrid.Util.Randomizer
 });
 
 /**
@@ -159,6 +159,6 @@ Hybrid.Util.Range = function(start, end) {
 };
 
 Hybrid.Util.Range = new Hybrid.Class({
-    constructor: Hybrid.Util.Range
+    initializer: Hybrid.Util.Range
 });
 

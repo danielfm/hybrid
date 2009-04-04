@@ -59,6 +59,6 @@ Hybrid.Stop.ElapsedGeneration = function(generations) {
 };
 Hybrid.Stop.ElapsedGeneration = new Hybrid.Class({
     extend: Hybrid.Stop.Condition,
-    constructor: Hybrid.Stop.ElapsedGeneration
+    initializer: Hybrid.Stop.ElapsedGeneration
 });
 

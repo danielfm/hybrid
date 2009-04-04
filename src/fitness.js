@@ -35,7 +35,7 @@ Hybrid.Fitness.Evaluator = function() {
     };
 };
 Hybrid.Fitness.Evaluator = new Hybrid.Class({
-    constructor: Hybrid.Fitness.Evaluator 
+    initializer: Hybrid.Fitness.Evaluator 
 });
 
 
@@ -66,6 +66,6 @@ Hybrid.Fitness.Comparator = function(inverse) {
     };
 };
 Hybrid.Fitness.Comparator = new Hybrid.Class({
-    constructor: Hybrid.Fitness.Comparator
+    initializer: Hybrid.Fitness.Comparator
 });
 

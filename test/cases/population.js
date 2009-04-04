@@ -185,7 +185,7 @@ var TestCases = {
         assertEqual(0, count);
     }},
 
-    testUnsubscribe: function() { with(this) {
+    testListenerSubscription: function() { with(this) {
         var count = population.getEventHandler().getListeners().length;
 
         var listener = function() {

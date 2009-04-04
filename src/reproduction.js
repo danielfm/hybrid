@@ -66,7 +66,7 @@ Hybrid.Reproduction.Crossover = function(probability) {
     };
 };
 Hybrid.Reproduction.Crossover = new Hybrid.Class({
-    constructor: Hybrid.Reproduction.Crossover
+    initializer: Hybrid.Reproduction.Crossover
 });
 
 /**
@@ -120,6 +120,6 @@ Hybrid.Reproduction.Mutation = function(probability) {
 };
 
 Hybrid.Reproduction.Mutation = new Hybrid.Class({
-    constructor: Hybrid.Reproduction.Mutation
+    initializer: Hybrid.Reproduction.Mutation
 });
 

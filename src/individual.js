@@ -143,6 +143,6 @@ Hybrid.Individual.Factory = function(initialSize) {
 };
 
 Hybrid.Individual.Factory = new Hybrid.Class({
-    constructor: Hybrid.Individual.Factory
+    initializer: Hybrid.Individual.Factory
 });
 

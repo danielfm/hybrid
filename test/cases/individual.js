@@ -1,5 +1,5 @@
 var TestCases = {
-    name: 'Candidates',
+    name: 'Individuals',
 
     setup: function() {
         this.fitnessEvaluator = new FitnessEvaluatorStub();

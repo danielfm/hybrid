@@ -36,32 +36,66 @@ Hybrid.Engine = function(options) {
 
     /**
      * Initializes the population and processes the evolution.
+     * @param {boolean} serial Whether the evolution should run in caller's
+     * thread.
      */
-    this.evolve = function() {
+    this.evolve = function(options) {
+        options = options || {};
+
+        // Initializes the population
         population.initialize(randomizer);
+        var populationInitialSize = population.getSize();
 
-        // Simple replacement for setTimeout when it's not available
-        if (!setTimeout) {
-            setTimeout = function(func, timeout) {
-                func.apply(this);
-            };
+        if (options.serial) {
+            serialEvolution(populationInitialSize);
+        } else {
+            (cachedParallelEvolution = function() {
+                parallelEvolution(populationInitialSize);
+            })();
         }
-
-        processEvolution();
     };
 
     /**
-     * Processes the evolution. This method gets called until the stop
-     * condition being used by this engine tells us to keep going.
+     * Processes the evolution within the caller's thread.
+     */
+    function serialEvolution(populationInitialSize) {
+        // Keeps evolving until stop conditions are satisfied
+        while (!stopCondition.interrupt(population.getStatistics())) {
+            self.notify('newGeneration', population.getStatistics());
+            population.replaceGeneration(createNewGeneration(populationInitialSize));
+        }
+    }
+
+    /**
+     * Processes the evolution within another thread. This method gets called
+     * until the stop condition being used by this engine tells us to keep
+     * going.
+     * @param {number} populationInitialSize Initial size of the population.
      * @private
      */
-    function processEvolution() {
-        var size = population.getSize();
-
+    function parallelEvolution(populationInitialSize) {
         self.notify('newGeneration', population.getStatistics());
-        var breed = [];
+        population.replaceGeneration(createNewGeneration(populationInitialSize));
 
-        while (breed.length < size) {
+        // Keeps evolving until stop conditions are satisfied
+        if (!stopCondition.interrupt(population.getStatistics())) {
+            setTimeout(cachedParallelEvolution);
+        }
+    };
+
+    // This variable stores a function that delegates to 'parallelEvolution'
+    var cachedParallelEvolution = function() {
+    };
+
+    /**
+     * Creates a new generation of individuals by applying the crossover and
+     * mutation operators to individuals of the current population.
+     * @param {number} populationInitialSize Initial size of the population.
+     * @return {array} New generation of individuals.
+     */
+    function createNewGeneration(populationInitialSize) {
+        var breed = [];
+        while (breed.length < populationInitialSize) {
             // selects two different individuals for breeding
             var father = selection.select(randomizer, population);
             var mother = null;
@@ -78,18 +112,13 @@ Hybrid.Engine = function(options) {
                 // preserves the parents if the crossover produces no child
                 breed.push(father);
 
-                if (breed.length < size) {
+                if (breed.length < populationInitialSize) {
                     breed.push(mother);
                 }
             }
         }
-
-        population.replaceGeneration(breed);
-
-        if (!stopCondition.interrupt(population.getStatistics())) {
-            setTimeout(processEvolution);
-        }
-    };
+        return breed;
+    }
 
     /**
      * Registers a listener to be called when the given event happens.
@@ -307,7 +336,7 @@ Hybrid.Engine = function(options) {
     var eventHandler = new Hybrid.EventHandler();
 };
 Hybrid.Engine = new Hybrid.Class({
-    constructor: Hybrid.Engine
+    initializer: Hybrid.Engine
 });
 
 /**
@@ -334,6 +363,6 @@ Hybrid.Error = function(msg) {
     this.message = msg;
 };
 Hybrid.Error = new Hybrid.Class({
-    constructor: Hybrid.Error
+    initializer: Hybrid.Error
 });
 

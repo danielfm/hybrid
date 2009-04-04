@@ -8,24 +8,24 @@
  * @constructor Creates a new class.
  * @param {object} options Options.
  * @param {class} [options.extend=Object] Super class.
- * @param {function} [options.constructor=function(){}] Constructor function.
- * @return {function} <b>options.constructor</b>.
+ * @param {function} [options.initializer=function(){}] Constructor function.
+ * @return {function} <b>options.initializer</b>.
  */
 Hybrid.Class = function(options) {
     options = options || {};
 
     var superConstructor = options.extend || Object;
-    var constructor = options.constructor || function() { };
+    var initializer = options.initializer || function() { };
 
     var SurrogateConstructor = function() { };
     SurrogateConstructor.prototype = superConstructor.prototype;
 
     var prototypeObject = new SurrogateConstructor();
-    prototypeObject.constructor = constructor;
+    prototypeObject.constructor = initializer;
 
-    constructor.prototype = prototypeObject;
-    constructor.superClass = superConstructor;
+    initializer.prototype = prototypeObject;
+    initializer.superClass = superConstructor;
 
-    return constructor;
+    return initializer;
 };
 
