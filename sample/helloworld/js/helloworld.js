@@ -135,7 +135,7 @@ var ExpectedWordStopCondition = new Hybrid.Class({
     }
 });
 
-/**
+/*
  * Evolves a population of random words.
  */
 function evolve() {
@@ -189,7 +189,7 @@ function evolve() {
         mutation: wordMutation
     });
 
-    //  Start the evolution
+    // Start the evolution
     engine.evolve();
     $('#evolve').val('Please wait...').attr('disabled', 'disabled');
 }
