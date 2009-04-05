@@ -1,6 +1,8 @@
 /*  Jsunittest, version 0.7.2
  *  (c) 2008 Dr Nic Williams
  *
+ *  Modified by Daniel F. Martins
+ *
  *  Jsunittest is freely distributable under
  *  the terms of an MIT-style license.
  *  For details, see the web site: http://jsunittest.rubyforge.org

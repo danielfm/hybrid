@@ -9,16 +9,6 @@
  *
  *--------------------------------------------------------------------------*/
 
-importPackage(java.lang);
-
-function print(obj) {
-  return System.out.print(obj);
-}
-
-function println(obj) {
-  return System.out.println(obj);
-}
-
 var JsUnitTest = {
   Unit: {},
   inspect: function(object) {
@@ -93,6 +83,20 @@ var JsUnitTest = {
     interpret: function(value) {
       return value == null ? '' : String(value);
     }
+  },
+
+  loadTestCasesFromDirectory: function(commandLineArgs, directory) {
+    var testCases = [];
+    if (!commandLineArgs.length) {
+      var cases = new java.io.File(directory).listFiles();
+      for (var i = 0; i < cases.length; i++) {
+        var name = cases[i].name;
+        if (name.search(/.*.js$/i) >= 0) {
+          testCases.push(name);
+        }
+      }
+    }
+    return testCases;
   }
 };
 
@@ -140,26 +144,35 @@ JsUnitTest.Template.Pattern = /(^|.|\r|\n)(#\{(.*?)\})/;
 
 JsUnitTest.Unit.Logger = function() {
   this.loggedTests = [];
+  importPackage(java.lang);
+};
+
+JsUnitTest.Unit.Logger.prototype.print = function(obj) {
+  return System.out.print(obj);
+};
+
+JsUnitTest.Unit.Logger.prototype.println = function(obj) {
+  return System.out.println(obj);
 };
 
 JsUnitTest.Unit.Logger.prototype.startCase = function(name) {
-  println('');
-  println('------------------------------------------------------------');
+  this.println('');
+  this.println('------------------------------------------------------------');
   
   if (name) {
-    println(name + ' Test Case:');
-    println('');
+    this.println(name + ' Test Case:');
+    this.println('');
   }
 };
 
 JsUnitTest.Unit.Logger.prototype.overallSummary = function() {
-  println('');
-  println('Overall Test Execution Summary');
-  println('------------------------------');
-  println('Tests      : ' + this.loggedTests.length);
-  println('Assertions : ' + this.getTotalAssertions());
-  println('Failures   : ' + this.getTotalFailures());
-  println('Errors     : ' + this.getTotalErrors());
+  this.println('');
+  this.println('Overall Test Execution Summary');
+  this.println('------------------------------');
+  this.println('Tests      : ' + this.loggedTests.length);
+  this.println('Assertions : ' + this.getTotalAssertions());
+  this.println('Failures   : ' + this.getTotalFailures());
+  this.println('Errors     : ' + this.getTotalErrors());
 };
 
 JsUnitTest.Unit.Logger.prototype.getTotalAssertions = function() {
@@ -196,21 +209,21 @@ JsUnitTest.Unit.Logger.prototype.hasErrors = function() {
 };
 
 JsUnitTest.Unit.Logger.prototype.start = function(test) {
-  print('Running ' + test.name + '... ');
+  this.print('Running ' + test.name + '... ');
 };
 
 JsUnitTest.Unit.Logger.prototype.finish = function(test) {
   this.loggedTests.push(test);
-  println(test.status());
+  this.println(test.status());
 
   for (var i = 0; i < test.messages.length; i++) {
-    println(test.messages[i]);
+    this.println(test.messages[i]);
   };
 };
 
 JsUnitTest.Unit.Logger.prototype.summary = function(summary) {
-  println('');
-  println('Summary: ' + summary);
+  this.println('');
+  this.println('Summary: ' + summary);
 };
 
 JsUnitTest.Unit.MessageTemplate = function(string) {
