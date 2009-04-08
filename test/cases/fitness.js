@@ -1,4 +1,4 @@
-var TestCases = {
+new TestRunner({
     name: 'Fitness',
 
     setup: function() {
@@ -39,11 +39,5 @@ var TestCases = {
         assertEqual(-1, inverseFitnessComparator.compare(second, third));
         assertEqual(1, inverseFitnessComparator.compare(third, second));
     }}
-};
-
-if (testingWithRhino) {
-    new Test.Unit.SimpleRunner(TestCases, {'logger':testLogger});
-} else {
-    new Test.Unit.Runner(TestCases, {'testLog':'fitnessLog'});
-}
+}, {'logger':testLogger, 'testLog':'fitnessLog'});
 

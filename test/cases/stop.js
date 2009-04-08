@@ -1,4 +1,4 @@
-var TestCases = {
+new TestRunner({
     name: 'Stop Conditions',
 
     setup: function() {
@@ -62,11 +62,5 @@ var TestCases = {
         assert(elapsedStop instanceof Hybrid.Stop.Condition);
         assert(elapsedStop instanceof Hybrid.Stop.ElapsedGeneration);
     }}
-};
-
-if (testingWithRhino) {
-    new Test.Unit.SimpleRunner(TestCases, {'logger':testLogger});
-} else {
-    new Test.Unit.Runner(TestCases, {'testLog':'stopLog'});
-}
+}, {'logger':testLogger, 'testLog':'stopLog'});
 

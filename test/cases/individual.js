@@ -1,4 +1,4 @@
-var TestCases = {
+new TestRunner({
     name: 'Individuals',
 
     setup: function() {
@@ -60,11 +60,5 @@ var TestCases = {
     testDefaultFactory: function() { with(this) {
         assert(new Hybrid.Individual.Factory().createIndividual());
     }}
-};
-
-if (testingWithRhino) {
-    new Test.Unit.SimpleRunner(TestCases, {'logger':testLogger});
-} else {
-    new Test.Unit.Runner(TestCases, {'testLog':'individualLog'});
-}
+}, {'logger':testLogger, 'testLog':'individualLog'});
 

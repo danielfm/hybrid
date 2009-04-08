@@ -1,4 +1,4 @@
-var TestCases = {
+new TestRunner({
     name: 'Selection',
 
     setup: function() {
@@ -63,11 +63,5 @@ var TestCases = {
         individual = selection.select(randomizer, population);
         assertEqual(1, individual.number);
     }}
-};
-
-if (testingWithRhino) {
-    new Test.Unit.SimpleRunner(TestCases, {'logger':testLogger});
-} else {
-    new Test.Unit.Runner(TestCases, {'testLog':'selectionLog'});
-}
+}, {'logger':testLogger, 'testLog':'selectionLog'});
 

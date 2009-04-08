@@ -1,4 +1,4 @@
-var TestCases = {
+new TestRunner({
     name: 'Event',
 
     setup: function() {
@@ -132,11 +132,5 @@ var TestCases = {
         handler.notifyListeners('event', eventObject);
         assertEqual(1, clickerCount);
     }}
-};
-
-if (testingWithRhino) {
-    new Test.Unit.SimpleRunner(TestCases, {'logger':testLogger});
-} else {
-    new Test.Unit.Runner(TestCases, {'testLog':'eventLog'});
-}
+}, {'logger':testLogger, 'testLog':'eventLog'});
 

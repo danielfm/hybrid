@@ -1,4 +1,4 @@
-var TestCases = {
+new TestRunner({
     name: 'Reproduction',
 
     setup: function() {
@@ -58,11 +58,5 @@ var TestCases = {
         assertEqual(1, mutation.individual);
         assertEqual(2, mutation.population);
     }}
-};
-
-if (testingWithRhino) {
-    new Test.Unit.SimpleRunner(TestCases, {'logger':testLogger});
-} else {
-    new Test.Unit.Runner(TestCases, {'testLog':'reproductionLog'});
-}
+}, {'logger':testLogger, 'testLog':'reproductionLog'});
 

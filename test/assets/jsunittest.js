@@ -253,7 +253,7 @@ var JsUnitTest = {
     interpret: function(value) {
       return value == null ? '' : String(value);
     }
-  },
+  }
 };
 
 JsUnitTest.gsub.prepareReplacement = function(replacement) {
@@ -488,14 +488,19 @@ JsUnitTest.Unit.RhinoTextLogger.prototype.startCase = function(name) {
   }
 };
 
-JsUnitTest.Unit.RhinoTextLogger.prototype.overallSummary = function() {
+JsUnitTest.Unit.RhinoTextLogger.prototype.printSummary = function() {
   this.println('');
-  this.println('Overall Test Execution Summary');
-  this.println('------------------------------');
+  this.println('Test Execution Summary');
+  this.println('----------------------');
   this.println('Tests      : ' + this.loggedTests.length);
   this.println('Assertions : ' + this.getTotalAssertions());
   this.println('Failures   : ' + this.getTotalFailures());
   this.println('Errors     : ' + this.getTotalErrors());
+};
+
+JsUnitTest.Unit.RhinoTextLogger.prototype.printSummaryAndExit = function() {
+  this.printSummary();
+  System.exit(testLogger.hasErrors() ? 1 : 0);
 };
 
 JsUnitTest.Unit.RhinoTextLogger.prototype.getTotalAssertions = function() {

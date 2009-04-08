@@ -1,4 +1,4 @@
-var TestCases = {
+new TestRunner({
     name: 'Engine',
 
     setup: function() {
@@ -137,12 +137,5 @@ var TestCases = {
             engine.setStopCondition({});
         });
     }}
-};
-
-if (testingWithRhino) {
-    new Test.Unit.SimpleRunner(TestCases, {'logger':testLogger});
-}
-else {
-    new Test.Unit.Runner(TestCases, {'testLog':'engineLog'});
-}
+}, {'logger':testLogger, 'testLog':'engineLog'});
 

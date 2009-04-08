@@ -1,4 +1,4 @@
-var TestCases = {
+new TestRunner({
     name: 'Util',
 
     setup: function() {
@@ -93,11 +93,5 @@ var TestCases = {
         }
         assert(moreThanFifth > 250);
     }}
-};
-
-if (testingWithRhino) {
-    new Test.Unit.SimpleRunner(TestCases, {'logger':testLogger});
-} else {
-    new Test.Unit.Runner(TestCases, {'testLog':'utilLog'});
-}
+}, {'logger':testLogger, 'testLog':'utilLog'});
 

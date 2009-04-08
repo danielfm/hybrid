@@ -1,4 +1,4 @@
-var TestCases = {
+new TestRunner({
     name: 'Population',
 
     setup: function() {
@@ -372,11 +372,5 @@ var TestCases = {
         });
         assertIdentical(this.fitnessComparator, population.getFitnessComparator());
     }}
-};
-
-if (testingWithRhino) {
-    new Test.Unit.SimpleRunner(TestCases, {'logger':testLogger});
-} else {
-    new Test.Unit.Runner(TestCases, {'testLog':'populationLog'});
-}
+}, {'logger':testLogger, 'testLog':'populationLog'});
 
