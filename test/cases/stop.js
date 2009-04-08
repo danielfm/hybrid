@@ -9,13 +9,13 @@ var TestCases = {
 
     testStopCondition: function() { with(this) {
         var stop = new Hybrid.Stop.Condition();
-        assertTrue(stop.interrupt());
+        assert(stop.interrupt());
     }},
 
     testStopConditionClassHierarchy: function() { with(this) {
         var stop = new Hybrid.Stop.Condition();
-        assertTrue(stop instanceof Hybrid.Stop.Condition);
-        assertFalse(stop instanceof Hybrid.Stop.ElapsedGeneration);
+        assert(stop instanceof Hybrid.Stop.Condition);
+        assert(!(stop instanceof Hybrid.Stop.ElapsedGeneration));
     }},
 
     testElapsedGenerationStop: function() { with(this) {
@@ -28,13 +28,13 @@ var TestCases = {
         };
 
         var generations = 5;
-        assertFalse(elapsedStop.interrupt(event));
+        assert(!(elapsedStop.interrupt(event)));
 
         generations = 10;
-        assertTrue(elapsedStop.interrupt(event));
+        assert(elapsedStop.interrupt(event));
 
         generations = 15;
-        assertTrue(elapsedStop.interrupt(event));
+        assert(elapsedStop.interrupt(event));
     }},
 
     testElapsedGenerationStopDefault: function() { with(this) {
@@ -47,22 +47,26 @@ var TestCases = {
         };
 
         var generations = 10;
-        assertFalse(elapsedStop.interrupt(event));
+        assert(!(elapsedStop.interrupt(event)));
 
         generations = 100;
-        assertTrue(elapsedStop.interrupt(event));
+        assert(elapsedStop.interrupt(event));
 
         generations = 110;
-        assertTrue(elapsedStop.interrupt(event));
+        assert(elapsedStop.interrupt(event));
     }},
 
     testElapsedGenerationClassHierarchy: function() { with(this) {
         var elapsedStop = new Hybrid.Stop.ElapsedGeneration();
 
-        assertTrue(elapsedStop instanceof Hybrid.Stop.Condition);
-        assertTrue(elapsedStop instanceof Hybrid.Stop.ElapsedGeneration);
+        assert(elapsedStop instanceof Hybrid.Stop.Condition);
+        assert(elapsedStop instanceof Hybrid.Stop.ElapsedGeneration);
     }}
 };
 
-new Test.Unit.Runner(TestCases, {'testLog':'stopLog', 'logger':testLogger});
+if (testingWithRhino) {
+    new Test.Unit.SimpleRunner(TestCases, {'logger':testLogger});
+} else {
+    new Test.Unit.Runner(TestCases, {'testLog':'stopLog'});
+}
 

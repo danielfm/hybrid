@@ -15,7 +15,7 @@ var TestCases = {
 
     testInvaldiIndividual: function() { with(this) {
         var individual = {number: 10, fitness:{}};
-        assertRaise(Hybrid.Error, function() {
+        assertRaise('Hybrid.Error', function() {
             population.add(individual);
         });
     }},
@@ -46,9 +46,9 @@ var TestCases = {
         population.add(individual);
         population.add(other);
 
-        assertTrue(individual.fitness.isBetterThan(other));
-        assertFalse(other.fitness.isBetterThan(individual));
-        assertFalse(other.fitness.isBetterThan(other));
+        assert(individual.fitness.isBetterThan(other));
+        assert(!(other.fitness.isBetterThan(individual)));
+        assert(!(other.fitness.isBetterThan(other)));
     }},
 
     testFactoryConstructor: function() { with(this) {
@@ -62,5 +62,9 @@ var TestCases = {
     }}
 };
 
-new Test.Unit.Runner(TestCases, {'testLog':'individualLog', 'logger':testLogger});
+if (testingWithRhino) {
+    new Test.Unit.SimpleRunner(TestCases, {'logger':testLogger});
+} else {
+    new Test.Unit.Runner(TestCases, {'testLog':'individualLog'});
+}
 

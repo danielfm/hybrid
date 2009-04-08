@@ -36,17 +36,17 @@ var TestCases = {
         var object = new DefaultClass();
 
         assert(object);
-        assertTrue(object instanceof Object);
-        assertFalse(object instanceof ChildClass);
-        assertFalse(object instanceof ParentClass);
+        assert(object instanceof Object);
+        assert(!(object instanceof ChildClass));
+        assert(!(object instanceof ParentClass));
     }},
 
     testParentClassInheritance: function() { with(this) {
         var object = new ParentClass();
 
-        assertFalse(object instanceof ChildClass);
-        assertTrue(object instanceof ParentClass);
-        assertTrue(object instanceof Object);
+        assert(!(object instanceof ChildClass));
+        assert(object instanceof ParentClass);
+        assert(object instanceof Object);
 
         assertEqual('text', object.variable);
         assertEqual('Hello, Stranger', object.sayHelloTo('Stranger'));
@@ -56,10 +56,10 @@ var TestCases = {
     testChildClassInheritance: function() { with(this) {
         var object = new ChildClass();
 
-        assertFalse(object instanceof Array);
-        assertTrue(object instanceof ChildClass);
-        assertTrue(object instanceof ParentClass);
-        assertTrue(object instanceof Object);
+        assert(!(object instanceof Array));
+        assert(object instanceof ChildClass);
+        assert(object instanceof ParentClass);
+        assert(object instanceof Object);
 
         assertEqual('other', object.variable);
         assertEqual('Hey, Stranger', object.sayHelloTo('Stranger'));
@@ -67,5 +67,9 @@ var TestCases = {
     }}
 };
 
-new Test.Unit.Runner(TestCases, {'testLog':'classLog', 'logger':testLogger});
+if (testingWithRhino) {
+    new Test.Unit.SimpleRunner(TestCases, {'logger':testLogger});
+} else {
+    new Test.Unit.Runner(TestCases, {'testLog':'classLog'});
+}
 

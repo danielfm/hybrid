@@ -134,5 +134,9 @@ var TestCases = {
     }}
 };
 
-new Test.Unit.Runner(TestCases, {'testLog':'eventLog', 'logger':testLogger});
+if (testingWithRhino) {
+    new Test.Unit.SimpleRunner(TestCases, {'logger':testLogger});
+} else {
+    new Test.Unit.Runner(TestCases, {'testLog':'eventLog'});
+}
 

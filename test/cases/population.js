@@ -22,7 +22,7 @@ var TestCases = {
         population = new Hybrid.Population();
 
         assertEqual(0, population.getSize());
-        assertFalse(population.isInitialized());
+        assert(!(population.isInitialized()));
         assertEqual(0, population.getGeneration());
 
         assert(population.getEventHandler());
@@ -50,14 +50,14 @@ var TestCases = {
         population = new Hybrid.Population(args);
 
         assertEnumEqual(args.individuals, population.getIndividuals());
-        assertTrue(population.isInitialized());
+        assert(population.isInitialized());
     }},
 
     testConstructorWithInvalidGeneration: function() { with(this) {
         population = new Hybrid.Population({
             generation:-1
         });
-        assertTrue(population.getGeneration() >= 0);
+        assert(population.getGeneration() >= 0);
     }},
 
     testInitialize: function() { with(this) {
@@ -79,7 +79,7 @@ var TestCases = {
 
         assertEqual(0, population.getGeneration());
         assertEqual(10, population.getSize());
-        assertTrue(population.isInitialized());
+        assert(population.isInitialized());
 
         assertEqual(1, before);
         assertEqual(1, after);
@@ -92,7 +92,7 @@ var TestCases = {
     testInitializeTwice: function() { with(this) {
         population.initialize(randomizer);
 
-        assertRaise(Hybrid.Error, function() {
+        assertRaise('Hybrid.Error', function() {
             population.initialize(randomizer);
         });
     }},
@@ -118,7 +118,7 @@ var TestCases = {
     }},
 
     testAddAllWithInvalidArgument: function() { with(this) {
-        assertRaise(Hybrid.Error, function() {
+        assertRaise('Hybrid.Error', function() {
             population.addAll({});
         });
     }},
@@ -130,7 +130,7 @@ var TestCases = {
         var individuals = population.getIndividuals();
 
         for (var i = 0; i < individuals.length - 1; i++) {
-            assertTrue(individuals[i].fitness.get() >= individuals[i+1].fitness.get());
+            assert(individuals[i].fitness.get() >= individuals[i+1].fitness.get());
         }
     }},
 
@@ -179,7 +179,7 @@ var TestCases = {
             breed.push(factory.createIndividual(randomizer, population));
         }
 
-        assertRaise(Hybrid.Error, function() {
+        assertRaise('Hybrid.Error', function() {
             population.replaceGeneration(breed);
         });
         assertEqual(0, count);
@@ -265,17 +265,17 @@ var TestCases = {
     }},
 
     testElitismWithMissingOptions: function() { with(this) {
-        assertRaise(Hybrid.Error, function() {
+        assertRaise('Hybrid.Error', function() {
             Hybrid.Population.setElitism();
         });
 
-        assertRaise(Hybrid.Error, function() {
+        assertRaise('Hybrid.Error', function() {
             Hybrid.Population.setElitism({
                 to: population
             });
         });
 
-        assertRaise(Hybrid.Error, function() {
+        assertRaise('Hybrid.Error', function() {
             Hybrid.Population.setElitism({
                 size: 2
             });
@@ -294,11 +294,11 @@ var TestCases = {
     }},
 
     testSetFactory: function() { with(this) {
-        assertRaise(Hybrid.Error, function() {
+        assertRaise('Hybrid.Error', function() {
             population.setFactory({});
         });
 
-        assertRaise(Hybrid.Error, function() {
+        assertRaise('Hybrid.Error', function() {
             new Hybrid.Population({
                 factory: {}
             });
@@ -314,11 +314,11 @@ var TestCases = {
     }},
 
     testSetFitnessEvaluator: function() { with(this) {
-        assertRaise(Hybrid.Error, function() {
+        assertRaise('Hybrid.Error', function() {
             population.setFitnessEvaluator({});
         });
 
-        assertRaise(Hybrid.Error, function() {
+        assertRaise('Hybrid.Error', function() {
             new Hybrid.Population({
                 fitnessEvaluator: {}
             });
@@ -334,11 +334,11 @@ var TestCases = {
     }},
 
     testSetStatisticsProvider: function() { with(this) {
-        assertRaise(Hybrid.Error, function() {
+        assertRaise('Hybrid.Error', function() {
             population.setStatisticsProvider({});
         });
 
-        assertRaise(Hybrid.Error, function() {
+        assertRaise('Hybrid.Error', function() {
             new Hybrid.Population({
                 statisticsProvider: {}
             });
@@ -354,11 +354,11 @@ var TestCases = {
     }},
 
     testSetFitnessComparator: function() { with(this) {
-        assertRaise(Hybrid.Error, function() {
+        assertRaise('Hybrid.Error', function() {
             population.setFitnessComparator({});
         });
 
-        assertRaise(Hybrid.Error, function() {
+        assertRaise('Hybrid.Error', function() {
             new Hybrid.Population({
                 fitnessComparator: {}
             });
@@ -374,5 +374,9 @@ var TestCases = {
     }}
 };
 
-new Test.Unit.Runner(TestCases, {'testLog':'populationLog', 'logger':testLogger});
+if (testingWithRhino) {
+    new Test.Unit.SimpleRunner(TestCases, {'logger':testLogger});
+} else {
+    new Test.Unit.Runner(TestCases, {'testLog':'populationLog'});
+}
 

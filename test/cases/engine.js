@@ -89,7 +89,7 @@ var TestCases = {
     }},
 
     testSetInvalidRandomizer: function() { with(this) {
-        assertRaise(Hybrid.Error, function() {
+        assertRaise('Hybrid.Error', function() {
             engine.setRandomizer({});
         });
     }},
@@ -100,7 +100,7 @@ var TestCases = {
     }},
 
     testInvalidSelection: function() { with(this) {
-        assertRaise(Hybrid.Error, function() {
+        assertRaise('Hybrid.Error', function() {
             engine.setSelection({});
         });
     }},
@@ -111,7 +111,7 @@ var TestCases = {
     }},
 
     testSetInvalidCrossover: function() { with(this) {
-        assertRaise(Hybrid.Error, function() {
+        assertRaise('Hybrid.Error', function() {
             engine.setCrossover({});
         });
     }},
@@ -122,7 +122,7 @@ var TestCases = {
     }},
 
     testSetInvalidMutation: function() { with(this) {
-        assertRaise(Hybrid.Error, function() {
+        assertRaise('Hybrid.Error', function() {
             engine.setCrossover({});
         });
     }},
@@ -133,11 +133,16 @@ var TestCases = {
     }},
 
     testSetInvalidStopCondition: function() { with(this) {
-        assertRaise(Hybrid.Error, function() {
+        assertRaise('Hybrid.Error', function() {
             engine.setStopCondition({});
         });
     }}
 };
 
-new Test.Unit.Runner(TestCases, {'testLog':'engineLog', 'logger':testLogger});
+if (testingWithRhino) {
+    new Test.Unit.SimpleRunner(TestCases, {'logger':testLogger});
+}
+else {
+    new Test.Unit.Runner(TestCases, {'testLog':'engineLog'});
+}
 
