@@ -5,6 +5,8 @@
 // Bootstrap Jsunittest and Hybrid
 load('assets/env.js');
 load('assets/jsunittest.js');
+load('assets/jsunittest-hamcrest.js');
+load('assets/jscontext.js');
 load('../build/hybrid.js');
 
 // Load test stubs

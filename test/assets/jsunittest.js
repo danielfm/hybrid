@@ -483,7 +483,7 @@ JsUnitTest.Unit.RhinoTextLogger.prototype.startCase = function(name) {
   this.println('------------------------------------------------------------');
 
   if (name) {
-    this.println(name + ' Test Case:');
+    this.println(name + ':');
     this.println('');
   }
 };
@@ -494,6 +494,7 @@ JsUnitTest.Unit.RhinoTextLogger.prototype.printSummary = function() {
   this.println('----------------------');
   this.println('Tests      : ' + this.loggedTests.length);
   this.println('Assertions : ' + this.getTotalAssertions());
+  this.println('Warnings   : ' + this.getTotalWarnings());
   this.println('Failures   : ' + this.getTotalFailures());
   this.println('Errors     : ' + this.getTotalErrors());
 };
@@ -527,6 +528,14 @@ JsUnitTest.Unit.RhinoTextLogger.prototype.getTotalFailures = function() {
   return failures;
 };
 
+JsUnitTest.Unit.RhinoTextLogger.prototype.getTotalWarnings = function() {
+  var warnings = 0;
+  for (var i = 0; i < this.loggedTests.length; i++) {
+    warnings += this.loggedTests[i].warnings;
+  }
+  return warnings;
+};
+
 JsUnitTest.Unit.RhinoTextLogger.prototype.hasErrors = function() {
   var errorsAndFailures = 0;
   for (var i = 0; i < this.loggedTests.length; i++) {
@@ -537,7 +546,7 @@ JsUnitTest.Unit.RhinoTextLogger.prototype.hasErrors = function() {
 };
 
 JsUnitTest.Unit.RhinoTextLogger.prototype.start = function(test) {
-  this.print('Running ' + test.name + '... ');
+  this.print(test.name + '... ');
 };
 
 JsUnitTest.Unit.RhinoTextLogger.prototype.finish = function(test) {
@@ -1041,41 +1050,24 @@ JsUnitTest.Unit.SimpleRunner = function(testcases, options) {
   this.runTests();
 };
 
+JsUnitTest.Unit.SimpleRunner.prototype.queryParams = {
+  tests:null
+};
+
+JsUnitTest.Unit.Runner.prototype.portNumber = function() {
+  return null;
+};
+
 JsUnitTest.Unit.SimpleRunner.prototype.getTests = function(testcases) {
-  var tests = [], options = this.options;
-  if (options.tests) tests = options.tests;
-  else if (options.test) tests = [option.test];
-  else {
-    for (testname in testcases) {
-      if (testname.match(/^test/)) tests.push(testname);
-    }
-  }
-  var results = [];
-  for (var i=0; i < tests.length; i++) {
-    var test = tests[i];
-    if (testcases[test])
-      results.push(
-        new JsUnitTest.Unit.Testcase(test, testcases[test], testcases.setup, testcases.teardown)
-      );
-  };
-  return results;
+  return JsUnitTest.Unit.Runner.prototype.getTests.apply(this, arguments);
 };
 
 JsUnitTest.Unit.SimpleRunner.prototype.getResult = function() {
-  var results = {
-    tests: this.tests.length,
-    assertions: 0,
-    failures: 0,
-    errors: 0,
-  };
+  return JsUnitTest.Unit.Runner.prototype.getResult.apply(this, arguments);
+};
 
-  for (var i=0; i < this.tests.length; i++) {
-    var test = this.tests[i];
-    results.assertions += test.assertions;
-    results.failures   += test.failures;
-    results.errors     += test.errors;
-  };
-  return results;
+JsUnitTest.Unit.SimpleRunner.prototype.postResults = function() {
+  return JsUnitTest.Unit.Runner.prototype.postResults.apply(this, arguments);
 };
 
 JsUnitTest.Unit.SimpleRunner.prototype.runTests = function() {
@@ -1097,7 +1089,7 @@ JsUnitTest.Unit.SimpleRunner.prototype.finish = function() {
 };
 
 JsUnitTest.Unit.SimpleRunner.prototype.summary = function() {
-  return new JsUnitTest.Template('#{tests} tests, #{assertions} assertions, #{failures} failures, #{errors} errors').evaluate(this.getResult());
+  return new JsUnitTest.Template('#{tests} tests, #{assertions} assertions, #{failures} failures, #{errors} errors, #{warnings} warnings').evaluate(this.getResult());
 };
 JsUnitTest.Unit.Testcase = function(name, test, setup, teardown) {
   this.name           = name;
@@ -1209,72 +1201,6 @@ JsUnitTest.Unit.Testcase.prototype.benchmark = function(operation, iterations) {
   this.info((arguments[2] || 'Operation') + ' finished ' +
      iterations + ' iterations in ' + (timeTaken/1000)+'s' );
   return timeTaken;
-};
-JsUnitTest.Unit.SimpleTestcase = function(name, test, setup, teardown) {
-  this.name           = name;
-  this.test           = test     || function() {};
-  this.setup          = setup    || function() {};
-  this.teardown       = teardown || function() {};
-  this.messages       = [];
-  this.actions        = {};
-};
-
-for (method in JsUnitTest.Unit.Assertions) {
-  JsUnitTest.Unit.SimpleTestcase.prototype[method] = JsUnitTest.Unit.Assertions[method];
-}
-
-JsUnitTest.Unit.SimpleTestcase.prototype.assertions        = 0;
-JsUnitTest.Unit.SimpleTestcase.prototype.failures          = 0;
-JsUnitTest.Unit.SimpleTestcase.prototype.errors            = 0;
-
-JsUnitTest.Unit.SimpleTestcase.prototype.run = function(rethrow) {
-  try {
-    try {
-      this.setup();
-      this.test();
-    } finally {
-      this.teardown();
-    }
-  }
-  catch(e) {
-    if (rethrow) throw e;
-    this.error(e, this);
-  }
-};
-
-JsUnitTest.Unit.SimpleTestcase.prototype.summary = function() {
-  var msg = '#{assertions} assertions, #{failures} failures, #{errors} errors\n';
-  return new JsUnitTest.Template(msg).evaluate(this) +
-    this.messages.join("\n");
-};
-
-JsUnitTest.Unit.SimpleTestcase.prototype.pass = function() {
-  this.assertions++;
-};
-
-JsUnitTest.Unit.SimpleTestcase.prototype.fail = function(message) {
-  this.failures++;
-  try {
-    throw new Error("stack");
-  } catch(e){
-  }
-  this.messages.push("Failure: " + message);
-};
-
-JsUnitTest.Unit.SimpleTestcase.prototype.info = function(message) {
-  this.messages.push("Info: " + message);
-};
-
-JsUnitTest.Unit.SimpleTestcase.prototype.error = function(error, test) {
-  this.errors++;
-  this.actions['retry with throw'] = function() { test.run(true) };
-  this.messages.push('Error [' + error.name + ']: ' + error.message);
-};
-
-JsUnitTest.Unit.SimpleTestcase.prototype.status = function() {
-  if (this.errors > 0) return 'ERROR!';
-  if (this.failures > 0) return 'FAILED!';
-  return 'ok';
 };
 
 var Test = JsUnitTest;

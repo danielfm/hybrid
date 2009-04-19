@@ -26,44 +26,41 @@ new TestRunner({
     name: 'Class',
 
     setup: function() {
+        this.defaultObject = new (new Hybrid.Class())();
+        this.parentObject = new ParentClass();
+        this.childObject = new ChildClass();
     },
 
     teardown: function() {
     },
 
-    testCreateEmptyBaseClass: function() { with(this) {
-        var DefaultClass = new Hybrid.Class();
-        var object = new DefaultClass();
+    "Instance": new JsContext({
+        "should inherit from Object": function() { with(this) {
+            assertThat(defaultObject, instanceOf(Object));
+            assertThat(defaultObject, not(instanceOf(ChildClass)));
+            assertThat(defaultObject, not(instanceOf(ParentClass)));
+        }},
 
-        assert(object);
-        assert(object instanceof Object);
-        assert(!(object instanceof ChildClass));
-        assert(!(object instanceof ParentClass));
-    }},
+        "should inherit from Object and ParentClass": function() { with(this) {
+            assertThat(parentObject, not(instanceOf(ChildClass)));
+            assertThat(parentObject, instanceOf(ParentClass));
+            assertThat(parentObject, instanceOf(Object));
 
-    testParentClassInheritance: function() { with(this) {
-        var object = new ParentClass();
+            assertThat(parentObject.variable, equalTo('text'));
+            assertThat(parentObject.sayHelloTo('Stranger'), equalTo('Hello, Stranger'));
+            assertThat(parentObject.saySomething(), equalTo('Something'));
+        }},
 
-        assert(!(object instanceof ChildClass));
-        assert(object instanceof ParentClass);
-        assert(object instanceof Object);
+        "should inherit from Object, ParentClass and ChildClass": function() { with(this) {
+            assertThat(childObject, not(instanceOf(Array)));
+            assertThat(childObject, instanceOf(ChildClass));
+            assertThat(childObject, instanceOf(ParentClass));
+            assertThat(childObject, instanceOf(Object));
 
-        assertEqual('text', object.variable);
-        assertEqual('Hello, Stranger', object.sayHelloTo('Stranger'));
-        assertEqual('Something', object.saySomething());
-    }},
-
-    testChildClassInheritance: function() { with(this) {
-        var object = new ChildClass();
-
-        assert(!(object instanceof Array));
-        assert(object instanceof ChildClass);
-        assert(object instanceof ParentClass);
-        assert(object instanceof Object);
-
-        assertEqual('other', object.variable);
-        assertEqual('Hey, Stranger', object.sayHelloTo('Stranger'));
-        assertEqual('Something', object.saySomething());
-    }}
+            assertThat(childObject.variable, equalTo('other'));
+            assertThat(childObject.sayHelloTo('Stranger'), equalTo('Hey, Stranger'));
+            assertThat(childObject.saySomething(), equalTo('Something'));
+        }}
+    })
 }, {'logger':testLogger, 'testLog':'classLog'});
 
