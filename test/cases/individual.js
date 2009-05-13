@@ -15,15 +15,15 @@ new TestRunner({
 
     testInvaldiIndividual: function() { with(this) {
         var individual = {number: 10, fitness:{}};
-        assertRaise('Hybrid.Error', function() {
+        assertThat(function() {
             population.add(individual);
-        });
+        }, raises('Hybrid.Error'));
     }},
 
     testIndividualFitness: function() { with(this) {
         var individual = {number: 10};
         population.add(individual);
-        assertEqual(10, individual.fitness.get());
+        assertThat(individual.fitness.get(), 10);
     }},
 
     testIndividualResetFitness: function() { with(this) {
@@ -31,13 +31,13 @@ new TestRunner({
         population.add(individual);
 
         population.sort();
-        assertEqual(10, individual.fitness.get());
+        assertThat(individual.fitness.get(), 10);
 
         individual.number = 5;
-        assertEqual(10, individual.fitness.get());
+        assertThat(individual.fitness.get(), 10);
 
         individual.fitness.reset();
-        assertEqual(5, individual.fitness.get());
+        assertThat(individual.fitness.get(), 5);
     }},
 
     testIndividualIsBetterThan: function() { with(this) {
@@ -46,19 +46,19 @@ new TestRunner({
         population.add(individual);
         population.add(other);
 
-        assert(individual.fitness.isBetterThan(other));
-        assert(!(other.fitness.isBetterThan(individual)));
-        assert(!(other.fitness.isBetterThan(other)));
+        assertThat(individual.fitness.isBetterThan(other), true);
+        assertThat(other.fitness.isBetterThan(individual), false);
+        assertThat(other.fitness.isBetterThan(other), false);
     }},
 
     testFactoryConstructor: function() { with(this) {
-        assertEqual(100, new Hybrid.Individual.Factory().getInitialSize());
-        assertEqual(100, new Hybrid.Individual.Factory(0).getInitialSize());
-        assertEqual(50, new Hybrid.Individual.Factory(50).getInitialSize());
+        assertThat(new Hybrid.Individual.Factory().getInitialSize(), 100);
+        assertThat(new Hybrid.Individual.Factory(0).getInitialSize(), 100);
+        assertThat(new Hybrid.Individual.Factory(50).getInitialSize(), 50);
     }},
 
     testDefaultFactory: function() { with(this) {
-        assert(new Hybrid.Individual.Factory().createIndividual());
+        assertThat(new Hybrid.Individual.Factory().createIndividual(), not(nil()));
     }}
 }, {'logger':testLogger, 'testLog':'individualLog'});
 

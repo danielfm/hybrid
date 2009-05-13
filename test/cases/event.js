@@ -9,7 +9,7 @@ new TestRunner({
     },
 
     testInitialState: function() { with(this) {
-        assertEqual(0, handler.getListenersCount());
+        assertThat(handler.getListenersCount(), 0);
     }},
 
     testAddListener: function() { with(this) {
@@ -17,76 +17,76 @@ new TestRunner({
         var type = 'event type';
 
         handler.addListener(type, listener);
-        assertEqual(1, handler.getListenersCount());
+        assertThat(handler.getListenersCount(), 1);
 
         var entry = handler.getListeners()[0];
 
-        assertIdentical(listener, entry.listener);
-        assertIdentical(type, entry.type);
+        assertThat(entry.listener, sameAs(listener));
+        assertThat(entry.type, sameAs(type));
     }},
 
     testAddListenerNone: function() { with(this) {
         var listener = {};
 
         handler.addListener();
-        assertEqual(0, handler.getListenersCount());
+        assertThat(handler.getListenersCount(), 0);
 
         handler.addListener('event');
-        assertEqual(0, handler.getListenersCount());
+        assertThat(handler.getListenersCount(), 0);
 
         handler.addListener(null, {});
-        assertEqual(0, handler.getListenersCount());
+        assertThat(handler.getListenersCount(), 0);
     }},
 
     testRemoveListener: function() { with(this) {
         var listener = {};
 
         handler.addListener('event', listener);
-        assertEqual(1, handler.getListenersCount());
+        assertThat(handler.getListenersCount(), 1);
 
         handler.removeListener(listener);
-        assertEqual(0, handler.getListenersCount());
+        assertThat(handler.getListenersCount(), 0);
     }},
 
     testRemoveInexistentListener: function() { with(this) {
         handler.addListener('event', {});
-        assertEqual(1, handler.getListenersCount());
+        assertThat(handler.getListenersCount(), 1);
 
         handler.removeListener({});
-        assertEqual(1, handler.getListenersCount());
+        assertThat(handler.getListenersCount(), 1);
     }},
 
     testRemoveListenerNone: function() { with(this) {
         handler.addListener('event', {});
-        assertEqual(1, handler.getListenersCount());
+        assertThat(handler.getListenersCount(), 1);
 
         handler.removeListener();
-        assertEqual(1, handler.getListenersCount());
+        assertThat(handler.getListenersCount(), 1);
     }},
 
     testRemoveListenersByType: function() { with(this) {
         handler.addListener('event', {});
         handler.addListener('event', {});
-        assertEqual(2, handler.getListenersCount());
+        assertThat(handler.getListenersCount(), 2);
 
         handler.removeListenersByType('event');
-        assertEqual(0, handler.getListenersCount());
+        assertThat(handler.getListenersCount(), 0);
     }},
 
     testRemoveListenersByInexistentType: function() { with(this) {
         handler.addListener('event', {});
-        assertEqual(1, handler.getListenersCount());
+        assertThat(handler.getListenersCount(), 1);
 
         handler.removeListenersByType('another event');
-        assertEqual(1, handler.getListenersCount());
+        assertThat(handler.getListenersCount(), 1);
     }},
 
     testRemoveListenersByTypeNone: function() { with(this) {
         handler.addListener('event', {});
-        assertEqual(1, handler.getListenersCount());
+        assertThat(handler.getListenersCount(), 1);
 
         handler.removeListenersByType();
-        assertEqual(1, handler.getListenersCount());
+        assertThat(handler.getListenersCount(), 1);
     }},
 
     testGetListenersByType: function() { with(this) {
@@ -94,7 +94,7 @@ new TestRunner({
         handler.addListener('event', event);
 
         var events = handler.getListenersByType('event');
-        assertIdentical(event, events[0]);
+        assertThat(events[0], sameAs(event));
     }},
 
     testGetListenersByInexistentType: function() { with(this) {
@@ -102,7 +102,7 @@ new TestRunner({
         handler.addListener('event', event);
 
         var events = handler.getListenersByType('another event');
-        assertEnumEqual([], events);
+        assertThat(events, []);
     }},
 
     testGetListenersByTypeNone: function() { with(this) {
@@ -121,8 +121,8 @@ new TestRunner({
 
         var clickerCount = 0;
         var clicker = function(event, params) {
-            assertEqual('param', params.value);
-            assertEqual('param', event.parameter);
+            assertThat(params.value, 'param');
+            assertThat(event.parameter, 'param');
             clickerCount++;
         };
 
@@ -130,7 +130,7 @@ new TestRunner({
         handler.addListener('another_event', clicker);
 
         handler.notifyListeners('event', eventObject);
-        assertEqual(1, clickerCount);
+        assertThat(clickerCount, 1);
     }}
 }, {'logger':testLogger, 'testLog':'eventLog'});
 

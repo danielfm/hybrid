@@ -46,9 +46,9 @@ new TestRunner({
             assertThat(parentObject, instanceOf(ParentClass));
             assertThat(parentObject, instanceOf(Object));
 
-            assertThat(parentObject.variable, equalTo('text'));
-            assertThat(parentObject.sayHelloTo('Stranger'), equalTo('Hello, Stranger'));
-            assertThat(parentObject.saySomething(), equalTo('Something'));
+            assertThat(parentObject.variable, 'text');
+            assertThat(parentObject.sayHelloTo('Stranger'), 'Hello, Stranger');
+            assertThat(parentObject.saySomething(), 'Something');
         }},
 
         "should inherit from Object, ParentClass and ChildClass": function() { with(this) {
@@ -57,9 +57,9 @@ new TestRunner({
             assertThat(childObject, instanceOf(ParentClass));
             assertThat(childObject, instanceOf(Object));
 
-            assertThat(childObject.variable, equalTo('other'));
-            assertThat(childObject.sayHelloTo('Stranger'), equalTo('Hey, Stranger'));
-            assertThat(childObject.saySomething(), equalTo('Something'));
+            assertThat(childObject.variable, 'other');
+            assertThat(childObject.sayHelloTo('Stranger'), 'Hey, Stranger');
+            assertThat(childObject.saySomething(), 'Something');
         }}
     })
 }, {'logger':testLogger, 'testLog':'classLog'});

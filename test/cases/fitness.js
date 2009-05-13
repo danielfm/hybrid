@@ -23,9 +23,9 @@ new TestRunner({
 
         population.addAll([first, second, third]);
 
-        assertEqual(0, fitnessComparator.compare(first, second));
-        assertEqual(1, fitnessComparator.compare(second, third));
-        assertEqual(-1, fitnessComparator.compare(third, second));
+        assertThat(fitnessComparator.compare(first, second), 0);
+        assertThat(fitnessComparator.compare(second, third), 1);
+        assertThat(fitnessComparator.compare(third, second), -1);
     }},
 
     testInverseFitnessComparator: function() { with(this) {
@@ -35,9 +35,9 @@ new TestRunner({
 
         population.addAll([first, second, third]);
 
-        assertEqual(0, inverseFitnessComparator.compare(first, second));
-        assertEqual(-1, inverseFitnessComparator.compare(second, third));
-        assertEqual(1, inverseFitnessComparator.compare(third, second));
+        assertThat(inverseFitnessComparator.compare(first, second), 0);
+        assertThat(inverseFitnessComparator.compare(second, third), -1);
+        assertThat(inverseFitnessComparator.compare(third, second), 1);
     }}
 }, {'logger':testLogger, 'testLog':'fitnessLog'});
 

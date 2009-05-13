@@ -31,40 +31,39 @@ new TestRunner({
     testEngineConstructorWithNoArgs: function() { with(this) {
         engine = new Hybrid.Engine();
 
-        assert(engine.getPopulation());
-        assert(engine.getRandomizer());
-        assert(engine.getSelection());
-        assert(engine.getCrossover());
-        assert(engine.getMutation());
-        assert(engine.getStopCondition());
-        assert(engine.getEventHandler());
+        assertThat(engine.getPopulation(), not(nil()));
+        assertThat(engine.getRandomizer(), not(nil()));
+        assertThat(engine.getSelection(), not(nil()));
+        assertThat(engine.getCrossover(), not(nil()));
+        assertThat(engine.getMutation(), not(nil()));
+        assertThat(engine.getStopCondition(), not(nil()));
+        assertThat(engine.getEventHandler(), not(nil()));
     }},
 
     testEngineConstructor: function() { with(this) {
-        assertIdentical(population, engine.getPopulation());
-        assertIdentical(randomizer, engine.getRandomizer());
-        assertIdentical(selection, engine.getSelection());
-        assertIdentical(crossover, engine.getCrossover());
-        assertIdentical(mutation, engine.getMutation());
-        assertIdentical(stopCondition, engine.getStopCondition());
-        assert(engine.getEventHandler());
+        assertThat(engine.getPopulation(), sameAs(population));
+        assertThat(engine.getRandomizer(), sameAs(randomizer));
+        assertThat(engine.getSelection(), sameAs(selection));
+        assertThat(engine.getCrossover(), sameAs(crossover));
+        assertThat(engine.getMutation(), sameAs(mutation));
+        assertThat(engine.getStopCondition(), sameAs(stopCondition));
+        assertThat(engine.getEventHandler(), not(nil()));
     }},
 
     testGetEventHandler: function() { with(this) {
-        assert(engine.getEventHandler());
+        assertThat(engine.getEventHandler(), not(nil()));
     }},
 
     testListenerSubscription: function() { with(this) {
-        var count = engine.getEventHandler().getListeners().length;
-
-        var listener = function() {
-        };
+        var listeners = engine.getEventHandler().getListeners;
+        var count = listeners().length;
+        var listener = function() { };
 
         engine.on('some event', listener);
-        assertEqual(count+1, engine.getEventHandler().getListeners().length);
+        assertThat(listeners(), hasSize(count+1));
 
         engine.unsubscribe(listener);
-        assertEqual(count, engine.getEventHandler().getListeners().length);
+        assertThat(listeners(), hasSize(count));
     }},
 
     testEvolve: function() { with(this) {
@@ -73,69 +72,70 @@ new TestRunner({
         });
 
         var population = engine.getPopulation();
-        assertEqual(10, population.getGeneration());
-        assertEqual(10, population.getSize());
+        assertThat(population.getGeneration(), 10);
+        assertThat(population.getSize(), 10);
+        assertThat(factory.invocations, greaterThan(0));
 
-        assert(factory.invocations);
-        assert(mutation.emptyReturns);
-        assert(mutation.nonEmptyReturns);
-        assert(crossover.emptyReturns);
-        assert(crossover.nonEmptyReturns);
+        assertThat(mutation.emptyReturns, greaterThan(0));
+        assertThat(mutation.nonEmptyReturns, greaterThan(0));
+
+        assertThat(crossover.emptyReturns, greaterThan(0));
+        assertThat(crossover.nonEmptyReturns, greaterThan(0));
     }},
 
     testSetRandomizer: function() { with(this) {
         engine.setRandomizer(randomizer);
-        assertIdentical(randomizer, engine.getRandomizer());
+        assertThat(engine.getRandomizer(), sameAs(randomizer));
     }},
 
     testSetInvalidRandomizer: function() { with(this) {
-        assertRaise('Hybrid.Error', function() {
+        assertThat(function() {
             engine.setRandomizer({});
-        });
+        }, raises('Hybrid.Error'));
     }},
 
     testSetSelection: function() { with(this) {
         engine.setSelection(selection);
-        assertIdentical(selection, engine.getSelection());
+        assertThat(engine.getSelection(), sameAs(selection));
     }},
 
     testInvalidSelection: function() { with(this) {
-        assertRaise('Hybrid.Error', function() {
+        assertThat(function() {
             engine.setSelection({});
-        });
+        }, raises('Hybrid.Error'));
     }},
 
     testSetCrossover: function() { with(this) {
         engine.setCrossover(crossover);
-        assertIdentical(crossover, engine.getCrossover());
+        assertThat(engine.getCrossover(), sameAs(crossover));
     }},
 
     testSetInvalidCrossover: function() { with(this) {
-        assertRaise('Hybrid.Error', function() {
+        assertThat(function() {
             engine.setCrossover({});
-        });
+        }, raises('Hybrid.Error'));
     }},
 
     testSetMutation: function() { with(this) {
         engine.setMutation(mutation);
-        assertIdentical(mutation, engine.getMutation());
+        assertThat(engine.getMutation(), sameAs(mutation));
     }},
 
     testSetInvalidMutation: function() { with(this) {
-        assertRaise('Hybrid.Error', function() {
+        assertThat(function() {
             engine.setCrossover({});
-        });
+        }, raises('Hybrid.Error'));
     }},
 
     testSetStopCondition: function() { with(this) {
         engine.setStopCondition(stopCondition);
-        assertIdentical(stopCondition, engine.getStopCondition());
+        assertThat(engine.getStopCondition(), sameAs(stopCondition));
     }},
 
     testSetInvalidStopCondition: function() { with(this) {
-        assertRaise('Hybrid.Error', function() {
+        assertThat(function() {
             engine.setStopCondition({});
-        });
+        }, raises('Hybrid.Error'));
     }}
 }, {'logger':testLogger, 'testLog':'engineLog'});
 
