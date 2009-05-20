@@ -24,13 +24,13 @@ new TestRunner({
         randomizer.setResults([0, 4, 9]);
 
         var individual = selection.select(randomizer, population);
-        assertEqual(0, individual.number);
+        assertThat(individual.number, 0);
 
         individual = selection.select(randomizer, population);
-        assertEqual(4, individual.number);
+        assertThat(individual.number, 4);
 
         individual = selection.select(randomizer, population);
-        assertEqual(9, individual.number);
+        assertThat(individual.number, 9);
     }},
 
     testTournamentSelect: function() { with(this) {
@@ -38,13 +38,13 @@ new TestRunner({
         randomizer.setResults([2, 4, 3, 6, 4, 5, 8, 1, 9]);
 
         var individual = selection.select(randomizer, population);
-        assertEqual(4, individual.number);
+        assertThat(individual.number, 4);
 
         individual = selection.select(randomizer, population);
-        assertEqual(6, individual.number);
+        assertThat(individual.number, 6);
 
         individual = selection.select(randomizer, population);
-        assertEqual(9, individual.number);
+        assertThat(individual.number, 9);
     }},
 
     testRankingSelect: function() { with(this) {
@@ -52,16 +52,16 @@ new TestRunner({
         randomizer.setResults([36, 16, 7, 44]);
 
         var individual = selection.select(randomizer, population);
-        assertEqual(4, individual.number);
+        assertThat(individual.number, 4);
 
         individual = selection.select(randomizer, population);
-        assertEqual(8, individual.number);
+        assertThat(individual.number, 8);
 
         individual = selection.select(randomizer, population);
-        assertEqual(9, individual.number);
+        assertThat(individual.number, 9);
 
         individual = selection.select(randomizer, population);
-        assertEqual(1, individual.number);
+        assertThat(individual.number, 1);
     }}
 }, {'logger':testLogger, 'testLog':'selectionLog'});
 

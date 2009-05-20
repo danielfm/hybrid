@@ -11,52 +11,52 @@ new TestRunner({
     },
 
     testDefaultCrossover: function() { with(this) {
-        assertNull(crossover.crossover(randomizer));
+        assertThat(crossover.crossover(randomizer), nil());
     }},
 
     testDefaultMutation: function() { with(this) {
-        assertNull(mutation.mutate(randomizer));
+        assertThat(mutation.mutate(randomizer), nil());
     }},
 
     testMutationConstructor: function() { with(this) {
         mutation = new Hybrid.Reproduction.Mutation();
-        assertEqual(0, mutation.getProbability());
+        assertThat(mutation.getProbability(), 0);
 
         mutation = new Hybrid.Reproduction.Mutation(0);
-        assertEqual(0, mutation.getProbability());
+        assertThat(mutation.getProbability(), 0);
 
         mutation = new Hybrid.Reproduction.Mutation(2);
-        assertEqual(1, mutation.getProbability());
+        assertThat(mutation.getProbability(), 1);
     }},
 
     testCrossoverConstructor: function() { with(this) {
         crossover = new Hybrid.Reproduction.Crossover();
-        assertEqual(0.01, crossover.getProbability());
+        assertThat(crossover.getProbability(), 0.01);
 
         crossover = new Hybrid.Reproduction.Crossover(0);
-        assertEqual(0.01, crossover.getProbability());
+        assertThat(crossover.getProbability(), 0.01);
 
         crossover = new Hybrid.Reproduction.Crossover(2);
-        assertEqual(1, crossover.getProbability());
+        assertThat(crossover.getProbability(), 1);
     }},
 
     testCrossoverDelegation: function() { with(this) {
         crossover = new CrossoverStub(1);
         crossover.execute(randomizer, 1, 2, 3);
 
-        assertEqual(randomizer, crossover.randomizer);
-        assertEqual(1, crossover.mother);
-        assertEqual(2, crossover.father);
-        assertEqual(3, crossover.population);
+        assertThat(crossover.randomizer, sameAs(randomizer));
+        assertThat(crossover.mother, 1);
+        assertThat(crossover.father, 2);
+        assertThat(crossover.population, 3);
     }},
 
     testMutationDelegation: function() { with(this) {
         mutation = new MutationStub(1);
         mutation.execute(randomizer, 1, 2);
 
-        assertEqual(randomizer, mutation.randomizer);
-        assertEqual(1, mutation.individual);
-        assertEqual(2, mutation.population);
+        assertThat(mutation.randomizer, sameAs(randomizer));
+        assertThat(mutation.individual, 1);
+        assertThat(mutation.population, 2);
     }}
 }, {'logger':testLogger, 'testLog':'reproductionLog'});
 

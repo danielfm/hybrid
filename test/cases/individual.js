@@ -58,7 +58,7 @@ new TestRunner({
     }},
 
     testDefaultFactory: function() { with(this) {
-        assertThat(new Hybrid.Individual.Factory().createIndividual(), not(nil()));
+        assert(new Hybrid.Individual.Factory().createIndividual());
     }}
 }, {'logger':testLogger, 'testLog':'individualLog'});
 

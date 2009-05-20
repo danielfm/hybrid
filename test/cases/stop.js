@@ -9,13 +9,13 @@ new TestRunner({
 
     testStopCondition: function() { with(this) {
         var stop = new Hybrid.Stop.Condition();
-        assert(stop.interrupt());
+        assertThat(stop.interrupt());
     }},
 
     testStopConditionClassHierarchy: function() { with(this) {
         var stop = new Hybrid.Stop.Condition();
-        assert(stop instanceof Hybrid.Stop.Condition);
-        assert(!(stop instanceof Hybrid.Stop.ElapsedGeneration));
+        assertThat(stop, instanceOf(Hybrid.Stop.Condition));
+        assertThat(stop, not(instanceOf(Hybrid.Stop.ElapsedGeneration)));
     }},
 
     testElapsedGenerationStop: function() { with(this) {
@@ -28,7 +28,7 @@ new TestRunner({
         };
 
         var generations = 5;
-        assert(!(elapsedStop.interrupt(event)));
+        assert(!elapsedStop.interrupt(event));
 
         generations = 10;
         assert(elapsedStop.interrupt(event));
@@ -47,7 +47,7 @@ new TestRunner({
         };
 
         var generations = 10;
-        assert(!(elapsedStop.interrupt(event)));
+        assert(!elapsedStop.interrupt(event));
 
         generations = 100;
         assert(elapsedStop.interrupt(event));
@@ -59,8 +59,8 @@ new TestRunner({
     testElapsedGenerationClassHierarchy: function() { with(this) {
         var elapsedStop = new Hybrid.Stop.ElapsedGeneration();
 
-        assert(elapsedStop instanceof Hybrid.Stop.Condition);
-        assert(elapsedStop instanceof Hybrid.Stop.ElapsedGeneration);
+        assertThat(elapsedStop, instanceOf(Hybrid.Stop.Condition));
+        assertThat(elapsedStop, instanceOf(Hybrid.Stop.ElapsedGeneration));
     }}
 }, {'logger':testLogger, 'testLog':'stopLog'});
 

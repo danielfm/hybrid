@@ -107,7 +107,7 @@ new TestRunner({
 
     testGetListenersByTypeNone: function() { with(this) {
         var events = handler.getListenersByType();
-        assertEnumEqual([], events);
+        assertThat(events, []);
     }},
 
     testNotifyInexistentListeners: function() { with(this) {

@@ -31,13 +31,13 @@ new TestRunner({
     testEngineConstructorWithNoArgs: function() { with(this) {
         engine = new Hybrid.Engine();
 
-        assertThat(engine.getPopulation(), not(nil()));
-        assertThat(engine.getRandomizer(), not(nil()));
-        assertThat(engine.getSelection(), not(nil()));
-        assertThat(engine.getCrossover(), not(nil()));
-        assertThat(engine.getMutation(), not(nil()));
-        assertThat(engine.getStopCondition(), not(nil()));
-        assertThat(engine.getEventHandler(), not(nil()));
+        assert(engine.getPopulation());
+        assert(engine.getRandomizer());
+        assert(engine.getSelection());
+        assert(engine.getCrossover());
+        assert(engine.getMutation());
+        assert(engine.getStopCondition());
+        assert(engine.getEventHandler());
     }},
 
     testEngineConstructor: function() { with(this) {
@@ -47,11 +47,11 @@ new TestRunner({
         assertThat(engine.getCrossover(), sameAs(crossover));
         assertThat(engine.getMutation(), sameAs(mutation));
         assertThat(engine.getStopCondition(), sameAs(stopCondition));
-        assertThat(engine.getEventHandler(), not(nil()));
+        assert(engine.getEventHandler());
     }},
 
     testGetEventHandler: function() { with(this) {
-        assertThat(engine.getEventHandler(), not(nil()));
+        assert(engine.getEventHandler());
     }},
 
     testListenerSubscription: function() { with(this) {

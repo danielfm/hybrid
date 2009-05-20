@@ -21,9 +21,9 @@ new TestRunner({
     testDefaultConstructor: function() { with(this) {
         population = new Hybrid.Population();
 
-        assertEqual(0, population.getSize());
-        assert(!(population.isInitialized()));
-        assertEqual(0, population.getGeneration());
+        assertThat(population.getSize(), 0);
+        assertThat(population.getGeneration(), 0);
+        assert(!population.isInitialized());
 
         assert(population.getEventHandler());
         assert(population.getStatisticsProvider());
@@ -39,7 +39,7 @@ new TestRunner({
             elitismSize: 10
         });
 
-        assert(defaultListeners+1, population.getEventHandler().getListenersCount());
+        assertThat(population.getEventHandler().getListenersCount(), defaultListeners+1);
     }},
 
     testConstructorWithIndividuals: function() { with(this) {
@@ -49,15 +49,15 @@ new TestRunner({
 
         population = new Hybrid.Population(args);
 
-        assertEnumEqual(args.individuals, population.getIndividuals());
-        assert(population.isInitialized());
+        assertThat(population.getIndividuals(), args.individuals);
+        assertThat(population.isInitialized(), true);
     }},
 
     testConstructorWithInvalidGeneration: function() { with(this) {
         population = new Hybrid.Population({
             generation:-1
         });
-        assert(population.getGeneration() >= 0);
+        assertThat(population.getGeneration(), greaterThanOrEqualTo(0));
     }},
 
     testInitialize: function() { with(this) {
@@ -73,16 +73,16 @@ new TestRunner({
             after++;
         });
 
-        assertEqual(10, population.getGeneration());
+        assertThat(population.getGeneration(), 10);
 
         population.initialize(randomizer);
 
-        assertEqual(0, population.getGeneration());
-        assertEqual(10, population.getSize());
-        assert(population.isInitialized());
+        assertThat(population.getGeneration(), 0);
+        assertThat(population.getSize(), 10);
+        assertThat(population.isInitialized());
 
-        assertEqual(1, before);
-        assertEqual(1, after);
+        assertThat(before, 1);
+        assertThat(after, 1);
 
         for (var i = 0; i < population.getSize(); i++) {
             assert(population.getIndividual(i).fitness);
@@ -92,9 +92,9 @@ new TestRunner({
     testInitializeTwice: function() { with(this) {
         population.initialize(randomizer);
 
-        assertRaise('Hybrid.Error', function() {
+        assertThat(function() {
             population.initialize(randomizer);
-        });
+        }, raises('Hybrid.Error'));
     }},
 
     testAdd: function() { with(this) {
@@ -104,23 +104,23 @@ new TestRunner({
 
         population.add({});
 
-        assertEqual(1, population.getSize());
-        assertEqual('abc', population.getIndividual(0).someProperty);
+        assertThat(population.getSize(), 1);
+        assertThat(population.getIndividual(0).someProperty, 'abc');
     }},
 
     testAddAll: function() { with(this) {
         var individuals = [{}, {}];
         population.addAll(individuals);
 
-        assertEqual(2, population.getSize());
-        assertIdentical(population.getIndividual(0), individuals[0]);
-        assertIdentical(population.getIndividual(1), individuals[1]);
+        assertThat(population.getSize(), 2);
+        assertThat(population.getIndividual(0), sameAs(individuals[0]));
+        assertThat(population.getIndividual(1), sameAs(individuals[1]));
     }},
 
     testAddAllWithInvalidArgument: function() { with(this) {
-        assertRaise('Hybrid.Error', function() {
+        assertThat(function() {
             population.addAll({});
-        });
+        }, raises('Hybrid.Error'));
     }},
 
     testSort: function() { with(this) {
@@ -130,7 +130,7 @@ new TestRunner({
         var individuals = population.getIndividuals();
 
         for (var i = 0; i < individuals.length - 1; i++) {
-            assert(individuals[i].fitness.get() >= individuals[i+1].fitness.get());
+            assertThat(individuals[i].fitness.get(), greaterThanOrEqualTo(individuals[i+1].fitness.get()));
         }
     }},
 
@@ -140,7 +140,7 @@ new TestRunner({
         population.initialize(randomizer);
         population.add(best);
 
-        assertIdentical(best, population.best());
+        assertThat(population.best(), sameAs(best));
     }},
 
     testTwoBest: function() { with(this) {
@@ -150,7 +150,7 @@ new TestRunner({
         population.initialize(randomizer);
         population.addAll([second, first]);
 
-        assertEnumEqual([first, second], population.best(2));
+        assertThat(population.best(2), [first, second]);
     }},
 
     testReplaceGenerationAndIncrement: function() { with(this) {
@@ -162,7 +162,7 @@ new TestRunner({
         }
 
         population.replaceGeneration(breed, true);
-        assertEqual(1, population.getGeneration());
+        assertThat(population.getGeneration(), 1);
     }},
 
     testReplaceGenerationWithIncompatibleBreed: function() { with(this) {
@@ -179,10 +179,10 @@ new TestRunner({
             breed.push(factory.createIndividual(randomizer, population));
         }
 
-        assertRaise('Hybrid.Error', function() {
+        assertThat(function() {
             population.replaceGeneration(breed);
-        });
-        assertEqual(0, count);
+        }, raises('Hybrid.Error'));
+        assertThat(count, 0);
     }},
 
     testListenerSubscription: function() { with(this) {
@@ -192,10 +192,10 @@ new TestRunner({
         };
 
         population.on('some event', listener);
-        assertEqual(count+1, population.getEventHandler().getListeners().length);
+        assertThat(population.getEventHandler().getListeners().length, count+1);
 
         population.unsubscribe(listener);
-        assertEqual(count, population.getEventHandler().getListeners().length);
+        assertThat(population.getEventHandler().getListeners().length, count);
     }},
 
     testElitismWithSizeZero: function() { with(this) {
@@ -215,10 +215,10 @@ new TestRunner({
         });
         population.notify('replaceGeneration', event);
 
-        assertEqual(5, event.breed.length);
-        assertEqual(0, event.breed[0].number);
-        assertEqual(2, event.breed[2].number);
-        assertEqual(4, event.breed[4].number);
+        assertThat(event.breed.length, 5);
+        assertThat(event.breed[0].number, 0);
+        assertThat(event.breed[2].number, 2);
+        assertThat(event.breed[4].number, 4);
     }},
 
     testElitism: function() { with(this) {
@@ -238,11 +238,11 @@ new TestRunner({
         });
         population.notify('replaceGeneration', event);
 
-        assertEqual(5, event.breed.length);
-        assertEqual(2, event.breed[0].number);
-        assertEqual(4, event.breed[2].number);
-        assertEqual(9, event.breed[3].number);
-        assertEqual(8, event.breed[4].number);
+        assertThat(event.breed.length, 5);
+        assertThat(event.breed[0].number, 2);
+        assertThat(event.breed[2].number, 4);
+        assertThat(event.breed[3].number, 9);
+        assertThat(event.breed[4].number, 8);
     }},
 
     testSetTwoElitismListeners: function() { with(this) {
@@ -260,26 +260,27 @@ new TestRunner({
         }
 
         var listeners = population.getEventHandler().getListenersByType('replaceGeneration');
-        assertEqual(1, listeners.length);
+        assertThat(listeners.length, 1);
+
         listeners[0](event);
     }},
 
     testElitismWithMissingOptions: function() { with(this) {
-        assertRaise('Hybrid.Error', function() {
+        assertThat(function() {
             Hybrid.Population.setElitism();
-        });
+        }, raises('Hybrid.Error'));
 
-        assertRaise('Hybrid.Error', function() {
+        assertThat(function() {
             Hybrid.Population.setElitism({
                 to: population
             });
-        });
+        }, raises('Hybrid.Error'));
 
-        assertRaise('Hybrid.Error', function() {
+        assertThat(function() {
             Hybrid.Population.setElitism({
                 size: 2
             });
-        });
+        }, raises('Hybrid.Error'));
 
         Hybrid.Population.setElitism({
             to: population,
@@ -290,87 +291,87 @@ new TestRunner({
     testSetElitism: function() { with(this) {
         var defaultListeners = population.getEventHandler().getListenersCount();
         population.setElitism(10);
-        assert(defaultListeners+1, population.getEventHandler().getListenersCount());
+        assertThat(population.getEventHandler().getListenersCount(), defaultListeners+1);
     }},
 
     testSetFactory: function() { with(this) {
-        assertRaise('Hybrid.Error', function() {
+        assertThat(function() {
             population.setFactory({});
-        });
+        }, raises('Hybrid.Error'));
 
-        assertRaise('Hybrid.Error', function() {
+        assertThat(function() {
             new Hybrid.Population({
                 factory: {}
             });
-        });
+        }, raises('Hybrid.Error'));
 
         population.setFactory(factory);
-        assertIdentical(factory, population.getFactory());
+        assertThat(population.getFactory(), sameAs(factory));
 
         population = new Hybrid.Population({
-            factory: this.factory
+            factory: factory
         });
-        assertIdentical(factory, population.getFactory());
+        assertThat(population.getFactory(), sameAs(factory));
     }},
 
     testSetFitnessEvaluator: function() { with(this) {
-        assertRaise('Hybrid.Error', function() {
+        assertThat(function() {
             population.setFitnessEvaluator({});
-        });
+        }, raises('Hybrid.Error'));
 
-        assertRaise('Hybrid.Error', function() {
+        assertThat(function() {
             new Hybrid.Population({
                 fitnessEvaluator: {}
             });
-        });
+        }, raises('Hybrid.Error'));
 
-        population.setFitnessEvaluator(this.fitnessEvaluator);
-        assertIdentical(this.fitnessEvaluator, population.getFitnessEvaluator());
+        population.setFitnessEvaluator(fitnessEvaluator);
+        assertThat(population.getFitnessEvaluator(), sameAs(fitnessEvaluator));
 
         population = new Hybrid.Population({
-            fitnessEvaluator: this.fitnessEvaluator
+            fitnessEvaluator: fitnessEvaluator
         });
-        assertIdentical(this.fitnessEvaluator, population.getFitnessEvaluator());
+        assertThat(population.getFitnessEvaluator(), fitnessEvaluator);
     }},
 
     testSetStatisticsProvider: function() { with(this) {
-        assertRaise('Hybrid.Error', function() {
+        assertThat(function() {
             population.setStatisticsProvider({});
-        });
+        }, raises('Hybrid.Error'));
 
-        assertRaise('Hybrid.Error', function() {
+        assertThat(function() {
             new Hybrid.Population({
                 statisticsProvider: {}
             });
-        });
+        }, raises('Hybrid.Error'));
 
-        population.setStatisticsProvider(this.statisticsProvider);
-        assertIdentical(this.statisticsProvider, population.getStatisticsProvider());
+        population.setStatisticsProvider(statisticsProvider);
+        assertThat(population.getStatisticsProvider(), sameAs(statisticsProvider));
 
         population = new Hybrid.Population({
-            statisticsProvider: this.statisticsProvider
+            statisticsProvider: statisticsProvider
         });
-        assertIdentical(this.statisticsProvider, population.getStatisticsProvider());
+        assertThat(population.getStatisticsProvider(), statisticsProvider);
     }},
 
     testSetFitnessComparator: function() { with(this) {
-        assertRaise('Hybrid.Error', function() {
+        assertThat(function() {
             population.setFitnessComparator({});
-        });
+        }, raises('Hybrid.Error'));
 
-        assertRaise('Hybrid.Error', function() {
+        assertThat(function() {
             new Hybrid.Population({
                 fitnessComparator: {}
             });
-        });
+        }, raises('Hybrid.Error'));
 
-        population.setFitnessComparator(this.fitnessComparator);
-        assertIdentical(this.fitnessComparator, population.getFitnessComparator());
+        population.setFitnessComparator(fitnessComparator);
+        assertThat(population.getFitnessComparator(), sameAs(fitnessComparator));
 
         population = new Hybrid.Population({
-            fitnessComparator: this.fitnessComparator
+            fitnessComparator: fitnessComparator
         });
-        assertIdentical(this.fitnessComparator, population.getFitnessComparator());
+        assertThat(population.getFitnessComparator(), sameAs(fitnessComparator));
     }}
 }, {'logger':testLogger, 'testLog':'populationLog'});
 

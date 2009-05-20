@@ -8,8 +8,8 @@
  * Copyright (c) 2009 Daniel Fernandes Martins
  * Licensed under the BSD license.
  *
- * Revision: be23e57a7706a2f179ee0c326e8715a7154fdf40
- * Date:     Tue Apr 14 20:29:37 2009 -0300
+ * Revision: db6873631e268ef3b5cc56f1af5854439ed918fb
+ * Date:     Thu May 14 21:22:58 2009 -0300
  */
  
 /**
@@ -221,14 +221,12 @@ JsUnitTest.Hamcrest = {
                 this.append('<null>');
             } else if (literal instanceof Array) {
                 this.appendValueList('[', ', ', ']', literal);
-            } else if (typeof literal == 'number') {
-                this.append(literal);
             } else if (typeof literal == 'string') {
                 this.append('"' + literal + '"');
             } else if (literal instanceof Function) {
                 this.append('<Function>');
             } else {
-                this.append('{' + literal + '}');
+                this.append(literal);
             }
             return this;
         }
@@ -294,7 +292,21 @@ JsUnitTest.Hamcrest.Matchers = {};
 /**
  * Assert method that is capable of handling matchers. If the given matcher
  * fails, this method registers a failed/error'd assertion within the current
- * TestCase object.
+ * TestCase object. Ex: <p>
+ *
+ * <pre>
+ * // Asserts that something is equal to x
+ * assertThat(something, equalTo(x));
+ * assertThat(something, equalTo(x), "Some description text");
+ *
+ * // Same here
+ * assertThat(something, x);
+ * assertThat(something, x, "Some description text");
+ *
+ * // Asserts that something is a non-null value
+ * assertThat(something);
+ * </pre>
+ *
  * @param {object} actual Actual value under test.
  * @param {object} matcher Matcher to assert the correctness of the actual
  * value.
@@ -303,10 +315,16 @@ JsUnitTest.Hamcrest.Matchers = {};
  */
 JsUnitTest.Hamcrest.Matchers.assertThat = function(actual, matcher, message) {
     var description = new JsUnitTest.Hamcrest.Description();
+    var matchers = JsUnitTest.Hamcrest.Matchers;
+
+    // Actual value must be any value considered non-null by JavaScript
+    if (matcher == null) {
+        matcher = matchers.ok();
+    }
 
     // Creates a 'equalTo' matcher if 'matcher' is not a valid matcher
     if (!JsUnitTest.Hamcrest.isMatcher(matcher)) {
-        matcher = JsUnitTest.Hamcrest.Matchers.equalTo(matcher);
+        matcher = matchers.equalTo(matcher);
     }
 
     if (!matcher.matches(actual)) {
@@ -322,6 +340,31 @@ JsUnitTest.Hamcrest.Matchers.assertThat = function(actual, matcher, message) {
         this.pass();
     }
     return description;
+};
+
+/**
+ * The actual value must be any value considered truth by the JavaScript
+ * engine. Ex: <p>
+ *
+ * <pre>
+ * assertThat(10, ok());
+ * assertThat({}, ok());
+ * assertThat(0, not(ok()));
+ * assertThat('', not(ok()));
+ * </pre>
+ *
+ * @return {JsUnitTest.Hamcrest.SimpleMatcher} 'ok' matcher.
+ */
+JsUnitTest.Hamcrest.Matchers.ok = function() {
+    return new JsUnitTest.Hamcrest.SimpleMatcher({
+        matches: function(actual) {
+            return actual;
+        },
+
+        describeTo: function(description) {
+            description.append('true');
+        }
+    });
 };
 
 /**
@@ -607,7 +650,7 @@ JsUnitTest.Hamcrest.Matchers.allOf = function() {
  * </pre>
  *
  * @param {array} arguments List of delegate matchers.
- * @return {JsUnitTest.Hamcrest.SimpleMatcher} 'allOf' matcher.
+ * @return {JsUnitTest.Hamcrest.SimpleMatcher} 'anyOf' matcher.
  */
 JsUnitTest.Hamcrest.Matchers.anyOf = function() {
     var args = arguments;
@@ -783,7 +826,7 @@ JsUnitTest.Hamcrest.Matchers.even = function() {
 JsUnitTest.Hamcrest.Matchers.odd = function() {
     return new JsUnitTest.Hamcrest.SimpleMatcher({
         matches: function(actual) {
-            return actual % 2 == 1;
+            return actual % 2 != 0;
         },
 
         describeTo: function(description) {
@@ -804,7 +847,7 @@ JsUnitTest.Hamcrest.Matchers.odd = function() {
  */
 JsUnitTest.Hamcrest.Matchers.between = function(number) {
     return new JsUnitTest.Hamcrest.RangeMatcherBuilder({
-        start: number,
+        start: number
     });
 };
 
@@ -942,30 +985,79 @@ JsUnitTest.Hamcrest.Matchers.endsWith = function(str) {
 };
 
 /**
+ * Asserts that the actual value matches the given regular expression. Ex: <p>
+ *
+ * <pre>
+ * assertThat('0xa4f2c', matches(/\b0[xX][0-9a-fA-F]+\b/));
+ * </pre>
+ *
+ * @param {RegExp} regex Regular expression literal.
+ * @return {JsUnitTest.Hamcrest.SimpleMatcher} 'matches' matcher.
+ */
+JsUnitTest.Hamcrest.Matchers.matches = function(regex) {
+    return new JsUnitTest.Hamcrest.SimpleMatcher({
+        matches: function(actual) {
+            return regex.test(actual);
+        },
+
+        describeTo: function(description) {
+            description.append('matches ').appendLiteral(regex);
+        }
+    });
+};
+
+/**
  * @fileOverview Provides object-related matchers.
  */
 
 /**
- * Asserts that the actual object contains the given property. Ex: <p>
+ * Asserts that the actual object contains the given member (variable or
+ * function). Ex: <p>
  *
  * <pre>
- * assertThat(myObj, hasProperty('name'));
+ * assertThat(myObj, hasMember('name'));
  * </pre>
  *
- * @param {string} property Property name.
- * @return {JsUnitTest.Hamcrest.SimpleMatcher} 'hasProperty' matcher.
+ * @param {string} memberName Member name.
+ * @return {JsUnitTest.Hamcrest.SimpleMatcher} 'hasMember' matcher.
  */
-JsUnitTest.Hamcrest.Matchers.hasProperty = function(property) {
+JsUnitTest.Hamcrest.Matchers.hasMember = function(memberName) {
     return new JsUnitTest.Hamcrest.SimpleMatcher({
         matches: function(actual) {
             try {
-                return property in actual;
+                return memberName in actual;
             } catch (e) { }
             return false;
         },
 
         describeTo: function(description) {
-            description.append('has property ').appendLiteral(property);
+            description.append('has member ').appendLiteral(memberName);
+        }
+    });
+};
+
+/**
+ * Asserts that the actual object contains the given function. Ex: <p>
+ *
+ * <pre>
+ * assertThat(myObj, hasFunction('getName'));
+ * </pre>
+ *
+ * @param {string} property Property name.
+ * @return {JsUnitTest.Hamcrest.SimpleMatcher} 'hasFunction' matcher.
+ */
+JsUnitTest.Hamcrest.Matchers.hasFunction = function(functionName) {
+    return new JsUnitTest.Hamcrest.SimpleMatcher({
+        matches: function(actual) {
+            try {
+                return functionName in actual && 
+                        actual[functionName] instanceof Function;
+            } catch (e) { }
+            return false;
+        },
+
+        describeTo: function(description) {
+            description.append('has function ').appendLiteral(functionName);
         }
     });
 };
