@@ -5,9 +5,12 @@
 // Bootstrap Jsunittest and Hybrid
 load('assets/env.js');
 load('assets/jsunittest.js');
-load('assets/jsunittest-hamcrest.js');
 load('assets/jscontext.js');
 load('../build/hybrid.js');
+
+// Load JsHamcrest
+load('assets/jshamcrest.js');
+JsHamcrest.Integration.JsUnitTest();
 
 // Load test stubs
 load('testStubs.js');

@@ -1,5 +1,5 @@
 /*
- * JsUnitTest-Hamcrest v0.1
+ * JsUnitTest-Hamcrest v0.2
  * http://github.com/danielfm/jsunittest-hamcrest/tree/master
  *
  * Plug-in to JsUnitTest that adds a collection of useful matchers for building
@@ -8,8 +8,8 @@
  * Copyright (c) 2009 Daniel Fernandes Martins
  * Licensed under the BSD license.
  *
- * Revision: db6873631e268ef3b5cc56f1af5854439ed918fb
- * Date:     Thu May 14 21:22:58 2009 -0300
+ * Revision: 2a2cabe6855496b4b9e93a882cbfea80445fdad5
+ * Date:     Fri May 22 22:24:17 2009 -0300
  */
  
 /**
@@ -17,31 +17,66 @@
  */
 
 /**
- * JsUnitTest main namespace.
- * @namespace
- */
-JsUnitTest = JsUnitTest;
-
-/**
  * Main namespace.
  * @namespace
  */
-JsUnitTest.Hamcrest = {
+JsHamcrest = {
     /**
      * Library version.
      */
-    version: '0.1',
+    version: '0.2',
 
     /**
-     * Copies the properties of the given objects to the
-     * <code>JsUnitTest.Unit.Testcase</code> prototype.
-     * @param {object} matchers Object that contains the matchers to be
-     * installed.
+     * Assert method that is capable of handling matchers. If the given matcher
+     * fails, this method registers a failed/error'd assertion within the current
+     * TestCase object. Ex: <p>
+     *
+     * <pre>
+     * // Asserts that something is equal to x
+     * assertThat(something, equalTo(x));
+     * assertThat(something, equalTo(x), "Some description text");
+     *
+     * // Same here
+     * assertThat(something, x);
+     * assertThat(something, x, "Some description text");
+     *
+     * // Asserts that something evaluates to some value considered truth
+     * assertThat(something);
+     * </pre>
+     *
+     * @param {object} actual Actual value under test.
+     * @param {object} matcher Matcher to assert the correctness of the actual
+     * value.
+     * @param {string} message Message that describes the assertion, if necessary.
+     * @return {JsHamcrest.Description} Test result description.
      */
-    installMatchers: function(matchers) {
-        for (method in matchers) {
-            JsUnitTest.Unit.Testcase.prototype[method] = matchers[method];
+    assertThat: function(actual, matcher, message) {
+        var description = new JsHamcrest.Description();
+        var matchers = JsHamcrest.Matchers;
+
+        // Actual value must be any value considered non-null by JavaScript
+        if (matcher == null) {
+            matcher = matchers.ok();
         }
+
+        // Creates a 'equalTo' matcher if 'matcher' is not a valid matcher
+        if (!JsHamcrest.isMatcher(matcher)) {
+            matcher = matchers.equalTo(matcher);
+        }
+
+        if (!matcher.matches(actual)) {
+            if (message) {
+                description.append(message);
+            }
+            description.append('\nExpected: ');
+            matcher.describeTo(description);
+            description.append('\n     got: ').appendLiteral(actual).append('\n');
+            this.fail(description.get());
+        } else {
+            description.append('Success');
+            this.pass();
+        }
+        return description;
     },
 
     /**
@@ -50,7 +85,7 @@ JsUnitTest.Hamcrest = {
      * @return {boolean} If the given object is a matcher.
      */
     isMatcher: function(obj) {
-        return obj instanceof JsUnitTest.Hamcrest.SimpleMatcher;
+        return obj instanceof JsHamcrest.SimpleMatcher;
     },
 
     /**
@@ -70,7 +105,7 @@ JsUnitTest.Hamcrest = {
                 var b = anotherArray[i];
 
                 if (a instanceof Array || b instanceof Array) {
-                    return JsUnitTest.Hamcrest.isArraysEqual(a, b);
+                    return JsHamcrest.isArraysEqual(a, b);
                 } else if (a != b) {
                     return false;
                 }
@@ -121,7 +156,7 @@ JsUnitTest.Hamcrest = {
      */
     CombinableMatcher: function(params) {
         // Call superclass' constructor
-        JsUnitTest.Hamcrest.SimpleMatcher.apply(this, arguments);
+        JsHamcrest.SimpleMatcher.apply(this, arguments);
 
         params = params || {};
 
@@ -129,11 +164,11 @@ JsUnitTest.Hamcrest = {
          * Wraps this matcher with the given one in such a way that both
          * matchers must match the actual value to be successful.
          * @param {object} anotherMatcher Another matcher.
-         * @return {JsUnitTest.Hamcrest.CombinableMatcher} Combinable matcher.
+         * @return {JsHamcrest.CombinableMatcher} Combinable matcher.
          */
         this.and = function(anotherMatcher) {
-            var all = JsUnitTest.Hamcrest.Matchers.allOf(this, anotherMatcher);
-            return new JsUnitTest.Hamcrest.CombinableMatcher({
+            var all = JsHamcrest.Matchers.allOf(this, anotherMatcher);
+            return new JsHamcrest.CombinableMatcher({
                 matches: all.matches,
 
                 describeTo: function(description) {
@@ -146,11 +181,11 @@ JsUnitTest.Hamcrest = {
          * Wraps this matcher with the given one in such a way that at least
          * one of the matchers must match the actual value to be successful.
          * @param {object} anotherMatcher Another matcher.
-         * @return {JsUnitTest.Hamcrest.CombinableMatcher} Combinable matcher.
+         * @return {JsHamcrest.CombinableMatcher} Combinable matcher.
          */
         this.or = function(anotherMatcher) {
-            var any = JsUnitTest.Hamcrest.Matchers.anyOf(this, anotherMatcher);
-            return new JsUnitTest.Hamcrest.CombinableMatcher({
+            var any = JsHamcrest.Matchers.anyOf(this, anotherMatcher);
+            return new JsHamcrest.CombinableMatcher({
                 matches: any.matches,
 
                 describeTo: function(description) {
@@ -188,7 +223,7 @@ JsUnitTest.Hamcrest = {
          * @param {object} selfDescribing Any object that have a
          * <code>describeTo</code> method that accepts a description object as
          * argument.
-         * @return {JsUnitTest.Hamcrest.Description} this.
+         * @return {JsHamcrest.Description} this.
          */
         this.appendDescriptionOf = function(selfDescribing) {
             if (selfDescribing) {
@@ -200,7 +235,7 @@ JsUnitTest.Hamcrest = {
         /**
          * Appends a text to this description.
          * @param {string} text Text to append.
-         * @return {JsUnitTest.Hamcrest.Description} this.
+         * @return {JsHamcrest.Description} this.
          */
         this.append = function(text) {
             if (text != null) {
@@ -212,7 +247,7 @@ JsUnitTest.Hamcrest = {
         /**
          * Appends a JavaScript language's literals to this description.
          * @param {object} literal Literal to append.
-         * @return {JsUnitTest.Hamcrest.Description} this.
+         * @return {JsHamcrest.Description} this.
          */
         this.appendLiteral = function(literal) {
             if (literal === undefined) {
@@ -237,7 +272,7 @@ JsUnitTest.Hamcrest = {
          * @param {string} separator Separator string.
          * @param {string} end End string.
          * @param {array} list List of values.
-         * @return {JsUnitTest.Hamcrest.Description} this.
+         * @return {JsHamcrest.Description} this.
          */
         this.appendValueList = function(start, separator, end, list) {
             this.append(start);
@@ -259,7 +294,7 @@ JsUnitTest.Hamcrest = {
          * @param {array} list List of self describing objects. These objects
          * must that have a <code>describeTo</code> method that accepts a
          * description object as argument.
-         * @return {JsUnitTest.Hamcrest.Description} this.
+         * @return {JsHamcrest.Description} this.
          */
         this.appendList = function(start, separator, end, list) {
             this.append(start);
@@ -276,8 +311,8 @@ JsUnitTest.Hamcrest = {
 };
 
 // CombinableMatcher is a specialization of SimpleMatcher
-JsUnitTest.Hamcrest.CombinableMatcher.prototype =
-        new JsUnitTest.Hamcrest.SimpleMatcher();
+JsHamcrest.CombinableMatcher.prototype =
+        new JsHamcrest.SimpleMatcher();
 
 /**
  * @fileOverview Provides core matchers.
@@ -287,60 +322,7 @@ JsUnitTest.Hamcrest.CombinableMatcher.prototype =
  * Built-in matchers.
  * @namespace
  */
-JsUnitTest.Hamcrest.Matchers = {};
-
-/**
- * Assert method that is capable of handling matchers. If the given matcher
- * fails, this method registers a failed/error'd assertion within the current
- * TestCase object. Ex: <p>
- *
- * <pre>
- * // Asserts that something is equal to x
- * assertThat(something, equalTo(x));
- * assertThat(something, equalTo(x), "Some description text");
- *
- * // Same here
- * assertThat(something, x);
- * assertThat(something, x, "Some description text");
- *
- * // Asserts that something is a non-null value
- * assertThat(something);
- * </pre>
- *
- * @param {object} actual Actual value under test.
- * @param {object} matcher Matcher to assert the correctness of the actual
- * value.
- * @param {string} message Message that describes the assertion, if necessary.
- * @return {JsUnitTest.Hamcrest.Description} Test result description.
- */
-JsUnitTest.Hamcrest.Matchers.assertThat = function(actual, matcher, message) {
-    var description = new JsUnitTest.Hamcrest.Description();
-    var matchers = JsUnitTest.Hamcrest.Matchers;
-
-    // Actual value must be any value considered non-null by JavaScript
-    if (matcher == null) {
-        matcher = matchers.ok();
-    }
-
-    // Creates a 'equalTo' matcher if 'matcher' is not a valid matcher
-    if (!JsUnitTest.Hamcrest.isMatcher(matcher)) {
-        matcher = matchers.equalTo(matcher);
-    }
-
-    if (!matcher.matches(actual)) {
-        if (message) {
-            description.append(message);
-        }
-        description.append('\nExpected: ');
-        matcher.describeTo(description);
-        description.append('\n     got: ').appendLiteral(actual).append('\n');
-        this.fail(description.get());
-    } else {
-        description.append('Success');
-        this.pass();
-    }
-    return description;
-};
+JsHamcrest.Matchers = {};
 
 /**
  * The actual value must be any value considered truth by the JavaScript
@@ -353,10 +335,10 @@ JsUnitTest.Hamcrest.Matchers.assertThat = function(actual, matcher, message) {
  * assertThat('', not(ok()));
  * </pre>
  *
- * @return {JsUnitTest.Hamcrest.SimpleMatcher} 'ok' matcher.
+ * @return {JsHamcrest.SimpleMatcher} 'ok' matcher.
  */
-JsUnitTest.Hamcrest.Matchers.ok = function() {
-    return new JsUnitTest.Hamcrest.SimpleMatcher({
+JsHamcrest.Matchers.ok = function() {
+    return new JsHamcrest.SimpleMatcher({
         matches: function(actual) {
             return actual;
         },
@@ -376,15 +358,15 @@ JsUnitTest.Hamcrest.Matchers.ok = function() {
  * </pre>
  *
  * @param {object} matcher Delegate matcher.
- * @return {JsUnitTest.Hamcrest.SimpleMatcher} 'is' matcher.
+ * @return {JsHamcrest.SimpleMatcher} 'is' matcher.
  */
-JsUnitTest.Hamcrest.Matchers.is = function(matcher) {
+JsHamcrest.Matchers.is = function(matcher) {
     // Uses 'equalTo' matcher if the given object is not a matcher
-    if (!JsUnitTest.Hamcrest.isMatcher(matcher)) {
-        matcher = JsUnitTest.Hamcrest.Matchers.equalTo(matcher);
+    if (!JsHamcrest.isMatcher(matcher)) {
+        matcher = JsHamcrest.Matchers.equalTo(matcher);
     }
 
-    return new JsUnitTest.Hamcrest.SimpleMatcher({
+    return new JsHamcrest.SimpleMatcher({
         matches: function(actual) {
             return matcher.matches(actual);
         },
@@ -404,15 +386,15 @@ JsUnitTest.Hamcrest.Matchers.is = function(matcher) {
  * </pre>
  *
  * @param {object} matcher Delegate matcher.
- * @return {JsUnitTest.Hamcrest.SimpleMatcher} 'not' matcher.
+ * @return {JsHamcrest.SimpleMatcher} 'not' matcher.
  */
-JsUnitTest.Hamcrest.Matchers.not = function(matcher) {
+JsHamcrest.Matchers.not = function(matcher) {
     // Uses 'equalTo' matcher if the given object is not a matcher
-    if (!JsUnitTest.Hamcrest.isMatcher(matcher)) {
-        matcher = JsUnitTest.Hamcrest.Matchers.equalTo(matcher);
+    if (!JsHamcrest.isMatcher(matcher)) {
+        matcher = JsHamcrest.Matchers.equalTo(matcher);
     }
 
-    return new JsUnitTest.Hamcrest.SimpleMatcher({
+    return new JsHamcrest.SimpleMatcher({
         matches: function(actual) {
             return !matcher.matches(actual);
         },
@@ -432,13 +414,13 @@ JsUnitTest.Hamcrest.Matchers.not = function(matcher) {
  * </pre>
  *
  * @param {object} expected value.
- * @return {JsUnitTest.Hamcrest.SimpleMatcher} 'equalTo' matcher.
+ * @return {JsHamcrest.SimpleMatcher} 'equalTo' matcher.
  */
-JsUnitTest.Hamcrest.Matchers.equalTo = function(expected) {
-    return new JsUnitTest.Hamcrest.SimpleMatcher({
+JsHamcrest.Matchers.equalTo = function(expected) {
+    return new JsHamcrest.SimpleMatcher({
         matches: function(actual) {
             if (expected instanceof Array || actual instanceof Array) {
-                return JsUnitTest.Hamcrest.isArraysEqual(expected, actual);
+                return JsHamcrest.isArraysEqual(expected, actual);
             }
             return actual == expected;
         },
@@ -456,10 +438,10 @@ JsUnitTest.Hamcrest.Matchers.equalTo = function(expected) {
  * assertThat(myObj, is(anything())); // I don't actually care about myObj
  * </pre>
  *
- * @return {JsUnitTest.Hamcrest.SimpleMatcher} 'anything' matcher.
+ * @return {JsHamcrest.SimpleMatcher} 'anything' matcher.
  */
-JsUnitTest.Hamcrest.Matchers.anything = function() {
-    return new JsUnitTest.Hamcrest.SimpleMatcher({
+JsHamcrest.Matchers.anything = function() {
+    return new JsHamcrest.SimpleMatcher({
         matches: function(actual) {
             return true;
         },
@@ -477,10 +459,10 @@ JsUnitTest.Hamcrest.Matchers.anything = function() {
  * assertThat(myObj, nil()); // myObj should be null or undefined
  * </pre>
  *
- * @return {JsUnitTest.Hamcrest.SimpleMatcher} 'nil' matcher.
+ * @return {JsHamcrest.SimpleMatcher} 'nil' matcher.
  */
-JsUnitTest.Hamcrest.Matchers.nil = function() {
-    return new JsUnitTest.Hamcrest.SimpleMatcher({
+JsHamcrest.Matchers.nil = function() {
+    return new JsHamcrest.SimpleMatcher({
         matches: function(actual) {
             return actual == null;
         },
@@ -500,10 +482,10 @@ JsUnitTest.Hamcrest.Matchers.nil = function() {
  * </pre>
  *
  * @param {object} expected Expected object.
- * @return {JsUnitTest.Hamcrest.SimpleMatcher} 'sameAs' matcher.
+ * @return {JsHamcrest.SimpleMatcher} 'sameAs' matcher.
  */
-JsUnitTest.Hamcrest.Matchers.sameAs = function(expected) {
-    return new JsUnitTest.Hamcrest.SimpleMatcher({
+JsHamcrest.Matchers.sameAs = function(expected) {
+    return new JsHamcrest.SimpleMatcher({
         matches: function(actual) {
             return actual === expected;
         },
@@ -533,10 +515,10 @@ JsUnitTest.Hamcrest.Matchers.sameAs = function(expected) {
  * </pre>
  *
  * @param {string} exceptionName Name of the expected exception.
- * @return {JsUnitTest.Hamcrest.SimpleMatcher} 'raises' matcher
+ * @return {JsHamcrest.SimpleMatcher} 'raises' matcher
  */
-JsUnitTest.Hamcrest.Matchers.raises = function(exceptionName) {
-    return new JsUnitTest.Hamcrest.SimpleMatcher({
+JsHamcrest.Matchers.raises = function(exceptionName) {
+    return new JsHamcrest.SimpleMatcher({
         matches: function(actualFunction) {
             try {
                 actualFunction();
@@ -566,12 +548,11 @@ JsUnitTest.Hamcrest.Matchers.raises = function(exceptionName) {
  *
  * @param {object} matcher Matcher that should be turn into a combinable
  * matcher.
- * @return {JsUnitTest.Hamcrest.CombinableMatcher} 'both' matcher.
+ * @return {JsHamcrest.CombinableMatcher} 'both' matcher.
  */
-JsUnitTest.Hamcrest.Matchers.both = function(matcher) {
-    return new JsUnitTest.Hamcrest.CombinableMatcher({
+JsHamcrest.Matchers.both = function(matcher) {
+    return new JsHamcrest.CombinableMatcher({
         matches: matcher.matches,
-
         describeTo: function(description) {
             description.append('both ').appendDescriptionOf(matcher);
         }
@@ -588,12 +569,11 @@ JsUnitTest.Hamcrest.Matchers.both = function(matcher) {
  *
  * @param {object} matcher Matcher that should be turn into a combinable
  * matcher.
- * @return {JsUnitTest.Hamcrest.CombinableMatcher} 'either' matcher.
+ * @return {JsHamcrest.CombinableMatcher} 'either' matcher.
  */
-JsUnitTest.Hamcrest.Matchers.either = function(matcher) {
-    return new JsUnitTest.Hamcrest.CombinableMatcher({
+JsHamcrest.Matchers.either = function(matcher) {
+    return new JsHamcrest.CombinableMatcher({
         matches: matcher.matches,
-
         describeTo: function(description) {
             description.append('either ').appendDescriptionOf(matcher);
         }
@@ -613,19 +593,19 @@ JsUnitTest.Hamcrest.Matchers.either = function(matcher) {
  * </pre>
  *
  * @param {array} arguments List of delegate matchers.
- * @return {JsUnitTest.Hamcrest.SimpleMatcher} 'allOf' matcher.
+ * @return {JsHamcrest.SimpleMatcher} 'allOf' matcher.
  */
-JsUnitTest.Hamcrest.Matchers.allOf = function() {
+JsHamcrest.Matchers.allOf = function() {
     var args = arguments;
     if (args[0] instanceof Array) {
         args = args[0];
     }
-    return new JsUnitTest.Hamcrest.SimpleMatcher({
+    return new JsHamcrest.SimpleMatcher({
         matches: function(actual) {
             for (var i = 0; i < args.length; i++) {
                 var matcher = args[i];
-                if (!JsUnitTest.Hamcrest.isMatcher(matcher)) {
-                    matcher = JsUnitTest.Hamcrest.Matchers.equalTo(matcher);
+                if (!JsHamcrest.isMatcher(matcher)) {
+                    matcher = JsHamcrest.Matchers.equalTo(matcher);
                 }
                 if (!matcher.matches(actual)) {
                     return false;
@@ -650,19 +630,19 @@ JsUnitTest.Hamcrest.Matchers.allOf = function() {
  * </pre>
  *
  * @param {array} arguments List of delegate matchers.
- * @return {JsUnitTest.Hamcrest.SimpleMatcher} 'anyOf' matcher.
+ * @return {JsHamcrest.SimpleMatcher} 'anyOf' matcher.
  */
-JsUnitTest.Hamcrest.Matchers.anyOf = function() {
+JsHamcrest.Matchers.anyOf = function() {
     var args = arguments;
     if (args[0] instanceof Array) {
         args = args[0];
     }
-    return new JsUnitTest.Hamcrest.SimpleMatcher({
+    return new JsHamcrest.SimpleMatcher({
         matches: function(actual) {
             for (var i = 0; i < args.length; i++) {
                 var matcher = args[i];
-                if (!JsUnitTest.Hamcrest.isMatcher(matcher)) {
-                    matcher = JsUnitTest.Hamcrest.Matchers.equalTo(matcher);
+                if (!JsHamcrest.isMatcher(matcher)) {
+                    matcher = JsHamcrest.Matchers.equalTo(matcher);
                 }
                 if (matcher.matches(actual)) {
                     return true;
@@ -689,10 +669,10 @@ JsUnitTest.Hamcrest.Matchers.anyOf = function() {
  * </pre>
  *
  * @param {number} threshold Threshold number.
- * @return {JsUnitTest.Hamcrest.SimpleMatcher} 'greaterThan' matcher.
+ * @return {JsHamcrest.SimpleMatcher} 'greaterThan' matcher.
  */
-JsUnitTest.Hamcrest.Matchers.greaterThan = function(threshold) {
-    return new JsUnitTest.Hamcrest.SimpleMatcher({
+JsHamcrest.Matchers.greaterThan = function(threshold) {
+    return new JsHamcrest.SimpleMatcher({
         matches: function(actual) {
             return actual > threshold;
         },
@@ -712,10 +692,10 @@ JsUnitTest.Hamcrest.Matchers.greaterThan = function(threshold) {
  * </pre>
  *
  * @param {number} threshold Threshold number.
- * @return {JsUnitTest.Hamcrest.SimpleMatcher} 'greaterThanOrEqualTo' matcher.
+ * @return {JsHamcrest.SimpleMatcher} 'greaterThanOrEqualTo' matcher.
  */
-JsUnitTest.Hamcrest.Matchers.greaterThanOrEqualTo = function(threshold) {
-    return new JsUnitTest.Hamcrest.SimpleMatcher({
+JsHamcrest.Matchers.greaterThanOrEqualTo = function(threshold) {
+    return new JsHamcrest.SimpleMatcher({
         matches: function(actual) {
             return actual >= threshold;
         },
@@ -735,10 +715,10 @@ JsUnitTest.Hamcrest.Matchers.greaterThanOrEqualTo = function(threshold) {
  * </pre>
  *
  * @param {number} threshold Threshold number.
- * @return {JsUnitTest.Hamcrest.SimpleMatcher} 'lessThan' matcher.
+ * @return {JsHamcrest.SimpleMatcher} 'lessThan' matcher.
  */
-JsUnitTest.Hamcrest.Matchers.lessThan = function(threshold) {
-    return new JsUnitTest.Hamcrest.SimpleMatcher({
+JsHamcrest.Matchers.lessThan = function(threshold) {
+    return new JsHamcrest.SimpleMatcher({
         matches: function(actual) {
             return actual < threshold;
         },
@@ -758,10 +738,10 @@ JsUnitTest.Hamcrest.Matchers.lessThan = function(threshold) {
  * </pre>
  *
  * @param {number} threshold Threshold number.
- * @return {JsUnitTest.Hamcrest.SimpleMatcher} 'lessThanOrEqualTo' matcher.
+ * @return {JsHamcrest.SimpleMatcher} 'lessThanOrEqualTo' matcher.
  */
-JsUnitTest.Hamcrest.Matchers.lessThanOrEqualTo = function(threshold) {
-    return new JsUnitTest.Hamcrest.SimpleMatcher({
+JsHamcrest.Matchers.lessThanOrEqualTo = function(threshold) {
+    return new JsHamcrest.SimpleMatcher({
         matches: function(actual) {
             return actual <= threshold;
         },
@@ -779,10 +759,10 @@ JsUnitTest.Hamcrest.Matchers.lessThanOrEqualTo = function(threshold) {
  * assertThat(Math.sqrt(-1), notANumber());
  * </pre>
  *
- * @return {JsUnitTest.Hamcrest.SimpleMatcher} 'notANumber' matcher.
+ * @return {JsHamcrest.SimpleMatcher} 'notANumber' matcher.
  */
-JsUnitTest.Hamcrest.Matchers.notANumber = function() {
-    return new JsUnitTest.Hamcrest.SimpleMatcher({
+JsHamcrest.Matchers.notANumber = function() {
+    return new JsHamcrest.SimpleMatcher({
         matches: function(actual) {
             return isNaN(actual);
         },
@@ -800,10 +780,10 @@ JsUnitTest.Hamcrest.Matchers.notANumber = function() {
  * assertThat(4, even());
  * </pre>
  *
- * @return {JsUnitTest.Hamcrest.SimpleMatcher} 'even' matcher.
+ * @return {JsHamcrest.SimpleMatcher} 'even' matcher.
  */
-JsUnitTest.Hamcrest.Matchers.even = function() {
-    return new JsUnitTest.Hamcrest.SimpleMatcher({
+JsHamcrest.Matchers.even = function() {
+    return new JsHamcrest.SimpleMatcher({
         matches: function(actual) {
             return actual % 2 == 0;
         },
@@ -821,10 +801,10 @@ JsUnitTest.Hamcrest.Matchers.even = function() {
  * assertThat(3, odd());
  * </pre>
  *
- * @return {JsUnitTest.Hamcrest.SimpleMatcher} 'odd' matcher.
+ * @return {JsHamcrest.SimpleMatcher} 'odd' matcher.
  */
-JsUnitTest.Hamcrest.Matchers.odd = function() {
-    return new JsUnitTest.Hamcrest.SimpleMatcher({
+JsHamcrest.Matchers.odd = function() {
+    return new JsHamcrest.SimpleMatcher({
         matches: function(actual) {
             return actual % 2 != 0;
         },
@@ -843,10 +823,10 @@ JsUnitTest.Hamcrest.Matchers.odd = function() {
  * </pre>
  *
  * @param {number} number Range start.
- * @return {JsUnitTest.Hamcrest.RangeMatcherBuilder} 'between' matcher.
+ * @return {JsHamcrest.RangeMatcherBuilder} 'between' matcher.
  */
-JsUnitTest.Hamcrest.Matchers.between = function(number) {
-    return new JsUnitTest.Hamcrest.RangeMatcherBuilder({
+JsHamcrest.Matchers.between = function(number) {
+    return new JsHamcrest.RangeMatcherBuilder({
         start: number
     });
 };
@@ -859,7 +839,7 @@ JsUnitTest.Hamcrest.Matchers.between = function(number) {
  * @param {object} param Configuration object.
  * @param {number} param.start Range start.
  */
-JsUnitTest.Hamcrest.RangeMatcherBuilder = function(params) {
+JsHamcrest.RangeMatcherBuilder = function(params) {
     params = params || {};
 
     /**
@@ -873,7 +853,7 @@ JsUnitTest.Hamcrest.RangeMatcherBuilder = function(params) {
     /**
      * Finishes to build the range matcher.
      * @param {number} end Range end.
-     * @return {JsUnitTest.Hamcrest.SimpleMatcher} Range matcher.
+     * @return {JsHamcrest.SimpleMatcher} Range matcher.
      */
     this.and = function(end) {
         var greater = end;
@@ -884,9 +864,9 @@ JsUnitTest.Hamcrest.RangeMatcherBuilder = function(params) {
             lesser = end;
         }
 
-        return new JsUnitTest.Hamcrest.Matchers.allOf(
-            JsUnitTest.Hamcrest.Matchers.greaterThanOrEqualTo(lesser),
-            JsUnitTest.Hamcrest.Matchers.lessThanOrEqualTo(greater)
+        return new JsHamcrest.Matchers.allOf(
+            JsHamcrest.Matchers.greaterThanOrEqualTo(lesser),
+            JsHamcrest.Matchers.lessThanOrEqualTo(greater)
         );
     }
 };
@@ -903,10 +883,10 @@ JsUnitTest.Hamcrest.RangeMatcherBuilder = function(params) {
  * </pre>
  *
  * @param {string} String.
- * @return {JsUnitTest.Hamcrest.SimpleMatcher} 'equalIgnoringCase' matcher.
+ * @return {JsHamcrest.SimpleMatcher} 'equalIgnoringCase' matcher.
  */
-JsUnitTest.Hamcrest.Matchers.equalIgnoringCase = function(str) {
-    return new JsUnitTest.Hamcrest.SimpleMatcher({
+JsHamcrest.Matchers.equalIgnoringCase = function(str) {
+    return new JsHamcrest.SimpleMatcher({
         matches: function(actual) {
             return actual.toUpperCase() == str.toUpperCase();
         },
@@ -926,10 +906,10 @@ JsUnitTest.Hamcrest.Matchers.equalIgnoringCase = function(str) {
  * </pre>
  *
  * @param {string} String.
- * @return {JsUnitTest.Hamcrest.SimpleMatcher} 'containsString' matcher.
+ * @return {JsHamcrest.SimpleMatcher} 'containsString' matcher.
  */
-JsUnitTest.Hamcrest.Matchers.containsString = function(str) {
-    return new JsUnitTest.Hamcrest.SimpleMatcher({
+JsHamcrest.Matchers.containsString = function(str) {
+    return new JsHamcrest.SimpleMatcher({
         matches: function(actual) {
             return actual.indexOf(str) >= 0;
         },
@@ -948,10 +928,10 @@ JsUnitTest.Hamcrest.Matchers.containsString = function(str) {
  * </pre>
  *
  * @param {string} String.
- * @return {JsUnitTest.Hamcrest.SimpleMatcher} 'startsWith' matcher.
+ * @return {JsHamcrest.SimpleMatcher} 'startsWith' matcher.
  */
-JsUnitTest.Hamcrest.Matchers.startsWith = function(str) {
-    return new JsUnitTest.Hamcrest.SimpleMatcher({
+JsHamcrest.Matchers.startsWith = function(str) {
+    return new JsHamcrest.SimpleMatcher({
         matches: function(actual) {
             return actual.indexOf(str) == 0;
         },
@@ -970,10 +950,10 @@ JsUnitTest.Hamcrest.Matchers.startsWith = function(str) {
  * </pre>
  *
  * @param {string} String.
- * @return {JsUnitTest.Hamcrest.SimpleMatcher} 'endsWith' matcher.
+ * @return {JsHamcrest.SimpleMatcher} 'endsWith' matcher.
  */
-JsUnitTest.Hamcrest.Matchers.endsWith = function(str) {
-    return new JsUnitTest.Hamcrest.SimpleMatcher({
+JsHamcrest.Matchers.endsWith = function(str) {
+    return new JsHamcrest.SimpleMatcher({
         matches: function(actual) {
             return actual.lastIndexOf(str) + str.length == actual.length;
         },
@@ -992,10 +972,10 @@ JsUnitTest.Hamcrest.Matchers.endsWith = function(str) {
  * </pre>
  *
  * @param {RegExp} regex Regular expression literal.
- * @return {JsUnitTest.Hamcrest.SimpleMatcher} 'matches' matcher.
+ * @return {JsHamcrest.SimpleMatcher} 'matches' matcher.
  */
-JsUnitTest.Hamcrest.Matchers.matches = function(regex) {
-    return new JsUnitTest.Hamcrest.SimpleMatcher({
+JsHamcrest.Matchers.matches = function(regex) {
+    return new JsHamcrest.SimpleMatcher({
         matches: function(actual) {
             return regex.test(actual);
         },
@@ -1019,10 +999,10 @@ JsUnitTest.Hamcrest.Matchers.matches = function(regex) {
  * </pre>
  *
  * @param {string} memberName Member name.
- * @return {JsUnitTest.Hamcrest.SimpleMatcher} 'hasMember' matcher.
+ * @return {JsHamcrest.SimpleMatcher} 'hasMember' matcher.
  */
-JsUnitTest.Hamcrest.Matchers.hasMember = function(memberName) {
-    return new JsUnitTest.Hamcrest.SimpleMatcher({
+JsHamcrest.Matchers.hasMember = function(memberName) {
+    return new JsHamcrest.SimpleMatcher({
         matches: function(actual) {
             try {
                 return memberName in actual;
@@ -1044,10 +1024,10 @@ JsUnitTest.Hamcrest.Matchers.hasMember = function(memberName) {
  * </pre>
  *
  * @param {string} property Property name.
- * @return {JsUnitTest.Hamcrest.SimpleMatcher} 'hasFunction' matcher.
+ * @return {JsHamcrest.SimpleMatcher} 'hasFunction' matcher.
  */
-JsUnitTest.Hamcrest.Matchers.hasFunction = function(functionName) {
-    return new JsUnitTest.Hamcrest.SimpleMatcher({
+JsHamcrest.Matchers.hasFunction = function(functionName) {
+    return new JsHamcrest.SimpleMatcher({
         matches: function(actual) {
             try {
                 return functionName in actual && 
@@ -1070,21 +1050,115 @@ JsUnitTest.Hamcrest.Matchers.hasFunction = function(functionName) {
  * </pre>
  *
  * @param {function} clazz Constructor function.
- * @return {JsUnitTest.Hamcrest.SimpleMatcher} 'instanceOf' matcher.
+ * @return {JsHamcrest.SimpleMatcher} 'instanceOf' matcher.
  */
-JsUnitTest.Hamcrest.Matchers.instanceOf = function(clazz) {
-    return new JsUnitTest.Hamcrest.SimpleMatcher({
+JsHamcrest.Matchers.instanceOf = function(clazz) {
+    return new JsHamcrest.SimpleMatcher({
         matches: function(actual) {
             return !!(actual instanceof clazz);
         },
 
         describeTo: function(description) {
-            var className = clazz.name ? clazz.name : 'a class';
+            var className = clazz.name ? clazz.name : 'something else';
             description.append('instance of ').append(className);
         }
     });
 };
 
+/**
+ * Asserts that the actual object is of the specified type. Ex: <p>
+ *
+ * <pre>
+ * assertThat("text", typeOf("string"));
+ * </pre>
+ *
+ * @param {function} typeName Type name.
+ * @return {JsHamcrest.SimpleMatcher} 'instanceOf' matcher.
+ */
+JsHamcrest.Matchers.typeOf = function(typeName) {
+    return new JsHamcrest.SimpleMatcher({
+        matches: function(actual) {
+            return (typeof actual == typeName);
+        },
+
+        describeTo: function(description) {
+            description.append('typeof ').append('"').append(typeName)
+                    .append('"');
+        }
+    });
+};
+
+/**
+ * Asserts that the actual value is an object. Ex: <p>
+ *
+ * <pre>
+ * assertThat({}, object());
+ * assertThat(10, not(object()));
+ * </pre>
+ *
+ * @return {JsHamcrest.SimpleMatcher} 'object' matcher.
+ */
+JsHamcrest.Matchers.object = function() {
+    return new JsHamcrest.Matchers.instanceOf(Object);
+};
+
+/**
+ * Asserts that the actual value is a string. Ex: <p>
+ *
+ * <pre>
+ * assertThat("text", string());
+ * assertThat(10, not(string()));
+ * <pre>
+ *
+ * @return {JsHamcrest.SimpleMatcher} 'string' matcher.
+ */
+JsHamcrest.Matchers.string = function() {
+    return new JsHamcrest.Matchers.typeOf('string');
+};
+
+/**
+ * Asserts that the actual value is a number. Ex: <p>
+ *
+ * <pre>
+ * assertThat(10, number());
+ * assertThat(10.0, number());
+ * assertThat("text", not(number()));
+ * </pre>
+ *
+ * @return {JsHamcrest.SimpleMatcher} 'number' matcher.
+ */
+JsHamcrest.Matchers.number = function() {
+    return new JsHamcrest.Matchers.typeOf('number');
+};
+
+/**
+ * Asserts that the actual value is a boolean. Ex: <p>
+ *
+ * <pre>
+ * assertThat(true, bool());
+ * assertThat(false, bool());
+ * assertThat("text" not(bool()));
+ * <pre>
+ *
+ * @return {JsHamcrest.SimpleMatcher} 'bool' matcher.
+ */
+JsHamcrest.Matchers.bool = function() {
+    return new JsHamcrest.Matchers.typeOf('boolean');
+};
+
+/**
+ * Asserts that the actual object is a function. Ex: <p>
+ *
+ * <pre>
+ * assertThat(function() {}, func());
+ * assertThat("text", not(func()));
+ * </pre>
+ *
+ * @return {JsHamcrest.SimpleMatcher} 'func' matcher.
+ */
+JsHamcrest.Matchers.func = function() {
+    return new JsHamcrest.Matchers.typeOf('function');
+};
 /**
  * @fileOverview Provides collection-related matchers.
  */
@@ -1099,15 +1173,15 @@ JsUnitTest.Hamcrest.Matchers.instanceOf = function(clazz) {
  * </pre>
  *
  * @param {array} matcher Number or matcher.
- * @return {JsUnitTest.Hamcrest.SimpleMatcher} 'hasItem' matcher.
+ * @return {JsHamcrest.SimpleMatcher} 'hasItem' matcher.
  */
-JsUnitTest.Hamcrest.Matchers.hasItem = function(matcher) {
+JsHamcrest.Matchers.hasItem = function(matcher) {
     // Uses 'equalTo' matcher if the given object is not a matcher
-    if (!JsUnitTest.Hamcrest.isMatcher(matcher)) {
-        matcher = JsUnitTest.Hamcrest.Matchers.equalTo(matcher);
+    if (!JsHamcrest.isMatcher(matcher)) {
+        matcher = JsHamcrest.Matchers.equalTo(matcher);
     }
 
-    return new JsUnitTest.Hamcrest.SimpleMatcher({
+    return new JsHamcrest.SimpleMatcher({
         matches: function(actual) {
             // Should be an array
             if (!(actual instanceof Array)) {
@@ -1139,14 +1213,14 @@ JsUnitTest.Hamcrest.Matchers.hasItem = function(matcher) {
  * </pre>
  *
  * @param {object...} arguments Values or matchers.
- * @return {JsUnitTest.Hamcrest.SimpleMatcher} 'hasItems' matcher.
+ * @return {JsHamcrest.SimpleMatcher} 'hasItems' matcher.
  */
-JsUnitTest.Hamcrest.Matchers.hasItems = function() {
+JsHamcrest.Matchers.hasItems = function() {
     var items = [];
     for (var i = 0; i < arguments.length; i++) {
-        items.push(JsUnitTest.Hamcrest.Matchers.hasItem(arguments[i]));
+        items.push(JsHamcrest.Matchers.hasItem(arguments[i]));
     }
-    return JsUnitTest.Hamcrest.Matchers.allOf(items);
+    return JsHamcrest.Matchers.allOf(items);
 };
 
 /**
@@ -1157,17 +1231,17 @@ JsUnitTest.Hamcrest.Matchers.hasItems = function() {
  * assertThat(1, isIn(1,2,3));
  * </pre>
  *
- * @return {JsUnitTest.Hamcrest.SimpleMatcher} 'isIn' matcher.
+ * @return {JsHamcrest.SimpleMatcher} 'isIn' matcher.
  */
-JsUnitTest.Hamcrest.Matchers.isIn = function() {
-    var equalTo = JsUnitTest.Hamcrest.Matchers.equalTo;
+JsHamcrest.Matchers.isIn = function() {
+    var equalTo = JsHamcrest.Matchers.equalTo;
 
     var args = arguments;
     if (args[0] instanceof Array) {
         args = args[0];
     }
 
-    return new JsUnitTest.Hamcrest.SimpleMatcher({
+    return new JsHamcrest.SimpleMatcher({
         matches: function(actual) {
             for (var i = 0; i < args.length; i++) {
                 if (equalTo(args[i]).matches(actual)) {
@@ -1192,9 +1266,9 @@ JsUnitTest.Hamcrest.Matchers.isIn = function() {
  * </pre>
  *
  * @function
- * @return {JsUnitTest.Hamcrest.SimpleMatcher} 'oneOf' matcher.
+ * @return {JsHamcrest.SimpleMatcher} 'oneOf' matcher.
  */
-JsUnitTest.Hamcrest.Matchers.oneOf = JsUnitTest.Hamcrest.Matchers.isIn;
+JsHamcrest.Matchers.oneOf = JsHamcrest.Matchers.isIn;
 
 /**
  * The actual value should be an array and it must be empty to be sucessful.
@@ -1204,10 +1278,10 @@ JsUnitTest.Hamcrest.Matchers.oneOf = JsUnitTest.Hamcrest.Matchers.isIn;
  * assertThat([], empty());
  * </pre>
  *
- * @return {JsUnitTest.Hamcrest.SimpleMatcher} 'empty' matcher.
+ * @return {JsHamcrest.SimpleMatcher} 'empty' matcher.
  */
-JsUnitTest.Hamcrest.Matchers.empty = function() {
-    return new JsUnitTest.Hamcrest.SimpleMatcher({
+JsHamcrest.Matchers.empty = function() {
+    return new JsHamcrest.SimpleMatcher({
         matches: function(actual) {
             return actual instanceof Array && actual.length == 0;
         },
@@ -1228,15 +1302,15 @@ JsUnitTest.Hamcrest.Matchers.empty = function() {
  * </pre>
  *
  * @param {object} matcher Number or matcher.
- * @return {JsUnitTest.Hamcrest.SimpleMatcher} 'hasSize' matcher.
+ * @return {JsHamcrest.SimpleMatcher} 'hasSize' matcher.
  */
-JsUnitTest.Hamcrest.Matchers.hasSize = function(matcher) {
+JsHamcrest.Matchers.hasSize = function(matcher) {
     // Uses 'equalTo' matcher if the given object is not a matcher
-    if (!JsUnitTest.Hamcrest.isMatcher(matcher)) {
-        matcher = JsUnitTest.Hamcrest.Matchers.equalTo(matcher);
+    if (!JsHamcrest.isMatcher(matcher)) {
+        matcher = JsHamcrest.Matchers.equalTo(matcher);
     }
 
-    return new JsUnitTest.Hamcrest.SimpleMatcher({
+    return new JsHamcrest.SimpleMatcher({
         matches: function(actual) {
             return actual instanceof Array && matcher.matches(actual.length);
         },
@@ -1248,10 +1322,50 @@ JsUnitTest.Hamcrest.Matchers.hasSize = function(matcher) {
 };
 
 /**
- * @fileOverview Executes the code that installs the built-in
- * matchers to JsUnitTest.
+ * @fileOverview Methods to allow integration to major JavaScript testing
+ * frameworks.
  */
 
-// Install built-in matchers
-JsUnitTest.Hamcrest.installMatchers(JsUnitTest.Hamcrest.Matchers);
+/**
+ * Methods to integrate JsHamcrest to major JavaScript testing frameworks.
+ * @namespace
+ */
+JsHamcrest.Integration = {
+
+    /**
+     * JsUnitTest integration.
+     */
+    JsUnitTest: function() {
+        var source = JsHamcrest.Matchers;
+        var target = JsUnitTest.Unit.Testcase.prototype;
+
+        // Add assertions to test case
+        for (method in source) {
+            target[method] = source[method];
+        }
+
+        // Add assertion method
+        target.assertThat = JsHamcrest.assertThat;
+    },
+
+    /**
+     * YUITest integration.
+     */
+    YUITest: function() {
+        var source = JsHamcrest.Matchers;
+        var target = YAHOO.tool.TestCase.prototype;
+
+        // Add assertions to test case
+        for (method in source) {
+            target[method] = source[method];
+        }
+
+        // Add assertion method
+        target.Assert = YAHOO.util.Assert;
+        YAHOO.util.Assert.that = JsHamcrest.assertThat;
+
+        // Dumb testCase.pass() implementation
+        target.Assert.pass = function() { };
+    }
+};
 
