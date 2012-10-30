@@ -18,7 +18,7 @@ $('document').ready(function() {
  */
 function getRandomChar(randomizer) {
     return String.fromCharCode(randomizer.next(new Hybrid.Util.Range(97, 123)));
-};
+}
 
 /*
  * Factory used to create random words.
